@@ -1,3 +1,4 @@
+/* eslint-disable prettier/prettier */
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import {
   Outlet,
@@ -7,6 +8,8 @@ import {
   HeadContent,
   Scripts,
 } from "@tanstack/react-router";
+import { useState } from "react";
+import { SplashScreen } from "../components/portfolio/SplashScreen"; // Correct path
 
 import appCss from "../styles.css?url";
 
@@ -72,14 +75,13 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Jack — 3D Creator" },
-      { name: "description", content: "Jack — 3D Creator portfolio" },
-      { name: "author", content: "Lovable" },
-      { property: "og:title", content: "Jack — 3D Creator" },
-      { property: "og:description", content: "Jack — 3D Creator portfolio" },
+      { title: "Crewholic — Creative Digital Agency" },
+      { name: "description", content: "Premium digital services + Professional equipment rental" },
+      { name: "author", content: "Crewholic" },
+      { property: "og:title", content: "Crewholic — Creative Digital Agency" },
+      { property: "og:description", content: "Premium digital services + Professional equipment rental" },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
-      { name: "twitter:site", content: "@Lovable" },
     ],
     links: [
       {
@@ -90,6 +92,10 @@ export const Route = createRootRouteWithContext<{ queryClient: QueryClient }>()(
       {
         rel: "stylesheet",
         href: "https://fonts.googleapis.com/css2?family=Kanit:wght@300;400;500;600;700;800;900&display=swap",
+      },
+      {
+        rel: "stylesheet",
+        href: "https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=Space+Mono:wght@400;700&display=swap",
       },
     ],
   }),
@@ -115,10 +121,20 @@ function RootShell({ children }: { children: React.ReactNode }) {
 
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
+  const [showSplash, setShowSplash] = useState(true);
+
+  const handleSplashComplete = () => {
+    setShowSplash(false);
+  };
 
   return (
-    <QueryClientProvider client={queryClient}>
-      <Outlet />
-    </QueryClientProvider>
+    <>
+      {showSplash && <SplashScreen onDone={handleSplashComplete} showOncePerSession={true} />}
+      {!showSplash && (
+        <QueryClientProvider client={queryClient}>
+          <Outlet />
+        </QueryClientProvider>
+      )}
+    </>
   );
 }

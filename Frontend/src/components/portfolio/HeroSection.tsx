@@ -6,11 +6,10 @@ import { Magnet } from "./Magnet";
 import skr from "./skr.png";
 
 const navItems = [
-  { label: "About", href: "#about" },
-  { label: "Services", href: "/services" },  // Changed to link to services page
-  { label: "Price", href: "#price" },
-  { label: "Projects", href: "#projects" },
-  { label: "Contact", href: "#contact" },
+  { label: "About", href: "/about" },
+  { label: "Services", href: "/service" },  // Changed to link to services page
+  { label: "Portfolio", href: "/portfolio" },
+  { label: "Contact", href: "/contact" },
 ];
 
 export function HeroSection() {

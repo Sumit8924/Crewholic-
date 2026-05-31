@@ -1,3 +1,4 @@
+/* eslint-disable prettier/prettier */
 import { FadeIn } from "./FadeIn";
 import { AnimatedText } from "./AnimatedText";
 import { ContactButton } from "./ContactButton";

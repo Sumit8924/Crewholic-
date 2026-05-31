@@ -154,6 +154,75 @@ app.get("/", (req, res) => {
     res.send("🚀 Backend Running Successfully with Brevo API + Google Login + Auto Excel");
 });
 
+app.post("/api/service-inquiry", async (req, res) => {
+    try {
+        const {
+            service,
+            timeline,
+            name,
+            mobile,
+            email,
+            requirements,
+        } = req.body;
+
+        if (!service || !name || !mobile || !email || !requirements) {
+            return res.status(400).json({
+                msg: "All fields are required",
+            });
+        }
+
+        await sendEmail(
+            "officialcrewholic@gmail.com",
+            `📩 New Service Inquiry - ${service}`,
+            `
+            <div style="font-family: Arial, sans-serif; padding: 20px;">
+                <h2 style="color:#9B51E0;">New Service Inquiry</h2>
+
+                <p><strong>Service:</strong> ${service}</p>
+                <p><strong>Timeline:</strong> ${timeline || "Not specified"}</p>
+
+                <hr/>
+
+                <p><strong>Name:</strong> ${name}</p>
+                <p><strong>Mobile:</strong> ${mobile}</p>
+                <p><strong>Email:</strong> ${email}</p>
+
+                <p><strong>Requirements:</strong></p>
+                <p style="background:#f2f2f2; padding:15px; border-radius:10px;">
+                    ${requirements}
+                </p>
+
+                <br/>
+                <p>Admin please review and approve this inquiry.</p>
+            </div>
+            `
+        );
+
+        await sendEmail(
+            email,
+            "✅ Your CREWHOLIC Inquiry Received",
+            `
+            <div style="font-family: Arial, sans-serif; background:#0a0a2a; padding:30px; color:#fff;">
+                <div style="max-width:600px; margin:auto; background:#111328; border-radius:20px; padding:30px; text-align:center;">
+                    <h1 style="color:#F2994A;">Thank You, ${name}!</h1>
+                    <p>Your inquiry for <b>${service}</b> has been received.</p>
+                    <p>Our admin team will review and contact you soon.</p>
+                </div>
+            </div>
+            `
+        );
+
+        res.json({
+            msg: "Inquiry sent successfully",
+        });
+    } catch (err) {
+        res.status(500).json({
+            msg: "Failed to send inquiry",
+            error: err.response?.body || err.message,
+        });
+    }
+});
+
 app.get("/api/generate-excel", async (req, res) => {
     await safeGenerateExcel();
 
@@ -535,25 +604,6 @@ app.post("/api/auth/google", async (req, res) => {
             });
 
             await safeGenerateExcel();
-
-            sendEmail(
-                email,
-                "🎉 Welcome to CREWHOLIC",
-                `
-                <div style="font-family: Arial, sans-serif; background: #0a0a2a; padding: 30px; color: #fff;">
-                    <div style="max-width: 600px; margin: auto; background: #111328; border-radius: 20px; padding: 30px; text-align: center;">
-                        <h1 style="color: #9B51E0;">Welcome, ${name} 🚀</h1>
-                        <p>Your Google login account has been created successfully.</p>
-                    </div>
-                </div>
-                `
-            ).catch((err) => {
-                console.log("⚠️ Google welcome email failed:", err.response?.body || err.message);
-            });
-        } else if (!user.authProvider) {
-            user.authProvider = "local";
-            await user.save();
-            await safeGenerateExcel();
         }
 
         const token = jwt.sign(
@@ -911,11 +961,11 @@ app.get("/api/excel-data", async (req, res) => {
         res.json({
             users,
             orders,
-            lastUpdated: new Date()
+            lastUpdated: new Date(),
         });
     } catch (error) {
         res.status(500).json({
-            message: error.message
+            message: error.message,
         });
     }
 });
