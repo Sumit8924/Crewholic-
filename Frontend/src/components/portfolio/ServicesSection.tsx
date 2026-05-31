@@ -4,28 +4,28 @@ import { FadeIn } from "./FadeIn";
 const SERVICES = [
   {
     n: "01",
-    name: "3D Modeling",
-    desc: "Creation of detailed objects, characters, or environments tailored to specific client needs, ideal for games, products, and visualizations.",
+    name: "Web Development",
+    desc: "Custom websites, e-commerce solutions, and web applications built with modern technologies for optimal performance.",
   },
   {
     n: "02",
-    name: "Rendering",
-    desc: "High-quality, photorealistic renders that showcase designs with custom lighting, textures, and materials to bring concepts to life.",
+    name: "Digital Marketing",
+    desc: "Strategic digital marketing solutions to boost your online presence, drive engagement, and maximize ROI.",
   },
   {
     n: "03",
-    name: "Motion Design",
-    desc: "Dynamic animations and motion graphics that add energy and storytelling to brands, products, and digital experiences.",
+    name: "Event Management",
+    desc: "End-to-end event planning and execution for corporate events, conferences, weddings, and special occasions.",
   },
   {
     n: "04",
-    name: "Branding",
-    desc: "Crafting cohesive visual identities — from logos to full brand systems — that communicate a clear and memorable presence.",
+    name: "Rental Equipment",
+    desc: "Professional audio, video, and photography equipment rental for events, productions, and creative projects.",
   },
   {
     n: "05",
-    name: "Web Design",
-    desc: "Designing clean, modern, and conversion-focused websites with attention to layout, typography, and user experience.",
+    name: "Content Creation",
+    desc: " High-quality content creation including video production, photography, motion graphics, copywriting, and social media content that tells your brand's story.",
   },
 ];
 

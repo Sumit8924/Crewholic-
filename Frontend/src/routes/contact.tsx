@@ -466,7 +466,7 @@ function ContactPage() {
                     transition={{ duration: 0.6, delay: 0.1 }}
                     className="relative z-10 hidden md:flex items-center gap-8"
                 >
-                    {["About", "Services", "Price", "Projects", "Contact"].map((item) => (
+                    {["About", "Services", "Projects", "Contact"].map((item) => (
                         <a
                             key={item}
                             href={item === "Services" ? "/service" : item === "Projects" ? "/portfolio" : `/${item.toLowerCase()}`}

@@ -7,7 +7,7 @@ import skr from "./skr.png";
 
 const navItems = [
   { label: "About", href: "/about" },
-  { label: "Services", href: "/service" },  // Changed to link to services page
+  { label: "Services", href: "/service" },
   { label: "Portfolio", href: "/portfolio" },
   { label: "Contact", href: "/contact" },
 ];
@@ -15,6 +15,7 @@ const navItems = [
 export function HeroSection() {
   const [isLoggedIn, setIsLoggedIn] = useState(false);
   const [userName, setUserName] = useState("");
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
   useEffect(() => {
     const token = localStorage.getItem("token");
@@ -40,13 +41,80 @@ export function HeroSection() {
     window.location.href = "/";
   };
 
+  const handleNavClick = (href: string) => {
+    setMobileMenuOpen(false);
+    window.location.href = href;
+  };
+
   return (
     <section className="relative h-screen flex flex-col" style={{ overflowX: "clip" }}>
+      {/* Mobile Menu Button */}
+      <button
+        onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+        className="fixed top-4 right-4 z-50 md:hidden w-10 h-10 flex flex-col items-center justify-center gap-1.5 bg-black/50 backdrop-blur-md rounded-lg border border-white/10"
+        aria-label="Menu"
+      >
+        <span className={`w-5 h-0.5 bg-white transition-all duration-300 ${mobileMenuOpen ? 'rotate-45 translate-y-2' : ''}`} />
+        <span className={`w-5 h-0.5 bg-white transition-all duration-300 ${mobileMenuOpen ? 'opacity-0' : ''}`} />
+        <span className={`w-5 h-0.5 bg-white transition-all duration-300 ${mobileMenuOpen ? '-rotate-45 -translate-y-2' : ''}`} />
+      </button>
+
+      {/* Mobile Menu Overlay */}
+      {mobileMenuOpen && (
+        <div 
+          className="fixed inset-0 z-40 bg-black/95 backdrop-blur-xl md:hidden"
+          onClick={() => setMobileMenuOpen(false)}
+        >
+          <div className="flex flex-col items-center justify-center h-full gap-6 px-6">
+            {navItems.map((item) => (
+              <button
+                key={item.label}
+                onClick={() => handleNavClick(item.href)}
+                className="text-2xl font-medium uppercase tracking-wider hover:text-[#ff6a00] transition-colors duration-200"
+                style={{ color: "#D7E2EA" }}
+              >
+                {item.label}
+              </button>
+            ))}
+            
+            {isLoggedIn ? (
+              <div className="flex flex-col items-center gap-4 mt-4 pt-4 border-t border-white/20 w-full max-w-xs">
+                <div className="text-center">
+                  <p className="text-sm text-gray-400">Signed in as</p>
+                  <p className="text-lg font-semibold text-white">{userName}</p>
+                </div>
+                <button
+                  onClick={() => handleNavClick("/dashboard")}
+                  className="w-full py-2 text-center text-white bg-purple-600/50 rounded-lg hover:bg-purple-600 transition-colors"
+                >
+                  Dashboard
+                </button>
+                <button
+                  onClick={handleLogout}
+                  className="w-full py-2 text-center text-red-400 border border-red-400/30 rounded-lg hover:bg-red-600/20 transition-colors"
+                >
+                  Logout
+                </button>
+              </div>
+            ) : (
+              <button
+                onClick={() => handleNavClick("/login")}
+                className="mt-4 text-2xl font-medium uppercase tracking-wider hover:text-[#ff6a00] transition-colors duration-200"
+                style={{ color: "#D7E2EA" }}
+              >
+                Signup/Login
+              </button>
+            )}
+          </div>
+        </div>
+      )}
+
+      {/* Desktop Navigation */}
       <FadeIn
         as="nav"
         delay={0}
         y={-20}
-        className="flex justify-between px-6 md:px-10 pt-6 md:pt-8"
+        className="hidden md:flex justify-between px-6 md:px-10 pt-6 md:pt-8"
       >
         {navItems.map((item) => (
           <a
@@ -66,7 +134,7 @@ export function HeroSection() {
               style={{ color: "#D7E2EA" }}
             >
               <span>👋</span>
-              {userName.split(' ')[0]}
+              <span className="max-w-[100px] truncate">{userName.split(' ')[0]}</span>
               <svg className="w-4 h-4 ml-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
               </svg>
@@ -76,7 +144,7 @@ export function HeroSection() {
               <div className="py-2">
                 <div className="px-4 py-2 border-b border-white/10">
                   <p className="text-sm text-gray-300">Signed in as</p>
-                  <p className="text-sm font-semibold text-white">{userName}</p>
+                  <p className="text-sm font-semibold text-white truncate">{userName}</p>
                 </div>
                 <button
                   onClick={() => window.location.href = "/dashboard"}
@@ -107,7 +175,14 @@ export function HeroSection() {
       <div className="flex-1 flex flex-col justify-between relative">
         <div className="overflow-hidden mt-6 sm:mt-4 md:-mt-5">
           <FadeIn delay={0.15} y={40}>
-            <h1 className="hero-heading font-black uppercase tracking-tight leading-none whitespace-nowrap w-full text-center text-[14vw] sm:text-[15vw] md:text-[16vw] lg:text-[17.5vw]">
+            <h1 
+              className="hero-heading font-black uppercase tracking-tight leading-none w-full text-center px-4"
+              style={{ 
+                fontSize: "clamp(3.5rem, 12vw, 17.5vw)",
+                wordBreak: "break-word",
+                whiteSpace: "normal"
+              }}
+            >
               CREWHOLIC
             </h1>
           </FadeIn>
@@ -116,7 +191,7 @@ export function HeroSection() {
         <FadeIn
           delay={0.6}
           y={30}
-          className="absolute left-1/2 -translate-x-1/2 z-10 w-[280px] sm:w-[360px] md:w-[440px] lg:w-[520px] top-1/2 -translate-y-1/2 sm:top-auto sm:translate-y-0 sm:bottom-0"
+          className="absolute left-1/2 -translate-x-1/2 z-10 w-[180px] sm:w-[280px] md:w-[360px] lg:w-[440px] xl:w-[520px] top-1/2 -translate-y-1/2 sm:top-auto sm:translate-y-0 sm:bottom-0"
         >
           <Magnet
             padding={150}
@@ -124,19 +199,19 @@ export function HeroSection() {
             activeTransition="transform 0.3s ease-out"
             inactiveTransition="transform 0.6s ease-in-out"
           >
-          <img
-            src={skr}
-            alt="Creholic logo"
-            className="w-full h-auto"
-          />
+            <img
+              src={skr}
+              alt="Creholic logo"
+              className="w-full h-auto"
+            />
           </Magnet>
         </FadeIn>
 
-        <div className="flex justify-between items-end px-6 md:px-10 pb-7 sm:pb-8 md:pb-10 relative z-20">
+        <div className="flex justify-between items-end px-4 sm:px-6 md:px-10 pb-5 sm:pb-7 md:pb-10 relative z-20 gap-4">
           <FadeIn delay={0.35} y={20}>
             <p
-              className="font-light uppercase tracking-wide leading-snug max-w-[160px] sm:max-w-[220px] md:max-w-[260px]"
-              style={{ color: "#D7E2EA", fontSize: "clamp(0.75rem, 1.4vw, 1.5rem)" }}
+              className="font-light uppercase tracking-wide leading-snug max-w-[120px] sm:max-w-[160px] md:max-w-[200px] lg:max-w-[260px] text-[10px] sm:text-xs md:text-sm lg:text-base"
+              style={{ color: "#D7E2EA" }}
             >
               DOMINATE YOUR MARKET DOMINATE YOUR MARKET DIGITAL EXPERIENCES
             </p>
@@ -146,6 +221,9 @@ export function HeroSection() {
           </FadeIn>
         </div>
       </div>
+
+      {/* Mobile Bottom Padding for better spacing on small devices */}
+      <div className="h-4 sm:h-0" />
     </section>
   );
 }

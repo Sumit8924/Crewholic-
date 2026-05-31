@@ -7,7 +7,8 @@ export const Route = createFileRoute("/signup")({
     component: SignupPage,
 });
 
-const API_BASE_URL = "http://localhost:5000/api";
+const API_BASE_URL =
+    import.meta.env.VITE_API_URL || "https://https://crewholic-0jht.onrender.com/api";
 
 function SignupPage() {
     const [showPassword, setShowPassword] = useState(false);

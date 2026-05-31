@@ -8,9 +8,8 @@ import {
   HeadContent,
   Scripts,
 } from "@tanstack/react-router";
-import { useState } from "react";
-import { SplashScreen } from "../components/portfolio/SplashScreen"; // Correct path
-
+import { useState, useEffect } from "react";
+import SplashScreen from "../components/portfolio/SplashScreen";
 import appCss from "../styles.css?url";
 
 function NotFoundComponent() {
@@ -121,20 +120,29 @@ function RootShell({ children }: { children: React.ReactNode }) {
 
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
-  const [showSplash, setShowSplash] = useState(true);
+  // Check if splash screen has already been shown in this session
+  const [hasSeenSplash, setHasSeenSplash] = useState(() => {
+    // Check sessionStorage on initial load
+    if (typeof window !== "undefined") {
+      return sessionStorage.getItem("splashShown") === "true";
+    }
+    return false;
+  });
+  const [showSplash, setShowSplash] = useState(!hasSeenSplash);
 
   const handleSplashComplete = () => {
     setShowSplash(false);
+    // Mark that splash has been shown for this session
+    sessionStorage.setItem("splashShown", "true");
   };
 
   return (
-    <>
-      {showSplash && <SplashScreen onDone={handleSplashComplete} showOncePerSession={true} />}
-      {!showSplash && (
-        <QueryClientProvider client={queryClient}>
-          <Outlet />
-        </QueryClientProvider>
+    <QueryClientProvider client={queryClient}>
+      {showSplash ? (
+        <SplashScreen onDone={handleSplashComplete} showOncePerSession={false} />
+      ) : (
+        <Outlet />
       )}
-    </>
+    </QueryClientProvider>
   );
 }

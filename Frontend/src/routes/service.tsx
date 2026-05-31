@@ -1,7 +1,8 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable prettier/prettier */
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
-import { motion, useMotionValue, useSpring, AnimatePresence } from "framer-motion";
+import { motion, useMotionValue, useSpring, AnimatePresence, useScroll, useTransform } from "framer-motion";
 
 export const Route = createFileRoute("/service")({
     component: ServicePage,
@@ -59,7 +60,7 @@ const services = [
     },
 ];
 
-// Rental Categories (as cards like webdev)
+// Rental Categories
 const rentalCategories = [
     {
         id: "05",
@@ -115,7 +116,6 @@ const rentalCategories = [
     },
 ];
 
-// Combined all cards (services + rental categories)
 const allCards = [...services, ...rentalCategories];
 
 interface ServiceFormData {
@@ -138,37 +138,107 @@ interface RentalFormData {
     requirements: string;
 }
 
+// ─── SCROLL 3D REVEAL wrapper ────────────────────────────────────────────────
+function Scroll3DReveal({
+    children,
+    rotateFrom = [20, 0, 0],
+    translateFrom = [0, 80, -120],
+    scaleFrom = 0.8,
+    className = "",
+}: {
+    children: React.ReactNode;
+    rotateFrom?: [number, number, number];
+    translateFrom?: [number, number, number];
+    scaleFrom?: number;
+    className?: string;
+}) {
+    const ref = useRef<HTMLDivElement>(null);
+    const { scrollYProgress } = useScroll({
+        target: ref,
+        offset: ["start end", "center center"],
+    });
+
+    const rotateX  = useTransform(scrollYProgress, [0, 1], [rotateFrom[0], 0]);
+    const rotateY  = useTransform(scrollYProgress, [0, 1], [rotateFrom[1], 0]);
+    const rotateZ  = useTransform(scrollYProgress, [0, 1], [rotateFrom[2], 0]);
+    const x        = useTransform(scrollYProgress, [0, 1], [translateFrom[0], 0]);
+    const y        = useTransform(scrollYProgress, [0, 1], [translateFrom[1], 0]);
+    const z        = useTransform(scrollYProgress, [0, 1], [translateFrom[2], 0]);
+    const scale    = useTransform(scrollYProgress, [0, 1], [scaleFrom, 1]);
+    const opacity  = useTransform(scrollYProgress, [0, 0.35, 1], [0, 0.6, 1]);
+
+    return (
+        <div ref={ref} className={className} style={{ perspective: "1200px" }}>
+            <motion.div style={{ rotateX, rotateY, rotateZ, x, y, z, scale, opacity }}>
+                {children}
+            </motion.div>
+        </div>
+    );
+}
+
+// ─── SCROLL 3D CARD ──────────────────────────────────────────────────────────
+function Scroll3DCard({
+    children,
+    index = 0,
+    direction = "up",
+}: {
+    children: React.ReactNode;
+    index?: number;
+    direction?: "left" | "right" | "up" | "down";
+}) {
+    const ref = useRef<HTMLDivElement>(null);
+    const { scrollYProgress } = useScroll({
+        target: ref,
+        offset: ["start 95%", "center 55%"],
+    });
+
+    const dirMap: Record<string, [number, number, number, number, number, number]> = {
+        left:  [-8, -15, 3,  -60, 40, -80],
+        right: [-8,  15, -3,  60, 40, -80],
+        up:    [-20,  0, 0,   0, 80, -100],
+        down:  [ 20,  0, 0,   0,-80, -100],
+    };
+    const [frX, frY, frZ, frTX, frTY, frTZ] = dirMap[direction];
+
+    const rotateX = useTransform(scrollYProgress, [0, 1], [frX, 0]);
+    const rotateY = useTransform(scrollYProgress, [0, 1], [frY, 0]);
+    const rotateZ = useTransform(scrollYProgress, [0, 1], [frZ, 0]);
+    const x       = useTransform(scrollYProgress, [0, 1], [frTX, 0]);
+    const y       = useTransform(scrollYProgress, [0, 1], [frTY, 0]);
+    const z       = useTransform(scrollYProgress, [0, 1], [frTZ, 0]);
+    const scale   = useTransform(scrollYProgress, [0, 1], [0.75, 1]);
+    const opacity = useTransform(scrollYProgress, [0, 0.4, 1], [0, 0.5, 1]);
+
+    return (
+        <div ref={ref} style={{ perspective: "900px" }}>
+            <motion.div style={{ rotateX, rotateY, rotateZ, x, y, z, scale, opacity }}>
+                {children}
+            </motion.div>
+        </div>
+    );
+}
+
 // Modal for Regular Services
-function ServiceInquiryModal({ service, isOpen, onClose, onSubmit }: { 
-    service: typeof services[0] | null; 
-    isOpen: boolean; 
-    onClose: () => void; 
+function ServiceInquiryModal({ service, isOpen, onClose, onSubmit }: {
+    service: typeof services[0] | null;
+    isOpen: boolean;
+    onClose: () => void;
     onSubmit: (data: ServiceFormData) => Promise<boolean>;
 }) {
-    const [formData, setFormData] = useState<ServiceFormData>({
-        name: "",
-        mobile: "",
-        email: "",
-        requirements: "",
-    });
+    const [formData, setFormData] = useState<ServiceFormData>({ name: "", mobile: "", email: "", requirements: "" });
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [showSuccessPopup, setShowSuccessPopup] = useState(false);
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
-        setFormData({
-            ...formData,
-            [e.target.name]: e.target.value,
-        });
+        setFormData({ ...formData, [e.target.name]: e.target.value });
     };
 
     const handleSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
         e.preventDefault();
         if (isSubmitting) return;
-
         setIsSubmitting(true);
         const success = await onSubmit(formData);
         setIsSubmitting(false);
-
         if (success) {
             setShowSuccessPopup(true);
             setTimeout(() => {
@@ -185,15 +255,8 @@ function ServiceInquiryModal({ service, isOpen, onClose, onSubmit }: {
         <AnimatePresence>
             {isOpen && (
                 <>
-                    <motion.div
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        exit={{ opacity: 0 }}
-                        onClick={onClose}
-                        className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50"
-                    />
-                    
-                    {/* Success Popup for Services */}
+                    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={onClose} className="fixed inset-0 bg-black/80 backdrop-blur-sm z-50" />
+
                     <AnimatePresence>
                         {showSuccessPopup && (
                             <motion.div
@@ -203,23 +266,12 @@ function ServiceInquiryModal({ service, isOpen, onClose, onSubmit }: {
                                 transition={{ type: "spring", damping: 20, stiffness: 300 }}
                                 className="fixed inset-0 z-[100] flex items-center justify-center p-4 pointer-events-none"
                             >
-                                <div 
-                                    className="relative max-w-md w-full rounded-2xl overflow-hidden pointer-events-auto shadow-2xl"
-                                    style={{
-                                        background: "linear-gradient(135deg, rgba(30,30,40,0.98), rgba(20,20,30,0.98))",
-                                        backdropFilter: "blur(20px)",
-                                        border: `1px solid ${service.accent}66`,
-                                        boxShadow: `0 0 60px ${service.accent}40`,
-                                    }}
-                                >
+                                <div className="relative max-w-md w-full rounded-2xl overflow-hidden pointer-events-auto shadow-2xl"
+                                    style={{ background: "linear-gradient(135deg, rgba(30,30,40,0.98), rgba(20,20,30,0.98))", backdropFilter: "blur(20px)", border: `1px solid ${service.accent}66`, boxShadow: `0 0 60px ${service.accent}40` }}>
                                     <div className="p-6 text-center">
-                                        <motion.div
-                                            initial={{ scale: 0 }}
-                                            animate={{ scale: 1 }}
-                                            transition={{ delay: 0.2, type: "spring", stiffness: 200 }}
+                                        <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ delay: 0.2, type: "spring", stiffness: 200 }}
                                             className="w-20 h-20 mx-auto mb-4 rounded-full flex items-center justify-center"
-                                            style={{ background: `${service.accent}20`, border: `2px solid ${service.accent}` }}
-                                        >
+                                            style={{ background: `${service.accent}20`, border: `2px solid ${service.accent}` }}>
                                             <span className="text-4xl">🎉</span>
                                         </motion.div>
                                         <h3 className="text-2xl font-bold text-white mb-2">Thank You!</h3>
@@ -230,13 +282,7 @@ function ServiceInquiryModal({ service, isOpen, onClose, onSubmit }: {
                                             <p className="text-sm" style={{ color: service.accent }}>Timeline: {service.timeline}</p>
                                         </div>
                                     </div>
-                                    <motion.div 
-                                        className="h-1 w-full"
-                                        initial={{ width: "100%" }}
-                                        animate={{ width: "0%" }}
-                                        transition={{ duration: 2.8, ease: "linear" }}
-                                        style={{ background: service.accent }}
-                                    />
+                                    <motion.div className="h-1 w-full" initial={{ width: "100%" }} animate={{ width: "0%" }} transition={{ duration: 2.8, ease: "linear" }} style={{ background: service.accent }} />
                                 </div>
                             </motion.div>
                         )}
@@ -249,20 +295,11 @@ function ServiceInquiryModal({ service, isOpen, onClose, onSubmit }: {
                         transition={{ type: "spring", damping: 25, stiffness: 300 }}
                         className="fixed inset-0 z-50 flex items-center justify-center p-4 pointer-events-none"
                     >
-                        <div 
-                            className="relative w-full max-w-2xl rounded-3xl overflow-hidden pointer-events-auto"
-                            style={{
-                                background: "linear-gradient(135deg, rgba(25,25,35,0.98), rgba(15,15,20,0.98))",
-                                backdropFilter: "blur(20px)",
-                                border: `1px solid ${service.accent}66`,
-                                boxShadow: `0 25px 50px -12px ${service.accent}40`,
-                            }}
-                        >
+                        <div className="relative w-full max-w-2xl rounded-3xl overflow-hidden pointer-events-auto"
+                            style={{ background: "linear-gradient(135deg, rgba(25,25,35,0.98), rgba(15,15,20,0.98))", backdropFilter: "blur(20px)", border: `1px solid ${service.accent}66`, boxShadow: `0 25px 50px -12px ${service.accent}40` }}>
                             <div className="relative p-6 border-b" style={{ borderColor: `${service.accent}33`, background: `linear-gradient(90deg, ${service.accent}08, transparent)` }}>
                                 <div className="flex items-center gap-4">
-                                    <div className="text-4xl w-14 h-14 rounded-2xl flex items-center justify-center" style={{ background: `${service.accent}20`, border: `1px solid ${service.accent}44` }}>
-                                        {service.icon}
-                                    </div>
+                                    <div className="text-4xl w-14 h-14 rounded-2xl flex items-center justify-center" style={{ background: `${service.accent}20`, border: `1px solid ${service.accent}44` }}>{service.icon}</div>
                                     <div>
                                         <h2 className="text-2xl font-bold text-white">{service.title}</h2>
                                         <p className="text-gray-300 text-sm">Fill out the form to get started</p>
@@ -270,7 +307,6 @@ function ServiceInquiryModal({ service, isOpen, onClose, onSubmit }: {
                                 </div>
                                 <button onClick={onClose} className="absolute top-6 right-6 text-gray-400 hover:text-white text-2xl transition-colors">×</button>
                             </div>
-
                             <form onSubmit={handleSubmit} className="p-6 space-y-5">
                                 <div>
                                     <label className="block text-sm font-semibold mb-2 text-gray-200">Full Name *</label>
@@ -306,27 +342,20 @@ function ServiceInquiryModal({ service, isOpen, onClose, onSubmit }: {
 }
 
 // Modal for Rental Products Listing
-function RentalProductsModal({ category, isOpen, onClose, onRentClick }: { 
-    category: typeof rentalCategories[0] | null; 
-    isOpen: boolean; 
-    onClose: () => void; 
+function RentalProductsModal({ category, isOpen, onClose, onRentClick }: {
+    category: typeof rentalCategories[0] | null;
+    isOpen: boolean;
+    onClose: () => void;
     onRentClick: (product: any) => void;
 }) {
     if (!category) return null;
-
     const formatPrice = (price: number) => `₹${price.toLocaleString('en-IN')}`;
 
     return (
         <AnimatePresence>
             {isOpen && (
                 <>
-                    <motion.div
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        exit={{ opacity: 0 }}
-                        onClick={onClose}
-                        className="fixed inset-0 bg-black/90 backdrop-blur-md z-50"
-                    />
+                    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={onClose} className="fixed inset-0 bg-black/90 backdrop-blur-md z-50" />
                     <motion.div
                         initial={{ opacity: 0, scale: 0.95, y: 30 }}
                         animate={{ opacity: 1, scale: 1, y: 0 }}
@@ -334,21 +363,12 @@ function RentalProductsModal({ category, isOpen, onClose, onRentClick }: {
                         transition={{ type: "spring", damping: 25, stiffness: 300 }}
                         className="fixed inset-x-4 top-20 bottom-20 z-50 overflow-y-auto rounded-3xl pointer-events-auto"
                     >
-                        <div 
-                            className="relative w-full min-h-full rounded-3xl overflow-hidden"
-                            style={{
-                                background: "linear-gradient(135deg, rgba(25,25,35,0.98), rgba(15,15,20,0.98))",
-                                backdropFilter: "blur(20px)",
-                                border: `1px solid ${category.accent}66`,
-                            }}
-                        >
-                            {/* Header */}
+                        <div className="relative w-full min-h-full rounded-3xl overflow-hidden"
+                            style={{ background: "linear-gradient(135deg, rgba(25,25,35,0.98), rgba(15,15,20,0.98))", backdropFilter: "blur(20px)", border: `1px solid ${category.accent}66` }}>
                             <div className="sticky top-0 z-10 p-6 border-b" style={{ background: "rgba(15,15,20,0.95)", backdropFilter: "blur(20px)", borderColor: `${category.accent}33` }}>
                                 <div className="flex items-center justify-between">
                                     <div className="flex items-center gap-4">
-                                        <div className="text-4xl w-14 h-14 rounded-2xl flex items-center justify-center" style={{ background: `${category.accent}20`, border: `1px solid ${category.accent}44` }}>
-                                            {category.icon}
-                                        </div>
+                                        <div className="text-4xl w-14 h-14 rounded-2xl flex items-center justify-center" style={{ background: `${category.accent}20`, border: `1px solid ${category.accent}44` }}>{category.icon}</div>
                                         <div>
                                             <h2 className="text-2xl font-bold text-white">{category.title}</h2>
                                             <p className="text-gray-300 text-sm mt-1">{category.longDesc}</p>
@@ -358,8 +378,6 @@ function RentalProductsModal({ category, isOpen, onClose, onRentClick }: {
                                 </div>
                                 <p className="text-gray-300 text-sm mt-4">{category.items.length} equipment available for rent</p>
                             </div>
-
-                            {/* Products Grid */}
                             <div className="p-6">
                                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5">
                                     {category.items.map((product) => (
@@ -368,7 +386,7 @@ function RentalProductsModal({ category, isOpen, onClose, onRentClick }: {
                                             initial={{ opacity: 0, y: 20 }}
                                             animate={{ opacity: 1, y: 0 }}
                                             whileHover={{ y: -5, transition: { duration: 0.2 } }}
-                                            className="rounded-xl overflow-hidden border transition-all duration-300 cursor-pointer group"
+                                            className="rounded-xl overflow-hidden border transition-all duration-300 cursor-pointer"
                                             style={{ background: "rgba(255,255,255,0.08)", borderColor: "rgba(255,255,255,0.15)" }}
                                             onClick={() => onRentClick(product)}
                                         >
@@ -381,20 +399,13 @@ function RentalProductsModal({ category, isOpen, onClose, onRentClick }: {
                                                     <span className="text-gray-300 text-xs">(120+ reviews)</span>
                                                 </div>
                                                 <div className="mb-3">
-                                                    <span className="text-2xl font-bold text-white" style={{ color: category.accent }}>{formatPrice(product.price)}</span>
+                                                    <span className="text-2xl font-bold" style={{ color: category.accent }}>{formatPrice(product.price)}</span>
                                                     <span className="text-gray-400 line-through text-sm ml-2">{formatPrice(product.originalPrice)}</span>
                                                     <span className="text-green-400 text-xs ml-2 block sm:inline">{Math.round((1 - product.price/product.originalPrice) * 100)}% off</span>
                                                 </div>
                                                 <p className="text-gray-300 text-xs mb-4">per day</p>
-                                                {product.inStock && (
-                                                    <span className="inline-block text-green-400 text-xs mb-3 font-medium">✓ In Stock</span>
-                                                )}
-                                                <motion.button
-                                                    whileHover={{ scale: 1.02 }}
-                                                    whileTap={{ scale: 0.98 }}
-                                                    className="w-full py-2.5 rounded-lg font-semibold text-sm transition-all text-white"
-                                                    style={{ background: `linear-gradient(135deg, ${category.accent}, ${category.accent}CC)` }}
-                                                >
+                                                {product.inStock && <span className="inline-block text-green-400 text-xs mb-3 font-medium">✓ In Stock</span>}
+                                                <motion.button whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} className="w-full py-2.5 rounded-lg font-semibold text-sm transition-all text-white" style={{ background: `linear-gradient(135deg, ${category.accent}, ${category.accent}CC)` }}>
                                                     Rent Now →
                                                 </motion.button>
                                             </div>
@@ -410,21 +421,16 @@ function RentalProductsModal({ category, isOpen, onClose, onRentClick }: {
     );
 }
 
-// Modal for Individual Product Rental (Checkout) - WITH CUSTOM SUCCESS POPUP
-function RentalCheckoutModal({ product, category, isOpen, onClose, onSubmit }: { 
-    product: any; 
-    category: any; 
-    isOpen: boolean; 
-    onClose: () => void; 
+// Modal for Rental Checkout
+function RentalCheckoutModal({ product, category, isOpen, onClose, onSubmit }: {
+    product: any;
+    category: any;
+    isOpen: boolean;
+    onClose: () => void;
     onSubmit: (data: RentalFormData) => Promise<boolean>;
 }) {
     const [rentalDays, setRentalDays] = useState(1);
-    const [formData, setFormData] = useState({
-        name: "",
-        mobile: "",
-        email: "",
-        requirements: "",
-    });
+    const [formData, setFormData] = useState({ name: "", mobile: "", email: "", requirements: "" });
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [showSuccessPopup, setShowSuccessPopup] = useState(false);
 
@@ -434,19 +440,9 @@ function RentalCheckoutModal({ product, category, isOpen, onClose, onSubmit }: {
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         if (isSubmitting || !product) return;
-
         setIsSubmitting(true);
-        const success = await onSubmit({
-            ...formData,
-            productId: product.id,
-            productName: product.name,
-            categoryName: category.title,
-            pricePerDay: product.price,
-            rentalDays,
-            totalPrice,
-        });
+        const success = await onSubmit({ ...formData, productId: product.id, productName: product.name, categoryName: category.title, pricePerDay: product.price, rentalDays, totalPrice });
         setIsSubmitting(false);
-
         if (success) {
             setShowSuccessPopup(true);
             setTimeout(() => {
@@ -465,8 +461,7 @@ function RentalCheckoutModal({ product, category, isOpen, onClose, onSubmit }: {
             {isOpen && (
                 <>
                     <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }} onClick={onClose} className="fixed inset-0 bg-black/80 backdrop-blur-sm z-[60]" />
-                    
-                    {/* Custom Success Popup for Rentals */}
+
                     <AnimatePresence>
                         {showSuccessPopup && (
                             <motion.div
@@ -476,23 +471,12 @@ function RentalCheckoutModal({ product, category, isOpen, onClose, onSubmit }: {
                                 transition={{ type: "spring", damping: 20, stiffness: 300 }}
                                 className="fixed inset-0 z-[100] flex items-center justify-center p-4 pointer-events-none"
                             >
-                                <div 
-                                    className="relative max-w-md w-full rounded-2xl overflow-hidden pointer-events-auto shadow-2xl"
-                                    style={{
-                                        background: "linear-gradient(135deg, rgba(30,30,40,0.98), rgba(20,20,30,0.98))",
-                                        backdropFilter: "blur(20px)",
-                                        border: `1px solid ${category.accent}66`,
-                                        boxShadow: `0 0 60px ${category.accent}40`,
-                                    }}
-                                >
+                                <div className="relative max-w-md w-full rounded-2xl overflow-hidden pointer-events-auto shadow-2xl"
+                                    style={{ background: "linear-gradient(135deg, rgba(30,30,40,0.98), rgba(20,20,30,0.98))", backdropFilter: "blur(20px)", border: `1px solid ${category.accent}66`, boxShadow: `0 0 60px ${category.accent}40` }}>
                                     <div className="p-6 text-center">
-                                        <motion.div
-                                            initial={{ scale: 0 }}
-                                            animate={{ scale: 1 }}
-                                            transition={{ delay: 0.2, type: "spring", stiffness: 200 }}
+                                        <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ delay: 0.2, type: "spring", stiffness: 200 }}
                                             className="w-20 h-20 mx-auto mb-4 rounded-full flex items-center justify-center"
-                                            style={{ background: `${category.accent}20`, border: `2px solid ${category.accent}` }}
-                                        >
+                                            style={{ background: `${category.accent}20`, border: `2px solid ${category.accent}` }}>
                                             <span className="text-4xl">🎉</span>
                                         </motion.div>
                                         <h3 className="text-2xl font-bold text-white mb-2">Thank You!</h3>
@@ -504,13 +488,7 @@ function RentalCheckoutModal({ product, category, isOpen, onClose, onSubmit }: {
                                             <p className="text-sm" style={{ color: category.accent }}>{formatPrice(totalPrice)} for {rentalDays} day(s)</p>
                                         </div>
                                     </div>
-                                    <motion.div 
-                                        className="h-1 w-full"
-                                        initial={{ width: "100%" }}
-                                        animate={{ width: "0%" }}
-                                        transition={{ duration: 2.8, ease: "linear" }}
-                                        style={{ background: category.accent }}
-                                    />
+                                    <motion.div className="h-1 w-full" initial={{ width: "100%" }} animate={{ width: "0%" }} transition={{ duration: 2.8, ease: "linear" }} style={{ background: category.accent }} />
                                 </div>
                             </motion.div>
                         )}
@@ -522,9 +500,8 @@ function RentalCheckoutModal({ product, category, isOpen, onClose, onSubmit }: {
                         exit={{ opacity: 0, scale: 0.9, y: 20 }}
                         className="fixed inset-0 z-[70] flex items-center justify-center p-4 pointer-events-none overflow-y-auto"
                     >
-                        <div className="relative w-full max-w-4xl rounded-3xl overflow-hidden pointer-events-auto my-8" style={{ background: "linear-gradient(135deg, rgba(25,25,35,0.98), rgba(15,15,20,0.98))", backdropFilter: "blur(20px)", border: `1px solid ${category.accent}66`, boxShadow: `0 0 40px ${category.accent}20` }}>
-                            
-                            {/* Header */}
+                        <div className="relative w-full max-w-4xl rounded-3xl overflow-hidden pointer-events-auto my-8"
+                            style={{ background: "linear-gradient(135deg, rgba(25,25,35,0.98), rgba(15,15,20,0.98))", backdropFilter: "blur(20px)", border: `1px solid ${category.accent}66`, boxShadow: `0 0 40px ${category.accent}20` }}>
                             <div className="relative p-6 border-b" style={{ borderColor: `${category.accent}33`, background: `linear-gradient(90deg, ${category.accent}08, transparent)` }}>
                                 <div className="flex items-center gap-3">
                                     <div className="text-3xl">{product.image}</div>
@@ -535,13 +512,9 @@ function RentalCheckoutModal({ product, category, isOpen, onClose, onSubmit }: {
                                 </div>
                                 <button onClick={onClose} className="absolute top-6 right-6 text-gray-400 hover:text-white text-3xl transition-colors">×</button>
                             </div>
-
                             <div className="grid md:grid-cols-2 gap-6 p-6">
-                                {/* Product Info */}
                                 <div className="space-y-4">
-                                    <div className="text-8xl bg-white/10 rounded-2xl p-8 text-center" style={{ border: `1px solid ${category.accent}44` }}>
-                                        {product.image}
-                                    </div>
+                                    <div className="text-8xl bg-white/10 rounded-2xl p-8 text-center" style={{ border: `1px solid ${category.accent}44` }}>{product.image}</div>
                                     <h3 className="text-xl font-bold text-white text-center">{product.name}</h3>
                                     <div className="text-center">
                                         <span className="text-yellow-400">★ {product.rating}</span>
@@ -549,114 +522,52 @@ function RentalCheckoutModal({ product, category, isOpen, onClose, onSubmit }: {
                                         {product.inStock && <div className="text-green-400 text-sm mt-2 font-medium">✓ In Stock</div>}
                                     </div>
                                     <div className="text-center p-4 rounded-xl" style={{ background: `${category.accent}15` }}>
-                                        <span className="text-3xl font-bold text-white" style={{ color: category.accent }}>{formatPrice(product.price)}</span>
+                                        <span className="text-3xl font-bold" style={{ color: category.accent }}>{formatPrice(product.price)}</span>
                                         <span className="text-gray-400 line-through ml-2">{formatPrice(product.originalPrice)}</span>
                                         <span className="text-green-400 ml-2 font-medium">{Math.round((1 - product.price/product.originalPrice) * 100)}% off</span>
                                         <p className="text-gray-300 text-sm mt-1">per day</p>
                                     </div>
-                                    
-                                    {/* Features */}
                                     <div className="p-4 rounded-xl bg-white/10">
                                         <h4 className="text-white text-sm font-semibold mb-2">Key Features:</h4>
                                         <p className="text-gray-300 text-sm">{product.specs}</p>
                                     </div>
                                 </div>
-
-                                {/* Checkout Form */}
                                 <div>
                                     <form onSubmit={handleSubmit} className="space-y-4">
                                         <div>
                                             <label className="block text-sm font-semibold mb-2 text-gray-200">Full Name *</label>
-                                            <input 
-                                                type="text" 
-                                                required 
-                                                value={formData.name} 
-                                                onChange={(e) => setFormData({...formData, name: e.target.value})} 
-                                                className="w-full px-4 py-3 rounded-xl bg-white/10 border border-white/20 focus:border-orange-500 focus:outline-none focus:ring-1 focus:ring-orange-500 text-white placeholder-gray-400 transition-all"
-                                                placeholder="Enter your full name"
-                                            />
+                                            <input type="text" required value={formData.name} onChange={(e) => setFormData({...formData, name: e.target.value})} className="w-full px-4 py-3 rounded-xl bg-white/10 border border-white/20 focus:border-orange-500 focus:outline-none focus:ring-1 focus:ring-orange-500 text-white placeholder-gray-400 transition-all" placeholder="Enter your full name" />
                                         </div>
-
                                         <div>
                                             <label className="block text-sm font-semibold mb-2 text-gray-200">Mobile Number *</label>
-                                            <input 
-                                                type="tel" 
-                                                required 
-                                                value={formData.mobile} 
-                                                onChange={(e) => setFormData({...formData, mobile: e.target.value})} 
-                                                className="w-full px-4 py-3 rounded-xl bg-white/10 border border-white/20 focus:border-orange-500 focus:outline-none focus:ring-1 focus:ring-orange-500 text-white placeholder-gray-400 transition-all"
-                                                placeholder="+91 98765 43210"
-                                            />
+                                            <input type="tel" required value={formData.mobile} onChange={(e) => setFormData({...formData, mobile: e.target.value})} className="w-full px-4 py-3 rounded-xl bg-white/10 border border-white/20 focus:border-orange-500 focus:outline-none focus:ring-1 focus:ring-orange-500 text-white placeholder-gray-400 transition-all" placeholder="+91 98765 43210" />
                                         </div>
-
                                         <div>
                                             <label className="block text-sm font-semibold mb-2 text-gray-200">Email Address *</label>
-                                            <input 
-                                                type="email" 
-                                                required 
-                                                value={formData.email} 
-                                                onChange={(e) => setFormData({...formData, email: e.target.value})} 
-                                                className="w-full px-4 py-3 rounded-xl bg-white/10 border border-white/20 focus:border-orange-500 focus:outline-none focus:ring-1 focus:ring-orange-500 text-white placeholder-gray-400 transition-all"
-                                                placeholder="you@example.com"
-                                            />
+                                            <input type="email" required value={formData.email} onChange={(e) => setFormData({...formData, email: e.target.value})} className="w-full px-4 py-3 rounded-xl bg-white/10 border border-white/20 focus:border-orange-500 focus:outline-none focus:ring-1 focus:ring-orange-500 text-white placeholder-gray-400 transition-all" placeholder="you@example.com" />
                                         </div>
-
                                         <div>
                                             <label className="block text-sm font-semibold mb-2 text-gray-200">Rental Duration (Days) *</label>
-                                            <input 
-                                                type="number" 
-                                                min="1" 
-                                                max="30" 
-                                                required 
-                                                value={rentalDays} 
-                                                onChange={(e) => setRentalDays(parseInt(e.target.value) || 1)} 
-                                                className="w-full px-4 py-3 rounded-xl bg-white/10 border border-white/20 focus:border-orange-500 focus:outline-none focus:ring-1 focus:ring-orange-500 text-white transition-all"
-                                            />
+                                            <input type="number" min="1" max="30" required value={rentalDays} onChange={(e) => setRentalDays(parseInt(e.target.value) || 1)} className="w-full px-4 py-3 rounded-xl bg-white/10 border border-white/20 focus:border-orange-500 focus:outline-none focus:ring-1 focus:ring-orange-500 text-white transition-all" />
                                         </div>
-
-                                        {/* Price Summary */}
                                         <div className="p-4 rounded-xl" style={{ background: `${category.accent}15`, border: `1px solid ${category.accent}33` }}>
                                             <p className="text-white text-sm font-semibold mb-3">Price Summary</p>
-                                            <div className="flex justify-between py-2">
-                                                <span className="text-gray-300">Daily Rate:</span>
-                                                <span className="text-white font-medium">{formatPrice(product.price)}</span>
-                                            </div>
-                                            <div className="flex justify-between py-2">
-                                                <span className="text-gray-300">Number of Days:</span>
-                                                <span className="text-white font-medium">{rentalDays}</span>
-                                            </div>
+                                            <div className="flex justify-between py-2"><span className="text-gray-300">Daily Rate:</span><span className="text-white font-medium">{formatPrice(product.price)}</span></div>
+                                            <div className="flex justify-between py-2"><span className="text-gray-300">Number of Days:</span><span className="text-white font-medium">{rentalDays}</span></div>
                                             <div className="flex justify-between pt-3 mt-1 border-t" style={{ borderColor: `${category.accent}33` }}>
                                                 <span className="text-white font-semibold">Total Amount:</span>
-                                                <span className="font-bold text-2xl text-white" style={{ color: category.accent }}>{formatPrice(totalPrice)}</span>
+                                                <span className="font-bold text-2xl" style={{ color: category.accent }}>{formatPrice(totalPrice)}</span>
                                             </div>
-                                            <p className="text-xs text-gray-400 mt-3 flex items-center gap-1">
-                                                <span>⚠️</span> Security deposit may be required
-                                            </p>
+                                            <p className="text-xs text-gray-400 mt-3">⚠️ Security deposit may be required</p>
                                         </div>
-
                                         <div>
                                             <label className="block text-sm font-semibold mb-2 text-gray-200">Special Requests</label>
-                                            <textarea 
-                                                rows={3} 
-                                                value={formData.requirements} 
-                                                onChange={(e) => setFormData({...formData, requirements: e.target.value})} 
-                                                className="w-full px-4 py-3 rounded-xl bg-white/10 border border-white/20 focus:border-orange-500 focus:outline-none focus:ring-1 focus:ring-orange-500 text-white placeholder-gray-400 resize-none transition-all"
-                                                placeholder="Delivery location, pickup time, special instructions..."
-                                            />
+                                            <textarea rows={3} value={formData.requirements} onChange={(e) => setFormData({...formData, requirements: e.target.value})} className="w-full px-4 py-3 rounded-xl bg-white/10 border border-white/20 focus:border-orange-500 focus:outline-none focus:ring-1 focus:ring-orange-500 text-white placeholder-gray-400 resize-none transition-all" placeholder="Delivery location, pickup time, special instructions..." />
                                         </div>
-
-                                        <button 
-                                            type="submit" 
-                                            disabled={isSubmitting} 
-                                            className="w-full py-3.5 rounded-xl font-semibold transition-all transform hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 disabled:cursor-not-allowed text-white"
-                                            style={{ background: `linear-gradient(135deg, ${category.accent}, ${category.accent}CC)`, boxShadow: `0 4px 20px ${category.accent}40` }}
-                                        >
+                                        <button type="submit" disabled={isSubmitting} className="w-full py-3.5 rounded-xl font-semibold transition-all transform hover:scale-[1.02] active:scale-[0.98] disabled:opacity-50 text-white" style={{ background: `linear-gradient(135deg, ${category.accent}, ${category.accent}CC)`, boxShadow: `0 4px 20px ${category.accent}40` }}>
                                             {isSubmitting ? "Processing..." : "Confirm Rental →"}
                                         </button>
-                                        
-                                        <p className="text-xs text-gray-400 text-center mt-3">
-                                            By confirming, you agree to our rental terms and conditions
-                                        </p>
+                                        <p className="text-xs text-gray-400 text-center mt-3">By confirming, you agree to our rental terms and conditions</p>
                                     </form>
                                 </div>
                             </div>
@@ -689,7 +600,7 @@ function MagneticButton({ children, className, onClick }: { children: React.Reac
     );
 }
 
-// Unified Card Component
+// Unified Card with 3D scroll
 function ServiceCard({ item, index, onClick }: { item: any; index: number; onClick: () => void }) {
     const [hovered, setHovered] = useState(false);
     const cardRef = useRef<HTMLDivElement>(null);
@@ -708,47 +619,45 @@ function ServiceCard({ item, index, onClick }: { item: any; index: number; onCli
     const isRental = item.type === "rental";
     const itemCount = isRental ? item.items.length : null;
 
+    // Cycle directions for visual variety
+    const dirs: Array<"left"|"right"|"up"|"down"> = ["left","up","right","down","left","right","up"];
+
     return (
-        <motion.div
-            ref={cardRef}
-            initial={{ opacity: 0, y: 60 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
-            transition={{ duration: 0.6, delay: index * 0.08 }}
-            style={{ rotateX: springRX, rotateY: springRY, transformPerspective: 800 }}
-            onMouseMove={handleMouseMove}
-            onMouseEnter={() => setHovered(true)}
-            onMouseLeave={() => { rotateX.set(0); rotateY.set(0); setHovered(false); }}
-            onClick={onClick}
-            className="relative group cursor-pointer"
-        >
-            <motion.div animate={{ opacity: hovered ? 1 : 0 }} className="absolute inset-0 rounded-2xl blur-xl -z-10" style={{ background: `radial-gradient(ellipse at center, ${item.accent}33 0%, transparent 70%)` }} />
-            <div className="relative rounded-2xl p-6 h-full border transition-all duration-300" style={{ background: "rgba(255,255,255,0.05)", backdropFilter: "blur(20px)", borderColor: hovered ? item.accent + "55" : "rgba(255,255,255,0.1)" }}>
-                <div className="text-xs font-mono mb-4 tracking-widest" style={{ color: item.accent + "cc" }}>{item.id}</div>
-                <motion.div animate={{ scale: hovered ? 1.15 : 1 }} className="text-4xl mb-5" style={{ color: item.accent }}>{item.icon}</motion.div>
-                <h3 className="text-xl font-semibold mb-3 tracking-tight text-white">{item.title}</h3>
-                <p className="text-sm leading-relaxed mb-5 text-gray-300">{item.desc}</p>
-                <div className="flex flex-wrap gap-2 mb-3">
-                    {item.tags.slice(0, 3).map((tag: string) => (
-                        <span key={tag} className="text-[10px] px-2.5 py-1 rounded-full uppercase font-medium" style={{ background: item.accent + "20", color: item.accent, border: `1px solid ${item.accent}33` }}>{tag}</span>
-                    ))}
-                </div>
-                {isRental && itemCount && (
-                    <div className="text-xs text-gray-300">
-                        {itemCount} equipment available
+        <Scroll3DCard index={index} direction={dirs[index % dirs.length]}>
+            <motion.div
+                ref={cardRef}
+                style={{ rotateX: springRX, rotateY: springRY, transformPerspective: 800 }}
+                onMouseMove={handleMouseMove}
+                onMouseEnter={() => setHovered(true)}
+                onMouseLeave={() => { rotateX.set(0); rotateY.set(0); setHovered(false); }}
+                onClick={onClick}
+                className="relative group cursor-pointer"
+            >
+                <motion.div animate={{ opacity: hovered ? 1 : 0 }} className="absolute inset-0 rounded-2xl blur-xl -z-10" style={{ background: `radial-gradient(ellipse at center, ${item.accent}33 0%, transparent 70%)` }} />
+                <div className="relative rounded-2xl p-6 h-full border transition-all duration-300"
+                    style={{ background: "rgba(255,255,255,0.05)", backdropFilter: "blur(20px)", borderColor: hovered ? item.accent + "55" : "rgba(255,255,255,0.1)" }}>
+                    <div className="text-xs font-mono mb-4 tracking-widest" style={{ color: item.accent + "cc" }}>{item.id}</div>
+                    <motion.div animate={{ scale: hovered ? 1.15 : 1 }} className="text-4xl mb-5" style={{ color: item.accent }}>{item.icon}</motion.div>
+                    <h3 className="text-xl font-semibold mb-3 tracking-tight text-white">{item.title}</h3>
+                    <p className="text-sm leading-relaxed mb-5 text-gray-300">{item.desc}</p>
+                    <div className="flex flex-wrap gap-2 mb-3">
+                        {item.tags.slice(0, 3).map((tag: string) => (
+                            <span key={tag} className="text-[10px] px-2.5 py-1 rounded-full uppercase font-medium" style={{ background: item.accent + "20", color: item.accent, border: `1px solid ${item.accent}33` }}>{tag}</span>
+                        ))}
                     </div>
-                )}
-                <motion.div animate={{ x: hovered ? 4 : 0, opacity: hovered ? 1 : 0 }} className="absolute bottom-6 right-6 text-sm text-white" style={{ color: item.accent }}>
-                    {isRental ? "View All →" : "Inquire →"}
-                </motion.div>
-            </div>
-        </motion.div>
+                    {isRental && itemCount && <div className="text-xs text-gray-300">{itemCount} equipment available</div>}
+                    <motion.div animate={{ x: hovered ? 4 : 0, opacity: hovered ? 1 : 0 }} className="absolute bottom-6 right-6 text-sm" style={{ color: item.accent }}>
+                        {isRental ? "View All →" : "Inquire →"}
+                    </motion.div>
+                </div>
+            </motion.div>
+        </Scroll3DCard>
     );
 }
 
 function OrbVisual() {
     return (
-        <div className="relative flex items-center justify-center w-72 h-72 mx-auto">
+        <div className="relative flex items-center justify-center w-64 h-64 md:w-72 md:h-72 mx-auto">
             <motion.div className="absolute w-80 h-80 rounded-full" style={{ background: "radial-gradient(circle, #FF6B2B1A 0%, transparent 70%)" }} animate={{ scale: [1, 1.1, 1] }} transition={{ duration: 4, repeat: Infinity }} />
             <motion.div className="absolute w-60 h-60 rounded-full" style={{ background: "radial-gradient(circle, #A855F71A 0%, transparent 70%)" }} animate={{ scale: [1.1, 1, 1.1] }} transition={{ duration: 5, repeat: Infinity }} />
             <div className="relative w-20 h-20 rounded-full flex items-center justify-center" style={{ background: "radial-gradient(circle, #FF6B2B44, #A855F722)", border: "1px solid rgba(255,107,43,0.4)" }}>
@@ -758,6 +667,13 @@ function OrbVisual() {
     );
 }
 
+const gradientStyle = {
+    background: "linear-gradient(135deg, #C0C0C0 0%, #FFFFFF 20%, #A8A8A8 40%, #E8E8E8 55%, #888 70%, #FFFFFF 85%, #C0C0C0 100%)",
+    WebkitBackgroundClip: "text",
+    WebkitTextFillColor: "transparent",
+    backgroundClip: "text",
+};
+
 function ServicePage() {
     const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
     const [selectedService, setSelectedService] = useState<typeof services[0] | null>(null);
@@ -766,24 +682,44 @@ function ServicePage() {
     const [isRentalProductsModalOpen, setIsRentalProductsModalOpen] = useState(false);
     const [selectedProduct, setSelectedProduct] = useState<any>(null);
     const [isCheckoutModalOpen, setIsCheckoutModalOpen] = useState(false);
+    const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+
+    // Page scroll for hero parallax
+    const { scrollY } = useScroll();
+    const heroY       = useTransform(scrollY, [0, 600], [0, -80]);
+    const heroScale   = useTransform(scrollY, [0, 600], [1, 0.92]);
+    const heroOpacity = useTransform(scrollY, [0, 400], [1, 0]);
+
+    // Close mobile menu on escape key
+    useEffect(() => {
+        const handleEsc = (e: KeyboardEvent) => {
+            if (e.key === 'Escape') setMobileMenuOpen(false);
+        };
+        window.addEventListener('keydown', handleEsc);
+        return () => window.removeEventListener('keydown', handleEsc);
+    }, []);
+
+    // Lock body scroll when mobile menu is open
+    useEffect(() => {
+        if (mobileMenuOpen) {
+            document.body.style.overflow = 'hidden';
+        } else {
+            document.body.style.overflow = 'unset';
+        }
+        return () => {
+            document.body.style.overflow = 'unset';
+        };
+    }, [mobileMenuOpen]);
 
     useEffect(() => {
         const link = document.createElement("link");
         link.rel = "stylesheet";
         link.href = "https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800&family=Space+Mono:wght@400;700&display=swap";
         document.head.appendChild(link);
-
         const handleMouseMove = (e: MouseEvent) => setMousePos({ x: e.clientX, y: e.clientY });
         window.addEventListener("mousemove", handleMouseMove);
         return () => window.removeEventListener("mousemove", handleMouseMove);
     }, []);
-
-    const gradientStyle = {
-        background: "linear-gradient(135deg, #C0C0C0 0%, #FFFFFF 20%, #A8A8A8 40%, #E8E8E8 55%, #888 70%, #FFFFFF 85%, #C0C0C0 100%)",
-        WebkitBackgroundClip: "text",
-        WebkitTextFillColor: "transparent",
-        backgroundClip: "text",
-    };
 
     const handleCardClick = (item: any) => {
         if (item.type === "service") {
@@ -805,141 +741,175 @@ function ServicePage() {
         try {
             if (!selectedService) return false;
             const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:5000";
-            
-            const emailData = {
-                to: "your-email@example.com",
-                subject: `New Service Inquiry: ${selectedService.title}`,
-                html: `
-                    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-                        <h2 style="color: #FF6B2B;">New Service Inquiry from Crewholic</h2>
-                        <div style="background: #f5f5f5; padding: 20px; border-radius: 10px;">
-                            <h3>Customer Details:</h3>
-                            <p><strong>Name:</strong> ${data.name}</p>
-                            <p><strong>Mobile:</strong> ${data.mobile}</p>
-                            <p><strong>Email:</strong> ${data.email}</p>
-                            
-                            <h3>Service Details:</h3>
-                            <p><strong>Service:</strong> ${selectedService.title}</p>
-                            <p><strong>Timeline:</strong> ${selectedService.timeline}</p>
-                            
-                            <h3>Requirements:</h3>
-                            <p>${data.requirements}</p>
-                        </div>
-                        <p style="margin-top: 20px; color: #666;">Please contact the customer within 24 hours.</p>
-                        <hr />
-                        <p style="font-size: 12px; color: #999;">This is an automated message from Crewholic Service System.</p>
-                    </div>
-                `
-            };
-            
             const res = await fetch(`${apiUrl}/api/service-inquiry`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ 
-                    service: selectedService.title, 
-                    timeline: selectedService.timeline, 
-                    ...data,
-                    emailData 
-                }),
+                body: JSON.stringify({ service: selectedService.title, timeline: selectedService.timeline, ...data }),
             });
             return res.ok;
-        } catch (error) {
-            console.error(error);
-            return false;
-        }
+        } catch { return false; }
     };
 
     const handleRentalSubmit = async (data: RentalFormData): Promise<boolean> => {
         try {
             const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:5000";
-            
-            const emailData = {
-                to: "your-email@example.com",
-                subject: `New Rental Request: ${data.productName}`,
-                html: `
-                    <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-                        <h2 style="color: #FF6B2B;">New Rental Request from Crewholic</h2>
-                        <div style="background: #f5f5f5; padding: 20px; border-radius: 10px;">
-                            <h3>Customer Details:</h3>
-                            <p><strong>Name:</strong> ${data.name}</p>
-                            <p><strong>Mobile:</strong> ${data.mobile}</p>
-                            <p><strong>Email:</strong> ${data.email}</p>
-                            
-                            <h3>Rental Details:</h3>
-                            <p><strong>Category:</strong> ${data.categoryName}</p>
-                            <p><strong>Product:</strong> ${data.productName}</p>
-                            <p><strong>Price per day:</strong> ₹${data.pricePerDay}</p>
-                            <p><strong>Rental Days:</strong> ${data.rentalDays}</p>
-                            <p><strong>Total Amount:</strong> ₹${data.totalPrice}</p>
-                            
-                            <h3>Special Requests:</h3>
-                            <p>${data.requirements || "No special requests"}</p>
-                        </div>
-                        <p style="margin-top: 20px; color: #666;">Please contact the customer within 24 hours.</p>
-                        <hr />
-                        <p style="font-size: 12px; color: #999;">This is an automated message from Crewholic Rental System.</p>
-                    </div>
-                `
-            };
-            
             const res = await fetch(`${apiUrl}/api/rental-inquiry`, {
                 method: "POST",
                 headers: { "Content-Type": "application/json" },
-                body: JSON.stringify({ ...data, emailData }),
+                body: JSON.stringify(data),
             });
-            
             return res.ok;
-        } catch (error) {
-            console.error(error);
-            return false;
-        }
+        } catch { return false; }
     };
+
+    const navItems = [
+        { label: "Home", href: "/" },
+        { label: "About", href: "/about" },
+        { label: "Services", href: "/service" },
+        { label: "Projects", href: "/portfolio" },
+        { label: "Contact", href: "/contact" },
+    ];
 
     return (
         <div className="min-h-screen overflow-x-hidden" style={{ background: "#0C0C0C", fontFamily: "'Syne', sans-serif" }}>
             {/* Cursor Glow */}
-            <motion.div className="fixed pointer-events-none z-50 rounded-full w-96 h-96" style={{ background: "radial-gradient(circle, rgba(255,107,43,0.05) 0%, transparent 70%)", x: mousePos.x - 200, y: mousePos.y - 200 }} transition={{ type: "spring", stiffness: 150, damping: 20 }} />
+            <motion.div className="fixed pointer-events-none z-50 rounded-full w-96 h-96"
+                style={{ background: "radial-gradient(circle, rgba(255,107,43,0.05) 0%, transparent 70%)", x: mousePos.x - 200, y: mousePos.y - 200 }}
+                transition={{ type: "spring", stiffness: 150, damping: 20 }} />
 
-            {/* Navbar */}
-            <nav className="fixed top-0 left-0 right-0 z-40 flex items-center justify-between px-8 py-5">
+            {/* Navbar with Mobile Menu */}
+            <nav className="fixed top-0 left-0 right-0 z-40">
                 <div className="absolute inset-0" style={{ background: "linear-gradient(180deg, rgba(12,12,12,0.95) 0%, transparent 100%)" }} />
-                <motion.a href="/" initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} className="relative z-10 text-sm font-bold tracking-[0.25em] uppercase" style={{ ...gradientStyle }}>CREWHOLIC</motion.a>
-                <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} className="relative z-10 hidden md:flex items-center gap-8">
-                    {["About", "Services", "Projects", "Contact"].map((item) => (
-                        <a key={item} href={`/${item.toLowerCase()}`} className="text-xs tracking-widest uppercase transition-colors" style={{ color: "rgba(255,255,255,0.45)", fontFamily: "'Space Mono', monospace" }}>{item}</a>
-                    ))}
-                </motion.div>
-                <MagneticButton className="relative z-10">
-                    <motion.button className="relative overflow-hidden text-xs tracking-widest uppercase px-5 py-2.5 rounded-full font-medium" style={{ background: "transparent", border: "1px solid rgba(255,255,255,0.15)", color: "rgba(255,255,255,0.7)" }} whileHover={{ borderColor: "rgba(255,107,43,0.6)", color: "#FF6B2B" }}>Contact</motion.button>
-                </MagneticButton>
+                <div className="relative z-10 flex items-center justify-between px-4 sm:px-6 md:px-8 py-4 md:py-5">
+                    <motion.a href="/" initial={{ opacity: 0, x: -20 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.6 }}
+                        className="text-sm md:text-base font-bold tracking-[0.25em] uppercase" style={{ ...gradientStyle, fontFamily: "'Syne', sans-serif" }}>
+                        CREWHOLIC
+                    </motion.a>
+
+                    {/* Desktop Navigation */}
+                    <motion.div initial={{ opacity: 0, y: -10 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.1 }}
+                        className="hidden md:flex items-center gap-6 lg:gap-8">
+                        {navItems.map((item) => (
+                            <a key={item.label} href={item.href} className="text-xs lg:text-sm tracking-widest uppercase transition-colors duration-200 hover:text-[#FF6B2B]"
+                                style={{ color: item.label === "Services" ? "#FF6B2B" : "rgba(255,255,255,0.6)", fontFamily: "'Space Mono', monospace" }}>
+                                {item.label}
+                            </a>
+                        ))}
+                    </motion.div>
+
+                    {/* Desktop Contact Button */}
+                    <MagneticButton className="relative z-10 hidden md:block">
+                        <motion.a href="/contact" initial={{ opacity: 0, x: 20 }} animate={{ opacity: 1, x: 0 }} transition={{ duration: 0.6, delay: 0.15 }}
+                            className="relative overflow-hidden text-xs tracking-widest uppercase px-4 lg:px-5 py-2 lg:py-2.5 rounded-full font-medium transition-all duration-300 inline-block"
+                            style={{ background: "transparent", border: "1px solid rgba(255,255,255,0.15)", color: "rgba(255,255,255,0.7)", fontFamily: "'Space Mono', monospace" }}
+                            whileHover={{ borderColor: "rgba(255,107,43,0.6)", color: "#FF6B2B" }}>
+                            <span className="relative z-10">Contact</span>
+                            <motion.div className="absolute inset-0 rounded-full" initial={{ scale: 0, opacity: 0 }} whileHover={{ scale: 1, opacity: 1 }} transition={{ duration: 0.4 }}
+                                style={{ background: "rgba(255,107,43,0.08)" }} />
+                        </motion.a>
+                    </MagneticButton>
+
+                    {/* Mobile Menu Button */}
+                    <button onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                        className="relative z-20 md:hidden w-10 h-10 flex flex-col items-center justify-center gap-1.5 bg-black/50 backdrop-blur-md rounded-lg border border-white/10"
+                        aria-label="Menu">
+                        <motion.span animate={{ rotate: mobileMenuOpen ? 45 : 0, y: mobileMenuOpen ? 8 : 0 }}
+                            className="w-5 h-0.5 bg-white transition-all duration-300" style={{ background: mobileMenuOpen ? "#FF6B2B" : "#fff" }} />
+                        <motion.span animate={{ opacity: mobileMenuOpen ? 0 : 1 }} className="w-5 h-0.5 bg-white transition-all duration-300" />
+                        <motion.span animate={{ rotate: mobileMenuOpen ? -45 : 0, y: mobileMenuOpen ? -8 : 0 }}
+                            className="w-5 h-0.5 bg-white transition-all duration-300" style={{ background: mobileMenuOpen ? "#FF6B2B" : "#fff" }} />
+                    </button>
+                </div>
             </nav>
 
-            {/* Hero Section */}
-            <section className="relative min-h-screen flex flex-col items-center justify-center pt-24 pb-16 px-6">
+            {/* Mobile Menu Overlay */}
+            <AnimatePresence>
+                {mobileMenuOpen && (
+                    <>
+                        <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
+                            onClick={() => setMobileMenuOpen(false)} className="fixed inset-0 bg-black/90 backdrop-blur-xl z-40 md:hidden" />
+                        <motion.div initial={{ x: "100%" }} animate={{ x: 0 }} exit={{ x: "100%" }}
+                            transition={{ type: "spring", damping: 25, stiffness: 200 }}
+                            className="fixed top-0 right-0 bottom-0 w-72 bg-[#0C0C0C] backdrop-blur-xl border-l border-white/10 z-40 md:hidden flex flex-col p-6 pt-20">
+                            <button onClick={() => setMobileMenuOpen(false)} className="absolute top-5 right-5 w-8 h-8 flex items-center justify-center rounded-full border border-white/10 text-white/60 hover:text-white hover:border-white/20 transition-all">✕</button>
+                            <div className="flex flex-col gap-2 mt-4">
+                                {navItems.map((item, index) => (
+                                    <motion.a key={item.label} href={item.href} initial={{ opacity: 0, x: 50 }} animate={{ opacity: 1, x: 0 }} transition={{ delay: index * 0.1 }}
+                                        onClick={() => setMobileMenuOpen(false)} className="py-4 px-4 text-lg tracking-widest uppercase transition-all duration-300 rounded-xl hover:bg-white/5"
+                                        style={{ color: item.label === "Services" ? "#FF6B2B" : "rgba(255,255,255,0.8)", fontFamily: "'Space Mono', monospace", borderLeft: item.label === "Services" ? `3px solid #FF6B2B` : "3px solid transparent" }}>
+                                        {item.label}
+                                    </motion.a>
+                                ))}
+                            </div>
+                            <motion.a href="/contact" initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5 }}
+                                onClick={() => setMobileMenuOpen(false)} className="mt-6 py-3 text-center text-sm tracking-widest uppercase font-medium rounded-full border border-[#FF6B2B]/50 text-[#FF6B2B] hover:bg-[#FF6B2B]/10 transition-all duration-300"
+                                style={{ fontFamily: "'Space Mono', monospace" }}>Get in Touch</motion.a>
+                            <div className="mt-auto pt-8 pb-4"><p className="text-[10px] tracking-[0.2em] text-center text-white/30">© 2025 Crewholic</p></div>
+                        </motion.div>
+                    </>
+                )}
+            </AnimatePresence>
+
+            {/* ── HERO SECTION (Fixed for SERVICES & RENTALS) ── */}
+            <section className="relative min-h-screen flex flex-col items-center justify-center pt-24 pb-16 px-4 overflow-hidden">
                 <div className="absolute inset-0 opacity-[0.03]" style={{ backgroundImage: `linear-gradient(rgba(255,255,255,1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,1) 1px, transparent 1px)`, backgroundSize: "80px 80px" }} />
                 <div className="absolute top-1/4 left-1/4 w-96 h-96 rounded-full opacity-10 blur-3xl" style={{ background: "#FF6B2B" }} />
                 <div className="absolute bottom-1/4 right-1/4 w-80 h-80 rounded-full opacity-10 blur-3xl" style={{ background: "#A855F7" }} />
-                
-                <div className="relative z-10 text-center max-w-5xl mx-auto">
-                    <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="flex items-center justify-center gap-3 mb-8">
-                        <div className="h-px w-12" style={{ background: "rgba(255,107,43,0.4)" }} />
-                        <span className="text-[10px] tracking-[0.4em] uppercase" style={{ color: "#FF6B2B99", fontFamily: "'Space Mono', monospace" }}>What we offer</span>
-                        <div className="h-px w-12" style={{ background: "rgba(255,107,43,0.4)" }} />
+
+                <motion.div style={{ y: heroY, scale: heroScale, opacity: heroOpacity }} className="relative z-10 text-center max-w-5xl mx-auto w-full">
+                    <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.2 }}
+                        className="flex items-center justify-center gap-3 mb-6 md:mb-8">
+                        <div className="h-px w-8 md:w-12" style={{ background: "rgba(255,107,43,0.4)" }} />
+                        <span className="text-[10px] md:text-xs tracking-[0.3em] md:tracking-[0.4em] uppercase" style={{ color: "#FF6B2B99", fontFamily: "'Space Mono', monospace" }}>What we offer</span>
+                        <div className="h-px w-8 md:w-12" style={{ background: "rgba(255,107,43,0.4)" }} />
                     </motion.div>
-                    <motion.h1 initial={{ opacity: 0, y: 40 }} animate={{ opacity: 1, y: 0 }} className="font-extrabold leading-none tracking-tighter mb-6" style={{ ...gradientStyle, fontSize: "clamp(56px, 10vw, 120px)" }}>SERVICES &<br />RENTALS</motion.h1>
-                    <OrbVisual />
-                    <motion.p initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} className="text-base md:text-lg mt-6 max-w-xl mx-auto leading-relaxed" style={{ color: "rgba(255,255,255,0.4)" }}>
+
+                    {/* SERVICES & RENTALS Heading - Fixed for mobile */}
+                    <div className="w-full flex justify-center items-center overflow-visible px-2">
+                        <motion.h1 
+                            initial={{ opacity: 0, y: 40 }} 
+                            animate={{ opacity: 1, y: 0 }} 
+                            transition={{ delay: 0.15 }}
+                            className="font-extrabold leading-[1.2] tracking-tighter text-center w-full"
+                            style={{ 
+                                ...gradientStyle, 
+                                fontSize: "clamp(32px, 6vw, 120px)", 
+                                fontFamily: "'Syne', sans-serif",
+                                whiteSpace: "normal",
+                                wordBreak: "keep-all",
+                                maxWidth: "100%",
+                                display: "inline-block"
+                            }}>
+                            SERVICES &<br />RENTALS
+                        </motion.h1>
+                    </div>
+
+                    <motion.div initial={{ opacity: 0, scale: 0.85 }} animate={{ opacity: 1, scale: 1 }} transition={{ delay: 0.3, ease: "backOut" }}>
+                        <OrbVisual />
+                    </motion.div>
+
+                    <motion.p initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5 }}
+                        className="text-sm md:text-base lg:text-lg mt-4 md:mt-6 max-w-xl mx-auto leading-relaxed px-4"
+                        style={{ color: "rgba(255,255,255,0.5)" }}>
                         Premium digital services <span style={{ color: "#FF6B2B" }}>+</span> Professional equipment rental
                     </motion.p>
-                </div>
+
+                    <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ delay: 1 }} className="mt-10 md:mt-12 flex flex-col items-center gap-2">
+                        <motion.div animate={{ y: [0, 8, 0] }} transition={{ duration: 2, repeat: Infinity, ease: "easeInOut" }} className="w-px h-8 md:h-10"
+                            style={{ background: "linear-gradient(180deg, transparent, rgba(255,107,43,0.5), transparent)" }} />
+                        <span className="text-[8px] md:text-[9px] tracking-[0.3em] md:tracking-[0.4em] uppercase" style={{ color: "rgba(255,255,255,0.2)", fontFamily: "'Space Mono', monospace" }}>Explore</span>
+                    </motion.div>
+                </motion.div>
             </section>
 
-            {/* All Cards Grid */}
+            {/* ── CARDS GRID (each card 3D scroll reveal) ── */}
             <section className="relative py-24 px-6 md:px-12 lg:px-20">
-                <motion.div initial={{ opacity: 0, x: -30 }} whileInView={{ opacity: 1, x: 0 }} viewport={{ once: true }} className="flex items-center gap-4 mb-16">
-                    <div className="h-px flex-1 max-w-16" style={{ background: "rgba(255,107,43,0.3)" }} />
-                    <span className="text-[10px] tracking-[0.4em] uppercase" style={{ color: "#FF6B2B66", fontFamily: "'Space Mono', monospace" }}>Explore All</span>
-                </motion.div>
+                <Scroll3DReveal rotateFrom={[15, -8, 0]} translateFrom={[40, 60, -80]}>
+                    <div className="flex items-center gap-4 mb-16">
+                        <div className="h-px flex-1 max-w-16" style={{ background: "rgba(255,107,43,0.3)" }} />
+                        <span className="text-[10px] tracking-[0.4em] uppercase" style={{ color: "#FF6B2B66", fontFamily: "'Space Mono', monospace" }}>Explore All</span>
+                    </div>
+                </Scroll3DReveal>
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-5 max-w-7xl mx-auto">
                     {allCards.map((item, i) => (
                         <ServiceCard key={item.id} item={item} index={i} onClick={() => handleCardClick(item)} />
@@ -947,24 +917,36 @@ function ServicePage() {
                 </div>
             </section>
 
-            {/* CTA Section */}
-            <section className="relative py-32 px-6 text-center">
+            {/* ── CTA (3D zoom-in from depth) ── */}
+            <section className="relative py-20 md:py-32 px-6 text-center overflow-hidden">
                 <div className="absolute inset-0 opacity-5" style={{ background: "radial-gradient(ellipse at center, #FF6B2B 0%, transparent 65%)" }} />
-                <motion.div initial={{ opacity: 0, y: 40 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} className="relative z-10">
-                    <p className="text-[10px] tracking-[0.4em] uppercase mb-6" style={{ color: "#FF6B2B66" }}>Need custom requirements?</p>
-                    <h2 className="font-extrabold leading-none tracking-tighter mb-8" style={{ ...gradientStyle, fontSize: "clamp(40px, 7vw, 96px)" }}>LET'S TALK<br />ABOUT YOUR<br />PROJECT.</h2>
-                    <MagneticButton>
-                        <motion.button whileHover={{ scale: 1.04 }} whileTap={{ scale: 0.97 }} className="relative overflow-hidden px-10 py-4 rounded-full text-sm tracking-widest uppercase font-bold" style={{ background: "linear-gradient(135deg, #FF6B2B, #E85520)", color: "#0C0C0C", boxShadow: "0 0 40px rgba(255,107,43,0.3)" }}>
-                            <span className="relative z-10">Contact Us</span>
-                        </motion.button>
-                    </MagneticButton>
-                </motion.div>
+                <Scroll3DReveal rotateFrom={[30, 0, 0]} translateFrom={[0, 100, -200]} scaleFrom={0.65}>
+                    <div className="relative z-10">
+                        <p className="text-[10px] tracking-[0.4em] uppercase mb-4 md:mb-6" style={{ color: "#FF6B2B66", fontFamily: "'Space Mono', monospace" }}>Need custom requirements?</p>
+                        <h2 className="font-extrabold leading-[1.2] tracking-tighter mb-6 md:mb-8"
+                            style={{ ...gradientStyle, fontSize: "clamp(28px, 5vw, 96px)", fontFamily: "'Syne', sans-serif" }}>
+                            LET'S TALK<br />ABOUT YOUR<br />PROJECT.
+                        </h2>
+                        <MagneticButton>
+                            <motion.a href="/contact" whileHover={{ scale: 1.04 }} whileTap={{ scale: 0.97 }}
+                                className="relative overflow-hidden px-6 md:px-10 py-3 md:py-4 rounded-full text-xs md:text-sm tracking-widest uppercase font-bold inline-block"
+                                style={{ background: "linear-gradient(135deg, #FF6B2B, #E85520)", color: "#0C0C0C", boxShadow: "0 0 40px rgba(255,107,43,0.3)" }}>
+                                <span className="relative z-10">Contact Us</span>
+                                <motion.div className="absolute inset-0" initial={{ x: "-100%" }} whileHover={{ x: "0%" }} transition={{ duration: 0.4 }}
+                                    style={{ background: "linear-gradient(135deg, #A855F7, #7C3AED)" }} />
+                            </motion.a>
+                        </MagneticButton>
+                    </div>
+                </Scroll3DReveal>
             </section>
 
             {/* Footer */}
-            <div className="px-8 py-6 flex items-center justify-between border-t" style={{ borderColor: "rgba(255,255,255,0.05)" }}>
-                <span className="text-[10px] tracking-[0.3em] uppercase" style={{ color: "rgba(255,255,255,0.2)" }}>© 2024 Crewholic</span>
-                <span className="text-[10px] tracking-[0.3em] uppercase" style={{ color: "rgba(255,255,255,0.2)" }}>All rights reserved</span>
+            <div className="px-6 md:px-8 py-6 flex flex-col sm:flex-row items-center justify-between gap-4 border-t" style={{ borderColor: "rgba(255,255,255,0.05)" }}>
+                <span className="text-[9px] md:text-[10px] tracking-[0.2em] md:tracking-[0.3em] uppercase text-center" style={{ color: "rgba(255,255,255,0.2)", fontFamily: "'Space Mono', monospace" }}>© 2025 Crewholic. All rights reserved.</span>
+                <div className="flex gap-6">
+                    <a href="#" className="text-[9px] md:text-[10px] tracking-[0.2em] md:tracking-[0.3em] uppercase hover:text-[#FF6B2B] transition-colors" style={{ color: "rgba(255,255,255,0.3)", fontFamily: "'Space Mono', monospace" }}>Privacy</a>
+                    <a href="#" className="text-[9px] md:text-[10px] tracking-[0.2em] md:tracking-[0.3em] uppercase hover:text-[#FF6B2B] transition-colors" style={{ color: "rgba(255,255,255,0.3)", fontFamily: "'Space Mono', monospace" }}>Terms</a>
+                </div>
             </div>
 
             {/* Modals */}

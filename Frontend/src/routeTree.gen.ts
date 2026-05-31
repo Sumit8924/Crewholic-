@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as UserDashboardRouteImport } from './routes/user-dashboard'
 import { Route as SignupRouteImport } from './routes/signup'
 import { Route as ServiceRouteImport } from './routes/service'
+import { Route as ProjectRouteImport } from './routes/project'
 import { Route as PortfolioRouteImport } from './routes/portfolio'
 import { Route as LoginRouteImport } from './routes/login'
 import { Route as ContactRouteImport } from './routes/contact'
@@ -31,6 +32,11 @@ const SignupRoute = SignupRouteImport.update({
 const ServiceRoute = ServiceRouteImport.update({
   id: '/service',
   path: '/service',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ProjectRoute = ProjectRouteImport.update({
+  id: '/project',
+  path: '/project',
   getParentRoute: () => rootRouteImport,
 } as any)
 const PortfolioRoute = PortfolioRouteImport.update({
@@ -65,6 +71,7 @@ export interface FileRoutesByFullPath {
   '/contact': typeof ContactRoute
   '/login': typeof LoginRoute
   '/portfolio': typeof PortfolioRoute
+  '/project': typeof ProjectRoute
   '/service': typeof ServiceRoute
   '/signup': typeof SignupRoute
   '/user-dashboard': typeof UserDashboardRoute
@@ -75,6 +82,7 @@ export interface FileRoutesByTo {
   '/contact': typeof ContactRoute
   '/login': typeof LoginRoute
   '/portfolio': typeof PortfolioRoute
+  '/project': typeof ProjectRoute
   '/service': typeof ServiceRoute
   '/signup': typeof SignupRoute
   '/user-dashboard': typeof UserDashboardRoute
@@ -86,6 +94,7 @@ export interface FileRoutesById {
   '/contact': typeof ContactRoute
   '/login': typeof LoginRoute
   '/portfolio': typeof PortfolioRoute
+  '/project': typeof ProjectRoute
   '/service': typeof ServiceRoute
   '/signup': typeof SignupRoute
   '/user-dashboard': typeof UserDashboardRoute
@@ -98,6 +107,7 @@ export interface FileRouteTypes {
     | '/contact'
     | '/login'
     | '/portfolio'
+    | '/project'
     | '/service'
     | '/signup'
     | '/user-dashboard'
@@ -108,6 +118,7 @@ export interface FileRouteTypes {
     | '/contact'
     | '/login'
     | '/portfolio'
+    | '/project'
     | '/service'
     | '/signup'
     | '/user-dashboard'
@@ -118,6 +129,7 @@ export interface FileRouteTypes {
     | '/contact'
     | '/login'
     | '/portfolio'
+    | '/project'
     | '/service'
     | '/signup'
     | '/user-dashboard'
@@ -129,6 +141,7 @@ export interface RootRouteChildren {
   ContactRoute: typeof ContactRoute
   LoginRoute: typeof LoginRoute
   PortfolioRoute: typeof PortfolioRoute
+  ProjectRoute: typeof ProjectRoute
   ServiceRoute: typeof ServiceRoute
   SignupRoute: typeof SignupRoute
   UserDashboardRoute: typeof UserDashboardRoute
@@ -155,6 +168,13 @@ declare module '@tanstack/react-router' {
       path: '/service'
       fullPath: '/service'
       preLoaderRoute: typeof ServiceRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/project': {
+      id: '/project'
+      path: '/project'
+      fullPath: '/project'
+      preLoaderRoute: typeof ProjectRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/portfolio': {
@@ -201,6 +221,7 @@ const rootRouteChildren: RootRouteChildren = {
   ContactRoute: ContactRoute,
   LoginRoute: LoginRoute,
   PortfolioRoute: PortfolioRoute,
+  ProjectRoute: ProjectRoute,
   ServiceRoute: ServiceRoute,
   SignupRoute: SignupRoute,
   UserDashboardRoute: UserDashboardRoute,

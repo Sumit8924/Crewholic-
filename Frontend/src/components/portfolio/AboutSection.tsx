@@ -74,7 +74,7 @@ export function AboutSection() {
         </FadeIn>
         <div className="flex flex-col items-center gap-16 sm:gap-20 md:gap-24">
           <AnimatedText
-            text="With more than five years of experience in design, i focus on branding, web design, and user experience, i truly enjoy working with businesses that aim to stand out and present their best image. Let's build something incredible together!"
+            text="Crewholic is a creative digital agency dedicated to helping businesses thrive in the digital age. We combine innovative strategies with cutting-edge technology to deliver exceptional results across digital marketing, web development, equipment rental, and event management."
             className="font-medium text-center leading-relaxed max-w-[560px]"
             style={{ color: "#D7E2EA", fontSize: "clamp(1rem, 2vw, 1.35rem)" }}
           />
