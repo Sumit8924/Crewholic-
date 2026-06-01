@@ -21,9 +21,10 @@ app.use(express.json());
 app.use(
     cors({
         origin: [
-        "http://localhost:3000",
-        "http://localhost:8080",
-        "https://crewholic.vercel.app",
+            "http://localhost:3000",
+            "http://localhost:8080",
+            "https://crewholic.vercel.app",
+            "https://crewholic-djzl6zjxv-sumit-kumar-routs-projects.vercel.app",
         ],
         credentials: true,
     })
