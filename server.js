@@ -15,7 +15,6 @@ const orderRoutes = require("./backend/routes/orderRoutes");
 const generateExcelFile = require("./backend/utils/generateExcel");
 
 const app = express();
-
 app.use(express.json());
 
 app.use(
@@ -23,6 +22,7 @@ app.use(
         origin: [
             "http://localhost:3000",
             "http://localhost:8080",
+            "http://localhost:5173",
             "https://crewholic.vercel.app",
             "https://crewholic-djzl6zjxv-sumit-kumar-routs-projects.vercel.app",
         ],
@@ -34,7 +34,7 @@ app.use("/api/export", exportRoutes);
 app.use("/api/orders", orderRoutes);
 
 const PORT = process.env.PORT || 5000;
-const JWT_SECRET = process.env.JWT_SECRET;
+const JWT_SECRET = process.env.JWT_SECRET || "crewholic_secret";
 const MONGO_URI = process.env.MONGO_URI;
 
 const BREVO_API_KEY = process.env.BREVO_API_KEY;
@@ -49,6 +49,54 @@ const apiKey = defaultClient.authentications["api-key"];
 apiKey.apiKey = BREVO_API_KEY;
 
 const emailApi = new SibApiV3Sdk.TransactionalEmailsApi();
+
+const ROLES = {
+    MAIN_ADMIN: "main_admin",
+    EVENT_ADMIN: "event_admin",
+    FINANCE_ADMIN: "finance_admin",
+    MARKETING_ADMIN: "marketing_admin",
+    RENTAL_ADMIN: "rental_admin",
+    WEB_ADMIN: "web_admin",
+    USER: "user",
+};
+
+const ADMIN_ROLES = [
+    ROLES.MAIN_ADMIN,
+    ROLES.EVENT_ADMIN,
+    ROLES.FINANCE_ADMIN,
+    ROLES.MARKETING_ADMIN,
+    ROLES.RENTAL_ADMIN,
+    ROLES.WEB_ADMIN,
+];
+
+const ROLE_PERMISSIONS = {
+    main_admin: [
+        "dashboard",
+        "website",
+        "marketing",
+        "rental",
+        "events",
+        "finance",
+        "team",
+        "reports",
+        "settings",
+    ],
+    event_admin: ["dashboard", "events", "reports"],
+    finance_admin: ["dashboard", "finance", "reports"],
+    marketing_admin: ["dashboard", "marketing", "reports"],
+    rental_admin: ["dashboard", "rental", "reports"],
+    web_admin: ["dashboard", "website", "reports"],
+    user: ["dashboard"],
+};
+
+function getDashboardRoute(role) {
+    if (ADMIN_ROLES.includes(role)) return "/admin";
+    return "/dashboard";
+}
+
+function getPermissions(role) {
+    return ROLE_PERMISSIONS[role] || ROLE_PERMISSIONS.user;
+}
 
 async function sendEmail(to, subject, html) {
     try {
@@ -87,6 +135,7 @@ const userSchema = new mongoose.Schema(
         email: {
             type: String,
             unique: true,
+            required: true,
         },
         password: String,
         authProvider: {
@@ -96,16 +145,12 @@ const userSchema = new mongoose.Schema(
         },
         role: {
             type: String,
-            enum: [
-                "super_admin",
-                "rental_admin",
-                "finance_admin",
-                "webdev_admin",
-                "marketing_admin",
-                "event_admin",
-                "user",
-            ],
-            default: "user",
+            enum: Object.values(ROLES),
+            default: ROLES.USER,
+        },
+        isActive: {
+            type: Boolean,
+            default: true,
         },
     },
     { timestamps: true }
@@ -113,9 +158,98 @@ const userSchema = new mongoose.Schema(
 
 const User = mongoose.models.User || mongoose.model("User", userSchema);
 
-async function createAdmin() {
-    const adminEmail = "admin@crewholic.com";
+function createToken(user) {
+    return jwt.sign(
+        {
+            id: user._id,
+            role: user.role,
+            email: user.email,
+        },
+        JWT_SECRET,
+        { expiresIn: "1d" }
+    );
+}
 
+function cleanUser(user) {
+    return {
+        _id: user._id,
+        name: user.name,
+        email: user.email,
+        role: user.role,
+        authProvider: user.authProvider,
+        dashboardRoute: getDashboardRoute(user.role),
+        permissions: getPermissions(user.role),
+    };
+}
+
+function verifyToken(req, res, next) {
+    const authHeader = req.headers.authorization;
+
+    if (!authHeader) {
+        return res.status(401).json({ msg: "No token" });
+    }
+
+    const token = authHeader.split(" ")[1] || authHeader;
+
+    try {
+        const decoded = jwt.verify(token, JWT_SECRET);
+        req.user = decoded;
+        next();
+    } catch (err) {
+        return res.status(401).json({ msg: "Invalid token" });
+    }
+}
+
+function verifyAdmin(req, res, next) {
+    const authHeader = req.headers.authorization;
+
+    if (!authHeader) {
+        return res.status(401).json({ msg: "No token" });
+    }
+
+    const token = authHeader.split(" ")[1] || authHeader;
+
+    try {
+        const decoded = jwt.verify(token, JWT_SECRET);
+
+        if (!ADMIN_ROLES.includes(decoded.role)) {
+            return res.status(403).json({ msg: "Admin only" });
+        }
+
+        req.user = decoded;
+        next();
+    } catch (err) {
+        return res.status(401).json({ msg: "Invalid token" });
+    }
+}
+
+function authorizeRoles(...roles) {
+    return (req, res, next) => {
+        const authHeader = req.headers.authorization;
+
+        if (!authHeader) {
+            return res.status(401).json({ msg: "No token" });
+        }
+
+        const token = authHeader.split(" ")[1] || authHeader;
+
+        try {
+            const decoded = jwt.verify(token, JWT_SECRET);
+
+            if (!roles.includes(decoded.role)) {
+                return res.status(403).json({ msg: "Access denied" });
+            }
+
+            req.user = decoded;
+            next();
+        } catch (err) {
+            return res.status(401).json({ msg: "Invalid token" });
+        }
+    };
+}
+
+async function createMainAdmin() {
+    const adminEmail = "admin@crewholic.com";
     const exist = await User.findOne({ email: adminEmail });
 
     if (!exist) {
@@ -126,10 +260,10 @@ async function createAdmin() {
             email: adminEmail,
             password: hashed,
             authProvider: "local",
-            role: "super_admin",
+            role: ROLES.MAIN_ADMIN,
         });
 
-        console.log("👑 Super Admin Created");
+        console.log("👑 Main Admin Created");
         await safeGenerateExcel();
     }
 }
@@ -139,7 +273,7 @@ mongoose
     .then(async () => {
         console.log("✅ MongoDB Connected");
 
-        await createAdmin();
+        await createMainAdmin();
         await safeGenerateExcel();
 
         cron.schedule("* * * * *", async () => {
@@ -156,19 +290,290 @@ mongoose
     });
 
 app.get("/", (req, res) => {
-    res.send("🚀 Backend Running Successfully with Brevo API + Google Login + Auto Excel");
+    res.send("🚀 Backend Running Successfully");
 });
+
+app.get("/api/me", verifyToken, async (req, res) => {
+    try {
+        const user = await User.findById(req.user.id).select("-password");
+
+        if (!user) {
+            return res.status(404).json({ msg: "User not found" });
+        }
+
+        res.json({
+            user: cleanUser(user),
+        });
+    } catch (err) {
+        res.status(500).json({
+            msg: "Failed to load profile",
+            error: err.message,
+        });
+    }
+});
+
+app.get("/api/admin/dashboard", verifyAdmin, async (req, res) => {
+    try {
+        const role = req.user.role;
+
+        const orderFilter = {};
+
+        if (role === ROLES.EVENT_ADMIN) {
+            orderFilter.service = { $regex: "event", $options: "i" };
+        }
+
+        if (role === ROLES.FINANCE_ADMIN) {
+            // Finance admin can see all orders for payment/revenue.
+        }
+
+        if (role === ROLES.MARKETING_ADMIN) {
+            orderFilter.service = { $regex: "marketing", $options: "i" };
+        }
+
+        if (role === ROLES.RENTAL_ADMIN) {
+            orderFilter.service = { $regex: "rental", $options: "i" };
+        }
+
+        if (role === ROLES.WEB_ADMIN) {
+            orderFilter.service = { $regex: "web|website|software", $options: "i" };
+        }
+
+        const [
+            totalUsers,
+            totalOrders,
+            pendingOrders,
+            approvedOrders,
+            completedOrders,
+            cancelledOrders,
+            users,
+            recentOrders,
+            revenueByService,
+            weeklyOrders,
+        ] = await Promise.all([
+            User.countDocuments(),
+            Order.countDocuments(orderFilter),
+            Order.countDocuments({ ...orderFilter, status: "pending" }),
+            Order.countDocuments({ ...orderFilter, status: "approved" }),
+            Order.countDocuments({ ...orderFilter, status: "completed" }),
+            Order.countDocuments({ ...orderFilter, status: "cancelled" }),
+            role === ROLES.MAIN_ADMIN
+                ? User.find({})
+                    .select("-password")
+                    .sort({ createdAt: -1 })
+                    .limit(50)
+                    .lean()
+                : [],
+            Order.find(orderFilter).sort({ createdAt: -1 }).limit(50).lean(),
+            Order.aggregate([
+                { $match: orderFilter },
+                {
+                    $group: {
+                        _id: "$service",
+                        totalRevenue: { $sum: "$amount" },
+                        totalOrders: { $sum: 1 },
+                    },
+                },
+                { $sort: { totalRevenue: -1 } },
+            ]),
+            Order.aggregate([
+                {
+                    $match: {
+                        ...orderFilter,
+                        createdAt: {
+                            $gte: new Date(Date.now() - 7 * 24 * 60 * 60 * 1000),
+                        },
+                    },
+                },
+                {
+                    $group: {
+                        _id: {
+                            $dateToString: {
+                                format: "%Y-%m-%d",
+                                date: "$createdAt",
+                            },
+                        },
+                        count: { $sum: 1 },
+                        revenue: { $sum: "$amount" },
+                    },
+                },
+                { $sort: { _id: 1 } },
+            ]),
+        ]);
+
+        const totalRevenueResult = await Order.aggregate([
+            { $match: orderFilter },
+            {
+                $group: {
+                    _id: null,
+                    total: { $sum: "$amount" },
+                },
+            },
+        ]);
+
+        res.json({
+            msg: "Admin dashboard data loaded",
+            role,
+            permissions: getPermissions(role),
+            metrics: {
+                totalUsers: role === ROLES.MAIN_ADMIN ? totalUsers : null,
+                totalOrders,
+                pendingOrders,
+                approvedOrders,
+                completedOrders,
+                cancelledOrders,
+                totalRevenue: totalRevenueResult[0]?.total || 0,
+            },
+            users,
+            recentOrders,
+            revenueByService,
+            weeklyOrders,
+            lastUpdated: new Date(),
+        });
+    } catch (err) {
+        res.status(500).json({
+            msg: "Error loading admin dashboard",
+            error: err.message,
+        });
+    }
+});
+
+app.patch("/api/admin/orders/:id/status", verifyAdmin, async (req, res) => {
+    try {
+        const { status } = req.body;
+
+        if (!["pending", "approved", "completed", "cancelled"].includes(status)) {
+            return res.status(400).json({ msg: "Invalid status" });
+        }
+
+        const order = await Order.findByIdAndUpdate(
+            req.params.id,
+            { status },
+            { new: true }
+        );
+
+        if (!order) {
+            return res.status(404).json({ msg: "Order not found" });
+        }
+
+        await safeGenerateExcel();
+
+        res.json({
+            msg: "Order status updated",
+            order,
+        });
+    } catch (err) {
+        res.status(500).json({
+            msg: "Failed to update order status",
+            error: err.message,
+        });
+    }
+});
+
+app.post(
+    "/api/admin/create-sub-admin",
+    authorizeRoles(ROLES.MAIN_ADMIN),
+    async (req, res) => {
+        try {
+            const { name, email, password, role } = req.body;
+
+            const allowedSubRoles = [
+                ROLES.EVENT_ADMIN,
+                ROLES.FINANCE_ADMIN,
+                ROLES.MARKETING_ADMIN,
+                ROLES.RENTAL_ADMIN,
+                ROLES.WEB_ADMIN,
+            ];
+
+            if (!name || !email || !password || !role) {
+                return res.status(400).json({
+                    msg: "Name, email, password and role required",
+                });
+            }
+
+            if (!allowedSubRoles.includes(role)) {
+                return res.status(400).json({
+                    msg: "Invalid sub-admin role",
+                    allowedRoles: allowedSubRoles,
+                });
+            }
+
+            const exist = await User.findOne({ email });
+
+            if (exist) {
+                return res.status(400).json({
+                    msg: "User already exists",
+                });
+            }
+
+            const hashedPassword = await bcrypt.hash(password, 10);
+
+            const subAdmin = await User.create({
+                name,
+                email,
+                password: hashedPassword,
+                authProvider: "local",
+                role,
+            });
+
+            await safeGenerateExcel();
+
+            res.status(201).json({
+                msg: "Sub-admin created successfully",
+                user: cleanUser(subAdmin),
+            });
+        } catch (err) {
+            res.status(500).json({
+                msg: "Failed to create sub-admin",
+                error: err.message,
+            });
+        }
+    }
+);
+
+app.patch(
+    "/api/admin/users/:id/role",
+    authorizeRoles(ROLES.MAIN_ADMIN),
+    async (req, res) => {
+        try {
+            const { role } = req.body;
+
+            if (!Object.values(ROLES).includes(role)) {
+                return res.status(400).json({
+                    msg: "Invalid role",
+                    allowedRoles: Object.values(ROLES),
+                });
+            }
+
+            const user = await User.findByIdAndUpdate(
+                req.params.id,
+                { role },
+                { new: true }
+            ).select("-password");
+
+            if (!user) {
+                return res.status(404).json({
+                    msg: "User not found",
+                });
+            }
+
+            await safeGenerateExcel();
+
+            res.json({
+                msg: "User role updated successfully",
+                user: cleanUser(user),
+            });
+        } catch (err) {
+            res.status(500).json({
+                msg: "Failed to update user role",
+                error: err.message,
+            });
+        }
+    }
+);
 
 app.post("/api/service-inquiry", async (req, res) => {
     try {
-        const {
-            service,
-            timeline,
-            name,
-            mobile,
-            email,
-            requirements,
-        } = req.body;
+        const { service, timeline, name, mobile, email, requirements } = req.body;
 
         if (!service || !name || !mobile || !email || !requirements) {
             return res.status(400).json({
@@ -176,27 +581,35 @@ app.post("/api/service-inquiry", async (req, res) => {
             });
         }
 
+        const order = await Order.create({
+            service,
+            serviceType: service,
+            amount: 0,
+            status: "pending",
+            customerName: name,
+            customerEmail: email,
+            customerPhone: mobile,
+            timeline,
+            features: requirements,
+            projectType: service,
+        });
+
         await sendEmail(
             "officialcrewholic@gmail.com",
             `📩 New Service Inquiry - ${service}`,
             `
             <div style="font-family: Arial, sans-serif; padding: 20px;">
                 <h2 style="color:#9B51E0;">New Service Inquiry</h2>
-
                 <p><strong>Service:</strong> ${service}</p>
                 <p><strong>Timeline:</strong> ${timeline || "Not specified"}</p>
-
                 <hr/>
-
                 <p><strong>Name:</strong> ${name}</p>
                 <p><strong>Mobile:</strong> ${mobile}</p>
                 <p><strong>Email:</strong> ${email}</p>
-
                 <p><strong>Requirements:</strong></p>
                 <p style="background:#f2f2f2; padding:15px; border-radius:10px;">
                     ${requirements}
                 </p>
-
                 <br/>
                 <p>Admin please review and approve this inquiry.</p>
             </div>
@@ -217,8 +630,11 @@ app.post("/api/service-inquiry", async (req, res) => {
             `
         );
 
+        await safeGenerateExcel();
+
         res.json({
-            msg: "Inquiry sent successfully",
+            msg: "Inquiry saved and sent successfully",
+            order,
         });
     } catch (err) {
         res.status(500).json({
@@ -266,9 +682,7 @@ app.post("/api/otp/send-email", async (req, res) => {
     const { email } = req.body;
 
     if (!email) {
-        return res.status(400).json({
-            message: "Email required",
-        });
+        return res.status(400).json({ message: "Email required" });
     }
 
     const otp = Math.floor(100000 + Math.random() * 900000);
@@ -291,9 +705,7 @@ app.post("/api/otp/send-email", async (req, res) => {
             `
         );
 
-        res.json({
-            message: "Email OTP sent successfully",
-        });
+        res.json({ message: "Email OTP sent successfully" });
     } catch (err) {
         res.status(500).json({
             message: "Failed to send email OTP",
@@ -307,40 +719,26 @@ app.post("/api/otp/verify-email", (req, res) => {
 
     const record = otpStore[email];
 
-    if (!record) {
-        return res.status(400).json({
-            message: "No OTP found",
-        });
-    }
+    if (!record) return res.status(400).json({ message: "No OTP found" });
 
     if (Date.now() > record.expires) {
         delete otpStore[email];
-        return res.status(400).json({
-            message: "OTP expired",
-        });
+        return res.status(400).json({ message: "OTP expired" });
     }
 
     if (record.otp != otp) {
-        return res.status(400).json({
-            message: "Invalid OTP",
-        });
+        return res.status(400).json({ message: "Invalid OTP" });
     }
 
     delete otpStore[email];
 
-    res.json({
-        message: "Email verified successfully",
-    });
+    res.json({ message: "Email verified successfully" });
 });
 
 app.post("/api/send-otp", async (req, res) => {
     const { email } = req.body;
 
-    if (!email) {
-        return res.status(400).json({
-            msg: "Email required",
-        });
-    }
+    if (!email) return res.status(400).json({ msg: "Email required" });
 
     const otp = Math.floor(100000 + Math.random() * 900000);
 
@@ -361,9 +759,7 @@ app.post("/api/send-otp", async (req, res) => {
             `
         );
 
-        res.json({
-            msg: "OTP sent successfully",
-        });
+        res.json({ msg: "OTP sent successfully" });
     } catch (err) {
         res.status(500).json({
             msg: "Failed to send OTP",
@@ -377,30 +773,20 @@ app.post("/api/verify-otp", (req, res) => {
 
     const record = otpStore[email];
 
-    if (!record) {
-        return res.status(400).json({
-            msg: "No OTP found",
-        });
-    }
+    if (!record) return res.status(400).json({ msg: "No OTP found" });
 
     if (Date.now() > record.expires) {
         delete otpStore[email];
-        return res.status(400).json({
-            msg: "OTP expired",
-        });
+        return res.status(400).json({ msg: "OTP expired" });
     }
 
     if (record.otp != otp) {
-        return res.status(400).json({
-            msg: "Invalid OTP",
-        });
+        return res.status(400).json({ msg: "Invalid OTP" });
     }
 
     delete otpStore[email];
 
-    res.json({
-        msg: "OTP verified successfully",
-    });
+    res.json({ msg: "OTP verified successfully" });
 });
 
 app.post("/api/register", async (req, res) => {
@@ -439,6 +825,7 @@ app.post("/api/register", async (req, res) => {
             email,
             password: hashedPassword,
             authProvider: "local",
+            role: ROLES.USER,
         });
 
         await safeGenerateExcel();
@@ -449,15 +836,8 @@ app.post("/api/register", async (req, res) => {
             `
             <div style="font-family: Arial, sans-serif; background: #0a0a2a; padding: 30px; color: #fff;">
                 <div style="max-width: 600px; margin: auto; background: #111328; border-radius: 20px; padding: 30px; text-align: center;">
-                    <h1 style="color: #9B51E0; margin-bottom: 10px;">
-                        Welcome, ${finalName} 🚀
-                    </h1>
-                    <p style="font-size: 16px; color: #ccc;">
-                        Your account has been successfully created at <b style="color:#F2994A;">CREWHOLIC</b>.
-                    </p>
-                    <p style="font-size: 12px; color: #777;">
-                        CREWHOLIC Team 🚀
-                    </p>
+                    <h1 style="color: #9B51E0;">Welcome, ${finalName} 🚀</h1>
+                    <p>Your account has been successfully created at CREWHOLIC.</p>
                 </div>
             </div>
             `
@@ -468,11 +848,7 @@ app.post("/api/register", async (req, res) => {
         res.status(201).json({
             msg: "Registered successfully",
             message: "Registered successfully",
-            user: {
-                name: newUser.name,
-                email: newUser.email,
-                role: newUser.role,
-            },
+            user: cleanUser(newUser),
         });
     } catch (err) {
         if (err.code === 11000) {
@@ -523,6 +899,7 @@ app.post("/api/auth/signup", async (req, res) => {
             email,
             password: hashedPassword,
             authProvider: "local",
+            role: ROLES.USER,
         });
 
         await safeGenerateExcel();
@@ -535,7 +912,6 @@ app.post("/api/auth/signup", async (req, res) => {
                 <div style="max-width: 600px; margin: auto; background: #111328; border-radius: 20px; padding: 30px; text-align: center;">
                     <h1 style="color: #9B51E0;">Welcome, ${finalName} 🚀</h1>
                     <p>Your account has been successfully created at CREWHOLIC.</p>
-                    <p style="font-size: 12px; color: #777;">CREWHOLIC Team 🚀</p>
                 </div>
             </div>
             `
@@ -545,17 +921,11 @@ app.post("/api/auth/signup", async (req, res) => {
 
         res.status(201).json({
             message: "Account created successfully",
-            user: {
-                name: newUser.name,
-                email: newUser.email,
-                role: newUser.role,
-            },
+            user: cleanUser(newUser),
         });
     } catch (err) {
         if (err.code === 11000) {
-            return res.status(400).json({
-                message: "User already exists",
-            });
+            return res.status(400).json({ message: "User already exists" });
         }
 
         res.status(500).json({
@@ -576,9 +946,7 @@ app.post("/api/auth/google", async (req, res) => {
         }
 
         if (!credential) {
-            return res.status(400).json({
-                msg: "Google credential missing",
-            });
+            return res.status(400).json({ msg: "Google credential missing" });
         }
 
         const ticket = await googleClient.verifyIdToken({
@@ -589,9 +957,7 @@ app.post("/api/auth/google", async (req, res) => {
         const payload = ticket.getPayload();
 
         if (!payload || !payload.email) {
-            return res.status(400).json({
-                msg: "Google account email not found",
-            });
+            return res.status(400).json({ msg: "Google account email not found" });
         }
 
         const name = payload.name || "Google User";
@@ -605,28 +971,17 @@ app.post("/api/auth/google", async (req, res) => {
                 email,
                 password: "",
                 authProvider: "google",
-                role: "user",
+                role: ROLES.USER,
             });
 
             await safeGenerateExcel();
         }
 
-        const token = jwt.sign(
-            {
-                id: user._id,
-                role: user.role,
-            },
-            JWT_SECRET,
-            { expiresIn: "1d" }
-        );
+        const token = createToken(user);
 
         res.json({
             msg: "Google login successful",
-            user: {
-                name: user.name,
-                email: user.email,
-                role: user.role,
-            },
+            user: cleanUser(user),
             token,
         });
     } catch (err) {
@@ -644,9 +999,11 @@ app.post("/api/login", async (req, res) => {
         const user = await User.findOne({ email });
 
         if (!user) {
-            return res.status(404).json({
-                msg: "User not found",
-            });
+            return res.status(404).json({ msg: "User not found" });
+        }
+
+        if (!user.isActive) {
+            return res.status(403).json({ msg: "Your account is disabled" });
         }
 
         if (user.authProvider === "google" && !user.password) {
@@ -658,27 +1015,14 @@ app.post("/api/login", async (req, res) => {
         const match = await bcrypt.compare(password, user.password);
 
         if (!match) {
-            return res.status(401).json({
-                msg: "Wrong password",
-            });
+            return res.status(401).json({ msg: "Wrong password" });
         }
 
-        const token = jwt.sign(
-            {
-                id: user._id,
-                role: user.role,
-            },
-            JWT_SECRET,
-            { expiresIn: "1d" }
-        );
+        const token = createToken(user);
 
         res.json({
             msg: "Login successful",
-            user: {
-                name: user.name,
-                email: user.email,
-                role: user.role,
-            },
+            user: cleanUser(user),
             token,
         });
     } catch (err) {
@@ -689,83 +1033,12 @@ app.post("/api/login", async (req, res) => {
     }
 });
 
-function verifyAdmin(req, res, next) {
-    const authHeader = req.headers.authorization;
-
-    if (!authHeader) {
-        return res.status(401).json({
-            msg: "No token",
-        });
-    }
-
-    const token = authHeader.split(" ")[1];
-
-    try {
-        const decoded = jwt.verify(token, JWT_SECRET);
-
-        if (
-            ![
-                "super_admin",
-                "rental_admin",
-                "finance_admin",
-                "webdev_admin",
-                "marketing_admin",
-                "event_admin",
-            ].includes(decoded.role)
-        ) {
-            return res.status(403).json({
-                msg: "Admin only",
-            });
-        }
-
-        req.user = decoded;
-        next();
-    } catch (err) {
-        res.status(401).json({
-            msg: "Invalid token",
-        });
-    }
-}
-
-function authorizeRoles(...roles) {
-    return (req, res, next) => {
-        const authHeader = req.headers.authorization;
-
-        if (!authHeader) {
-            return res.status(401).json({
-                msg: "No token",
-            });
-        }
-
-        const token = authHeader.split(" ")[1] || authHeader;
-
-        try {
-            const decoded = jwt.verify(token, JWT_SECRET);
-
-            if (!roles.includes(decoded.role)) {
-                return res.status(403).json({
-                    msg: "Access denied",
-                });
-            }
-
-            req.user = decoded;
-            next();
-        } catch (err) {
-            res.status(401).json({
-                msg: "Invalid token",
-            });
-        }
-    };
-}
-
 app.post("/api/admin/approve-order", verifyAdmin, async (req, res) => {
     try {
         const { email, name, service } = req.body;
 
         if (!email || !name || !service) {
-            return res.status(400).json({
-                msg: "Missing data",
-            });
+            return res.status(400).json({ msg: "Missing data" });
         }
 
         const result = await sendEmail(
@@ -799,9 +1072,7 @@ app.post("/api/contact", async (req, res) => {
         const { name, email, service, message } = req.body;
 
         if (!name || !email || !message) {
-            return res.status(400).json({
-                msg: "All fields required",
-            });
+            return res.status(400).json({ msg: "All fields required" });
         }
 
         await sendEmail(
@@ -832,31 +1103,11 @@ app.post("/api/contact", async (req, res) => {
             `
         );
 
-        res.json({
-            msg: "Message sent successfully",
-        });
+        res.json({ msg: "Message sent successfully" });
     } catch (err) {
         res.status(500).json({
             msg: "Failed to send message",
             error: err.response?.body || err.message,
-        });
-    }
-});
-
-app.get("/api/test-order", async (req, res) => {
-    try {
-        const order = await Order.create({
-            service: "rental",
-            amount: 2000,
-            status: "pending",
-        });
-
-        await safeGenerateExcel();
-
-        res.json(order);
-    } catch (err) {
-        res.status(500).json({
-            msg: "Error creating order",
         });
     }
 });
@@ -871,9 +1122,7 @@ app.get("/api/admin/analytics", verifyAdmin, async (req, res) => {
             {
                 $group: {
                     _id: "$service",
-                    total: {
-                        $sum: "$amount",
-                    },
+                    total: { $sum: "$amount" },
                 },
             },
         ]);
@@ -894,7 +1143,7 @@ app.get("/api/admin/analytics", verifyAdmin, async (req, res) => {
 
 app.get(
     "/api/rental-dashboard",
-    authorizeRoles("rental_admin", "super_admin"),
+    authorizeRoles(ROLES.RENTAL_ADMIN, ROLES.MAIN_ADMIN),
     (req, res) => {
         res.json({ msg: "📦 Rental Dashboard Data" });
     }
@@ -902,7 +1151,7 @@ app.get(
 
 app.get(
     "/api/finance-dashboard",
-    authorizeRoles("finance_admin", "super_admin"),
+    authorizeRoles(ROLES.FINANCE_ADMIN, ROLES.MAIN_ADMIN),
     (req, res) => {
         res.json({ msg: "💰 Finance Dashboard Data" });
     }
@@ -910,7 +1159,7 @@ app.get(
 
 app.get(
     "/api/webdev-dashboard",
-    authorizeRoles("webdev_admin", "super_admin"),
+    authorizeRoles(ROLES.WEB_ADMIN, ROLES.MAIN_ADMIN),
     (req, res) => {
         res.json({ msg: "💻 Web Development Dashboard Data" });
     }
@@ -918,7 +1167,7 @@ app.get(
 
 app.get(
     "/api/marketing-dashboard",
-    authorizeRoles("marketing_admin", "super_admin"),
+    authorizeRoles(ROLES.MARKETING_ADMIN, ROLES.MAIN_ADMIN),
     (req, res) => {
         res.json({ msg: "📈 Marketing Dashboard Data" });
     }
@@ -926,19 +1175,19 @@ app.get(
 
 app.get(
     "/api/event-dashboard",
-    authorizeRoles("event_admin", "super_admin"),
+    authorizeRoles(ROLES.EVENT_ADMIN, ROLES.MAIN_ADMIN),
     (req, res) => {
         res.json({ msg: "🎉 Event Management Dashboard Data" });
     }
 );
 
-app.get("/api/super-dashboard", authorizeRoles("super_admin"), async (req, res) => {
+app.get("/api/main-dashboard", authorizeRoles(ROLES.MAIN_ADMIN), async (req, res) => {
     try {
         const totalUsers = await User.countDocuments();
         const totalOrders = await Order.countDocuments();
 
         res.json({
-            msg: "👑 Super Admin Dashboard",
+            msg: "👑 Main Admin Dashboard",
             totalUsers,
             totalOrders,
         });
@@ -953,6 +1202,8 @@ app.get("/api/super-dashboard", authorizeRoles("super_admin"), async (req, res) 
 app.get("/api/admin-data", verifyAdmin, (req, res) => {
     res.json({
         msg: "🔥 Admin access granted",
+        role: req.user.role,
+        permissions: getPermissions(req.user.role),
     });
 });
 
@@ -971,6 +1222,24 @@ app.get("/api/excel-data", async (req, res) => {
     } catch (error) {
         res.status(500).json({
             message: error.message,
+        });
+    }
+});
+
+app.get("/api/test-order", async (req, res) => {
+    try {
+        const order = await Order.create({
+            service: "rental",
+            amount: 2000,
+            status: "pending",
+        });
+
+        await safeGenerateExcel();
+
+        res.json(order);
+    } catch (err) {
+        res.status(500).json({
+            msg: "Error creating order",
         });
     }
 });

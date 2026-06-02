@@ -1,5 +1,5 @@
 /* eslint-disable prettier/prettier */
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState, useEffect } from "react";
 import logo from "../components/portfolio/skr.png";
 
@@ -11,6 +11,7 @@ const API_BASE_URL =
     import.meta.env.VITE_API_URL || "https://crewholic-0jht.onrender.com/api";
 
 function SignupPage() {
+    const navigate = useNavigate();
     const [showPassword, setShowPassword] = useState(false);
     const [showConfirmPassword, setShowConfirmPassword] = useState(false);
 
@@ -27,6 +28,7 @@ function SignupPage() {
     const [emailOTPLoading, setEmailOTPLoading] = useState(false);
 
     const [passwordError, setPasswordError] = useState("");
+    const [agreeTerms, setAgreeTerms] = useState(false);
 
     const togglePassword = () => setShowPassword(!showPassword);
     const toggleConfirmPassword = () => setShowConfirmPassword(!showConfirmPassword);
@@ -130,6 +132,11 @@ function SignupPage() {
             return;
         }
 
+        if (!agreeTerms) {
+            alert("Please agree to the Terms of Service and Privacy Policy");
+            return;
+        }
+
         try {
             setLoading(true);
 
@@ -153,8 +160,19 @@ function SignupPage() {
                 return;
             }
 
-            alert("Account created successfully!");
-        } catch (error) {
+            // Store user info for welcome message
+            localStorage.setItem("token", data.token || "dummy-token");
+            localStorage.setItem("user", JSON.stringify({ name: fullName, email }));
+
+            // Navigate to home page with welcome message
+            navigate({
+            to: "/",
+            search: {
+                welcome: "true",
+                name: fullName,
+            },
+            });
+                    } catch (error) {
             console.error(error);
             alert("Something went wrong while creating account");
         } finally {
@@ -221,7 +239,7 @@ function SignupPage() {
                     display: flex;
                     align-items: center;
                     justify-content: center;
-                    padding: 2rem;
+                    padding: 1rem;
                     background: radial-gradient(circle at 20% 30%, #0a0a1a, #000000);
                 }
 
@@ -233,7 +251,7 @@ function SignupPage() {
                     border-radius: 2rem;
                     border: 1px solid rgba(155, 81, 224, 0.2);
                     box-shadow: 0 30px 50px -20px rgba(0,0,0,0.8), 0 0 0 0.5px rgba(155,81,224,0.15) inset;
-                    padding: 2.5rem 2rem;
+                    padding: 2rem 1.5rem;
                     transition: transform 0.2s ease;
                     max-height: 90vh;
                     overflow-y: auto;
@@ -255,13 +273,13 @@ function SignupPage() {
 
                 .brand-wrapper-signup {
                     text-align: center;
-                    margin-bottom: 2rem;
+                    margin-bottom: 1.5rem;
                 }
 
                 .logo-circle-signup {
-                    width: 88px;
-                    height: 88px;
-                    margin: 0 auto 1rem;
+                    width: 70px;
+                    height: 70px;
+                    margin: 0 auto 0.8rem;
                     border-radius: 50%;
                     background: linear-gradient(135deg, #9B51E0, #F2994A);
                     display: flex;
@@ -283,7 +301,7 @@ function SignupPage() {
                 }
 
                 .brand-title-signup {
-                    font-size: 2rem;
+                    font-size: 1.75rem;
                     font-weight: 800;
                     letter-spacing: -0.02em;
                     background: linear-gradient(120deg, #FFFFFF, #D7E2EA);
@@ -294,7 +312,7 @@ function SignupPage() {
                 }
 
                 .brand-tagline-signup {
-                    font-size: 0.75rem;
+                    font-size: 0.7rem;
                     letter-spacing: 0.3px;
                     text-transform: uppercase;
                     color: #9B51E0;
@@ -303,30 +321,30 @@ function SignupPage() {
                 }
 
                 .form-heading-signup {
-                    font-size: 1.5rem;
+                    font-size: 1.35rem;
                     font-weight: 700;
                     letter-spacing: -0.3px;
-                    margin-bottom: 0.5rem;
+                    margin-bottom: 0.4rem;
                     color: #F5F7FF;
                 }
 
                 .form-subheading-signup {
                     color: #9aa4bf;
-                    font-size: 0.85rem;
-                    margin-bottom: 1.8rem;
+                    font-size: 0.8rem;
+                    margin-bottom: 1.5rem;
                     border-left: 2px solid #F2994A;
-                    padding-left: 12px;
+                    padding-left: 10px;
                 }
 
                 .input-group-modern {
                     position: relative;
-                    margin-bottom: 1.25rem;
+                    margin-bottom: 1rem;
                 }
 
                 .input-group-verify {
                     display: flex;
                     gap: 10px;
-                    margin-bottom: 1.25rem;
+                    margin-bottom: 1rem;
                 }
 
                 .input-group-verify .input-group-modern {
@@ -383,8 +401,8 @@ function SignupPage() {
                     background: rgba(20, 22, 40, 0.7);
                     border: 1px solid rgba(155, 81, 224, 0.3);
                     border-radius: 44px;
-                    padding: 0.9rem 1rem 0.9rem 2.8rem;
-                    font-size: 0.95rem;
+                    padding: 0.8rem 1rem 0.8rem 2.8rem;
+                    font-size: 0.9rem;
                     font-weight: 500;
                     color: white;
                     transition: all 0.2s;
@@ -426,30 +444,32 @@ function SignupPage() {
 
                 .error-message {
                     color: #ff6b6b;
-                    font-size: 0.75rem;
+                    font-size: 0.7rem;
                     margin-top: 0.25rem;
                     margin-left: 1rem;
-                    margin-bottom: 1rem;
+                    margin-bottom: 0.8rem;
                 }
 
                 .terms-wrapper {
                     display: flex;
                     align-items: center;
-                    gap: 10px;
-                    margin: 1.5rem 0;
+                    gap: 8px;
+                    margin: 1.2rem 0;
                     color: #9aa4bf;
-                    font-size: 0.8rem;
+                    font-size: 0.75rem;
+                    flex-wrap: wrap;
                 }
 
                 .terms-wrapper input[type="checkbox"] {
-                    width: 18px;
-                    height: 18px;
+                    width: 16px;
+                    height: 16px;
                     cursor: pointer;
                     accent-color: #9B51E0;
                 }
 
                 .terms-wrapper label {
                     cursor: pointer;
+                    flex: 1;
                 }
 
                 .terms-wrapper a {
@@ -461,10 +481,10 @@ function SignupPage() {
                     background: linear-gradient(105deg, #9B51E0 0%, #F2994A 100%);
                     border: none;
                     width: 100%;
-                    padding: 0.9rem 0;
+                    padding: 0.8rem 0;
                     border-radius: 60px;
                     font-weight: 700;
-                    font-size: 1rem;
+                    font-size: 0.95rem;
                     color: white;
                     letter-spacing: 0.3px;
                     display: flex;
@@ -493,10 +513,10 @@ function SignupPage() {
                 .divider-modern {
                     display: flex;
                     align-items: center;
-                    gap: 12px;
+                    gap: 10px;
                     color: #4b5575;
-                    font-size: 0.7rem;
-                    margin: 1.5rem 0;
+                    font-size: 0.65rem;
+                    margin: 1.2rem 0;
                 }
 
                 .divider-line {
@@ -507,8 +527,8 @@ function SignupPage() {
 
                 .login-wrapper {
                     text-align: center;
-                    margin-top: 1.5rem;
-                    font-size: 0.85rem;
+                    margin-top: 1.2rem;
+                    font-size: 0.8rem;
                     color: #9aa4bf;
                 }
 
@@ -516,46 +536,119 @@ function SignupPage() {
                     color: #F2994A;
                     font-weight: 700;
                     text-decoration: none;
-                    margin-left: 6px;
+                    margin-left: 5px;
                     border-bottom: 1px solid rgba(242,153,74,0.5);
                 }
 
                 .back-home {
                     text-align: center;
-                    margin-top: 1rem;
+                    margin-top: 0.8rem;
                 }
 
                 .back-home-link {
                     color: rgba(215, 226, 234, 0.5);
                     text-decoration: none;
-                    font-size: 0.8rem;
+                    font-size: 0.75rem;
                     transition: color 0.2s;
                     display: inline-flex;
                     align-items: center;
-                    gap: 6px;
+                    gap: 5px;
                 }
 
                 .back-home-link:hover {
                     color: #F2994A;
                 }
 
+                /* Mobile Responsive */
                 @media (max-width: 480px) {
                     .crewholic-card-signup {
-                        padding: 1.8rem 1.5rem;
-                        margin: 0 1rem;
+                        padding: 1.5rem 1.2rem;
+                        margin: 0;
+                        border-radius: 1.5rem;
                     }
                     
                     .brand-title-signup {
-                        font-size: 1.75rem;
+                        font-size: 1.5rem;
                     }
                     
+                    .logo-circle-signup {
+                        width: 60px;
+                        height: 60px;
+                    }
+
+                    .form-heading-signup {
+                        font-size: 1.2rem;
+                    }
+
+                    .form-subheading-signup {
+                        font-size: 0.75rem;
+                        margin-bottom: 1.2rem;
+                    }
+
                     .input-group-verify {
                         flex-direction: column;
                     }
                     
                     .verify-btn {
-                        padding: 0.9rem;
+                        padding: 0.8rem;
+                        font-size: 0.8rem;
                     }
+
+                    .form-control-modern {
+                        padding: 0.7rem 1rem 0.7rem 2.5rem;
+                        font-size: 0.85rem;
+                    }
+
+                    .input-icon {
+                        left: 14px;
+                        font-size: 0.9rem;
+                    }
+
+                    .terms-wrapper {
+                        font-size: 0.7rem;
+                    }
+
+                    .signup-btn {
+                        padding: 0.7rem 0;
+                        font-size: 0.9rem;
+                    }
+                }
+
+                /* Extra Small Devices */
+                @media (max-width: 380px) {
+                    .crewholic-card-signup {
+                        padding: 1.2rem 1rem;
+                    }
+
+                    .brand-title-signup {
+                        font-size: 1.3rem;
+                    }
+
+                    .brand-tagline-signup {
+                        font-size: 0.6rem;
+                    }
+
+                    .form-heading-signup {
+                        font-size: 1.1rem;
+                    }
+
+                    .form-control-modern {
+                        padding: 0.65rem 1rem 0.65rem 2.3rem;
+                        font-size: 0.8rem;
+                    }
+
+                    .input-icon {
+                        font-size: 0.8rem;
+                    }
+                }
+
+                /* Loading Spinner Animation */
+                @keyframes spin {
+                    to { transform: rotate(360deg); }
+                }
+
+                .fa-spinner {
+                    animation: spin 1s linear infinite;
                 }
             `}</style>
 
@@ -714,7 +807,13 @@ function SignupPage() {
                         {passwordError && <div className="error-message">{passwordError}</div>}
 
                         <div className="terms-wrapper">
-                            <input type="checkbox" id="terms" required />
+                            <input 
+                                type="checkbox" 
+                                id="terms" 
+                                checked={agreeTerms}
+                                onChange={(e) => setAgreeTerms(e.target.checked)}
+                                required 
+                            />
                             <label htmlFor="terms">
                                 I agree to the <a href="/terms">Terms of Service</a> and{" "}
                                 <a href="/privacy">Privacy Policy</a>

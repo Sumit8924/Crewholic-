@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable prettier/prettier */
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
 import { motion, useMotionValue, useSpring, AnimatePresence, useScroll, useTransform } from "framer-motion";
 
@@ -138,6 +138,26 @@ interface RentalFormData {
     requirements: string;
 }
 
+// Helper function to check if user is logged in
+const isUserLoggedIn = () => {
+    const token = localStorage.getItem("token");
+    const user = localStorage.getItem("user");
+    return !!(token && user);
+};
+
+// Helper function to get user data
+const getUserData = () => {
+    const user = localStorage.getItem("user");
+    if (user) {
+        try {
+            return JSON.parse(user);
+        } catch {
+            return null;
+        }
+    }
+    return null;
+};
+
 // ─── SCROLL 3D REVEAL wrapper ────────────────────────────────────────────────
 function Scroll3DReveal({
     children,
@@ -225,9 +245,27 @@ function ServiceInquiryModal({ service, isOpen, onClose, onSubmit }: {
     onClose: () => void;
     onSubmit: (data: ServiceFormData) => Promise<boolean>;
 }) {
-    const [formData, setFormData] = useState<ServiceFormData>({ name: "", mobile: "", email: "", requirements: "" });
+    const userData = getUserData();
+    const [formData, setFormData] = useState<ServiceFormData>({ 
+        name: userData?.name || "", 
+        mobile: "", 
+        email: userData?.email || "", 
+        requirements: "" 
+    });
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [showSuccessPopup, setShowSuccessPopup] = useState(false);
+
+    // Auto-fill form when user data changes
+    useEffect(() => {
+        const user = getUserData();
+        if (user) {
+            setFormData(prev => ({
+                ...prev,
+                name: user.name || prev.name,
+                email: user.email || prev.email,
+            }));
+        }
+    }, [isOpen]);
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement>) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -243,7 +281,7 @@ function ServiceInquiryModal({ service, isOpen, onClose, onSubmit }: {
             setShowSuccessPopup(true);
             setTimeout(() => {
                 setShowSuccessPopup(false);
-                setFormData({ name: "", mobile: "", email: "", requirements: "" });
+                setFormData({ name: userData?.name || "", mobile: "", email: userData?.email || "", requirements: "" });
                 onClose();
             }, 3000);
         }
@@ -429,13 +467,31 @@ function RentalCheckoutModal({ product, category, isOpen, onClose, onSubmit }: {
     onClose: () => void;
     onSubmit: (data: RentalFormData) => Promise<boolean>;
 }) {
+    const userData = getUserData();
     const [rentalDays, setRentalDays] = useState(1);
-    const [formData, setFormData] = useState({ name: "", mobile: "", email: "", requirements: "" });
+    const [formData, setFormData] = useState({ 
+        name: userData?.name || "", 
+        mobile: "", 
+        email: userData?.email || "", 
+        requirements: "" 
+    });
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [showSuccessPopup, setShowSuccessPopup] = useState(false);
 
     const totalPrice = product ? product.price * rentalDays : 0;
     const formatPrice = (price: number) => `₹${price.toLocaleString('en-IN')}`;
+
+    // Auto-fill form when user data changes
+    useEffect(() => {
+        const user = getUserData();
+        if (user) {
+            setFormData(prev => ({
+                ...prev,
+                name: user.name || prev.name,
+                email: user.email || prev.email,
+            }));
+        }
+    }, [isOpen]);
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
@@ -447,7 +503,7 @@ function RentalCheckoutModal({ product, category, isOpen, onClose, onSubmit }: {
             setShowSuccessPopup(true);
             setTimeout(() => {
                 setShowSuccessPopup(false);
-                setFormData({ name: "", mobile: "", email: "", requirements: "" });
+                setFormData({ name: userData?.name || "", mobile: "", email: userData?.email || "", requirements: "" });
                 setRentalDays(1);
                 onClose();
             }, 3000);
@@ -675,6 +731,7 @@ const gradientStyle = {
 };
 
 function ServicePage() {
+    const navigate = useNavigate();
     const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
     const [selectedService, setSelectedService] = useState<typeof services[0] | null>(null);
     const [isServiceModalOpen, setIsServiceModalOpen] = useState(false);
@@ -722,6 +779,19 @@ function ServicePage() {
     }, []);
 
     const handleCardClick = (item: any) => {
+        // Check if user is logged in
+        if (!isUserLoggedIn()) {
+            // Redirect to login page with return URL
+            navigate({ 
+                to: "/login", 
+                state: { 
+                    returnTo: "/service",
+                    message: "Please login or signup to continue with your inquiry."
+                } 
+            });
+            return;
+        }
+
         if (item.type === "service") {
             setSelectedService(item);
             setIsServiceModalOpen(true);
@@ -732,6 +802,17 @@ function ServicePage() {
     };
 
     const handleRentClick = (product: any) => {
+        // Check if user is logged in
+        if (!isUserLoggedIn()) {
+            navigate({ 
+                to: "/login", 
+                state: { 
+                    returnTo: "/service",
+                    message: "Please login or signup to continue with your rental."
+                } 
+            });
+            return;
+        }
         setSelectedProduct(product);
         setIsRentalProductsModalOpen(false);
         setIsCheckoutModalOpen(true);

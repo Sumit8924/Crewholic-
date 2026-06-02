@@ -9,19 +9,25 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
-import { Route as UserDashboardRouteImport } from './routes/user-dashboard'
+import { Route as WebpanelRouteImport } from './routes/webpanel'
 import { Route as SignupRouteImport } from './routes/signup'
 import { Route as ServiceRouteImport } from './routes/service'
+import { Route as RentalRouteImport } from './routes/rental'
 import { Route as ProjectRouteImport } from './routes/project'
 import { Route as PortfolioRouteImport } from './routes/portfolio'
+import { Route as MarketingRouteImport } from './routes/marketing'
 import { Route as LoginRouteImport } from './routes/login'
+import { Route as FinanceRouteImport } from './routes/finance'
+import { Route as EventRouteImport } from './routes/event'
+import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as ContactRouteImport } from './routes/contact'
+import { Route as AdminRouteImport } from './routes/admin'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
 
-const UserDashboardRoute = UserDashboardRouteImport.update({
-  id: '/user-dashboard',
-  path: '/user-dashboard',
+const WebpanelRoute = WebpanelRouteImport.update({
+  id: '/webpanel',
+  path: '/webpanel',
   getParentRoute: () => rootRouteImport,
 } as any)
 const SignupRoute = SignupRouteImport.update({
@@ -34,6 +40,11 @@ const ServiceRoute = ServiceRouteImport.update({
   path: '/service',
   getParentRoute: () => rootRouteImport,
 } as any)
+const RentalRoute = RentalRouteImport.update({
+  id: '/rental',
+  path: '/rental',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ProjectRoute = ProjectRouteImport.update({
   id: '/project',
   path: '/project',
@@ -44,14 +55,39 @@ const PortfolioRoute = PortfolioRouteImport.update({
   path: '/portfolio',
   getParentRoute: () => rootRouteImport,
 } as any)
+const MarketingRoute = MarketingRouteImport.update({
+  id: '/marketing',
+  path: '/marketing',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const LoginRoute = LoginRouteImport.update({
   id: '/login',
   path: '/login',
   getParentRoute: () => rootRouteImport,
 } as any)
+const FinanceRoute = FinanceRouteImport.update({
+  id: '/finance',
+  path: '/finance',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const EventRoute = EventRouteImport.update({
+  id: '/event',
+  path: '/event',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DashboardRoute = DashboardRouteImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ContactRoute = ContactRouteImport.update({
   id: '/contact',
   path: '/contact',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AdminRoute = AdminRouteImport.update({
+  id: '/admin',
+  path: '/admin',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AboutRoute = AboutRouteImport.update({
@@ -68,92 +104,134 @@ const IndexRoute = IndexRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/admin': typeof AdminRoute
   '/contact': typeof ContactRoute
+  '/dashboard': typeof DashboardRoute
+  '/event': typeof EventRoute
+  '/finance': typeof FinanceRoute
   '/login': typeof LoginRoute
+  '/marketing': typeof MarketingRoute
   '/portfolio': typeof PortfolioRoute
   '/project': typeof ProjectRoute
+  '/rental': typeof RentalRoute
   '/service': typeof ServiceRoute
   '/signup': typeof SignupRoute
-  '/user-dashboard': typeof UserDashboardRoute
+  '/webpanel': typeof WebpanelRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/admin': typeof AdminRoute
   '/contact': typeof ContactRoute
+  '/dashboard': typeof DashboardRoute
+  '/event': typeof EventRoute
+  '/finance': typeof FinanceRoute
   '/login': typeof LoginRoute
+  '/marketing': typeof MarketingRoute
   '/portfolio': typeof PortfolioRoute
   '/project': typeof ProjectRoute
+  '/rental': typeof RentalRoute
   '/service': typeof ServiceRoute
   '/signup': typeof SignupRoute
-  '/user-dashboard': typeof UserDashboardRoute
+  '/webpanel': typeof WebpanelRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/admin': typeof AdminRoute
   '/contact': typeof ContactRoute
+  '/dashboard': typeof DashboardRoute
+  '/event': typeof EventRoute
+  '/finance': typeof FinanceRoute
   '/login': typeof LoginRoute
+  '/marketing': typeof MarketingRoute
   '/portfolio': typeof PortfolioRoute
   '/project': typeof ProjectRoute
+  '/rental': typeof RentalRoute
   '/service': typeof ServiceRoute
   '/signup': typeof SignupRoute
-  '/user-dashboard': typeof UserDashboardRoute
+  '/webpanel': typeof WebpanelRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
   fullPaths:
     | '/'
     | '/about'
+    | '/admin'
     | '/contact'
+    | '/dashboard'
+    | '/event'
+    | '/finance'
     | '/login'
+    | '/marketing'
     | '/portfolio'
     | '/project'
+    | '/rental'
     | '/service'
     | '/signup'
-    | '/user-dashboard'
+    | '/webpanel'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/about'
+    | '/admin'
     | '/contact'
+    | '/dashboard'
+    | '/event'
+    | '/finance'
     | '/login'
+    | '/marketing'
     | '/portfolio'
     | '/project'
+    | '/rental'
     | '/service'
     | '/signup'
-    | '/user-dashboard'
+    | '/webpanel'
   id:
     | '__root__'
     | '/'
     | '/about'
+    | '/admin'
     | '/contact'
+    | '/dashboard'
+    | '/event'
+    | '/finance'
     | '/login'
+    | '/marketing'
     | '/portfolio'
     | '/project'
+    | '/rental'
     | '/service'
     | '/signup'
-    | '/user-dashboard'
+    | '/webpanel'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AboutRoute: typeof AboutRoute
+  AdminRoute: typeof AdminRoute
   ContactRoute: typeof ContactRoute
+  DashboardRoute: typeof DashboardRoute
+  EventRoute: typeof EventRoute
+  FinanceRoute: typeof FinanceRoute
   LoginRoute: typeof LoginRoute
+  MarketingRoute: typeof MarketingRoute
   PortfolioRoute: typeof PortfolioRoute
   ProjectRoute: typeof ProjectRoute
+  RentalRoute: typeof RentalRoute
   ServiceRoute: typeof ServiceRoute
   SignupRoute: typeof SignupRoute
-  UserDashboardRoute: typeof UserDashboardRoute
+  WebpanelRoute: typeof WebpanelRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
-    '/user-dashboard': {
-      id: '/user-dashboard'
-      path: '/user-dashboard'
-      fullPath: '/user-dashboard'
-      preLoaderRoute: typeof UserDashboardRouteImport
+    '/webpanel': {
+      id: '/webpanel'
+      path: '/webpanel'
+      fullPath: '/webpanel'
+      preLoaderRoute: typeof WebpanelRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/signup': {
@@ -170,6 +248,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ServiceRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/rental': {
+      id: '/rental'
+      path: '/rental'
+      fullPath: '/rental'
+      preLoaderRoute: typeof RentalRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/project': {
       id: '/project'
       path: '/project'
@@ -184,6 +269,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof PortfolioRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/marketing': {
+      id: '/marketing'
+      path: '/marketing'
+      fullPath: '/marketing'
+      preLoaderRoute: typeof MarketingRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/login': {
       id: '/login'
       path: '/login'
@@ -191,11 +283,39 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LoginRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/finance': {
+      id: '/finance'
+      path: '/finance'
+      fullPath: '/finance'
+      preLoaderRoute: typeof FinanceRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/event': {
+      id: '/event'
+      path: '/event'
+      fullPath: '/event'
+      preLoaderRoute: typeof EventRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/dashboard': {
+      id: '/dashboard'
+      path: '/dashboard'
+      fullPath: '/dashboard'
+      preLoaderRoute: typeof DashboardRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/contact': {
       id: '/contact'
       path: '/contact'
       fullPath: '/contact'
       preLoaderRoute: typeof ContactRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/admin': {
+      id: '/admin'
+      path: '/admin'
+      fullPath: '/admin'
+      preLoaderRoute: typeof AdminRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/about': {
@@ -218,13 +338,19 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AboutRoute: AboutRoute,
+  AdminRoute: AdminRoute,
   ContactRoute: ContactRoute,
+  DashboardRoute: DashboardRoute,
+  EventRoute: EventRoute,
+  FinanceRoute: FinanceRoute,
   LoginRoute: LoginRoute,
+  MarketingRoute: MarketingRoute,
   PortfolioRoute: PortfolioRoute,
   ProjectRoute: ProjectRoute,
+  RentalRoute: RentalRoute,
   ServiceRoute: ServiceRoute,
   SignupRoute: SignupRoute,
-  UserDashboardRoute: UserDashboardRoute,
+  WebpanelRoute: WebpanelRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)

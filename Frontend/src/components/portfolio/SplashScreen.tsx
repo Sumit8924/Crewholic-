@@ -1,6 +1,6 @@
 /* eslint-disable prettier/prettier */
 import { useEffect } from "react";
-import { useNavigate } from "@tanstack/react-router"; // Changed from react-router-dom
+import { useNavigate } from "@tanstack/react-router";
 import logo from "./skr.png";
 
 type SplashScreenProps = {
@@ -32,12 +32,10 @@ export default function SplashScreen({
       sessionStorage.setItem("splashShown", "true");
     }
 
-    // Call onDone callback if provided
     if (onDone) {
       onDone();
     }
 
-    // Navigate to main page using TanStack Router
     navigate({ to: "/" });
   };
 
@@ -74,11 +72,14 @@ export default function SplashScreen({
 
         .scene {
           position: relative;
-          width: min(700px, 100vw);
-          height: min(560px, 100vh);
+          width: 100%;
+          max-width: 700px;
+          height: 100%;
+          max-height: 560px;
           display: flex;
           align-items: center;
           justify-content: center;
+          padding: 20px;
         }
 
         .ribbons {
@@ -298,6 +299,7 @@ export default function SplashScreen({
           text-align: center;
           opacity: 0;
           animation: brandIn 0.1s ease 3.0s forwards;
+          width: 90%;
         }
 
         @keyframes brandIn {
@@ -313,6 +315,7 @@ export default function SplashScreen({
           color: #f0ece0;
           position: relative;
           overflow: hidden;
+          white-space: nowrap;
         }
 
         .brand-name::before {
@@ -401,32 +404,136 @@ export default function SplashScreen({
           }
         }
 
-        @media (max-width: 600px) {
+        /* Mobile Responsive Styles */
+        @media (max-width: 768px) {
+          .scene {
+            max-height: 500px;
+            padding: 15px;
+          }
+
           .logo-img {
             width: 220px;
             height: 220px;
           }
 
           .brand {
-            bottom: 95px;
+            bottom: 80px;
           }
 
           .brand-name {
-            font-size: 42px;
-            letter-spacing: 7px;
+            font-size: 38px;
+            letter-spacing: 5px;
           }
 
           .brand-tagline {
-            font-size: 9px;
+            font-size: 8px;
+            letter-spacing: 2px;
+            white-space: normal;
+            word-break: keep-all;
+            max-width: 280px;
+            margin: 8px auto 0;
+            line-height: 1.4;
+          }
+
+          .ribbons {
+            transform: translate(-50%, -58%) scale(0.7);
+          }
+
+          .fragments {
+            transform: translate(-50%, -58%) scale(0.7);
+          }
+        }
+
+        /* Small Mobile Devices */
+        @media (max-width: 480px) {
+          .scene {
+            max-height: 450px;
+            padding: 10px;
+          }
+
+          .logo-img {
+            width: 180px;
+            height: 180px;
+          }
+
+          .brand {
+            bottom: 70px;
+          }
+
+          .brand-name {
+            font-size: 28px;
+            letter-spacing: 3px;
+          }
+
+          .brand-tagline {
+            font-size: 7px;
+            letter-spacing: 1.5px;
+            max-width: 240px;
+          }
+
+          .ribbons {
+            transform: translate(-50%, -58%) scale(0.55);
+          }
+
+          .fragments {
+            transform: translate(-50%, -58%) scale(0.55);
+          }
+
+          .rb1, .rb2, .rb3 {
+            transform-origin: center;
+          }
+        }
+
+        /* Landscape Mode on Mobile */
+        @media (max-width: 768px) and (orientation: landscape) {
+          .scene {
+            max-height: 400px;
+          }
+
+          .logo-img {
+            width: 150px;
+            height: 150px;
+          }
+
+          .brand {
+            bottom: 30px;
+          }
+
+          .brand-name {
+            font-size: 28px;
+            letter-spacing: 4px;
+          }
+
+          .brand-tagline {
+            font-size: 7px;
             letter-spacing: 2px;
           }
 
           .ribbons {
-            transform: translate(-50%, -58%) scale(0.78);
+            transform: translate(-50%, -58%) scale(0.5);
           }
 
           .fragments {
-            transform: translate(-50%, -58%) scale(0.78);
+            transform: translate(-50%, -58%) scale(0.5);
+          }
+        }
+
+        /* Extra Small Devices */
+        @media (max-width: 360px) {
+          .brand-name {
+            font-size: 24px;
+            letter-spacing: 2px;
+          }
+
+          .brand-tagline {
+            font-size: 6px;
+            letter-spacing: 1px;
+            max-width: 200px;
+          }
+
+          .logo-img {
+            width: 160px;
+            height: 160px;
           }
         }
       `}</style>
