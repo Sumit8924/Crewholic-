@@ -60,7 +60,7 @@ const services = [
     },
 ];
 
-// ─── RENTAL CATEGORIES (nested inside one Rentals parent) ───────────────────
+// ─── RENTAL CATEGORIES ───────────────────────────────────────────────────────
 const rentalCategories = [
     {
         id: "rental-cameras",
@@ -71,16 +71,16 @@ const rentalCategories = [
         accent: "#9B51E0",
         tags: ["Canon", "Sony", "GoPro", "4K"],
         items: [
-            { id: 1, name: "Canon EOS 200d mark2", price: 700, originalPrice: 1200, image: "📷", rating: 4.5, inStock: true, specs: "24.1MP, 4K Video" },
-            { id: 2, name: "Canon EOS 200d", price: 600, originalPrice: 1000, image: "📷", rating: 4.3, inStock: true, specs: "24.2MP, Full HD" },
-            { id: 3, name: "Canon m50", price: 1500, originalPrice: 2500, image: "📷", rating: 4.6, inStock: true, specs: "24.1MP, 4K, Mirrorless" },
-            { id: 4, name: "Sony alpha 7 mark 3", price: 2500, originalPrice: 4000, image: "📷", rating: 4.8, inStock: true, specs: "24.2MP, Full Frame, 4K" },
-            { id: 5, name: "Sony alpha 7 mark 4", price: 3000, originalPrice: 5000, image: "📷", rating: 4.9, inStock: true, specs: "33MP, Full Frame, 4K 60fps" },
-            { id: 6, name: "Sony zv e10", price: 2000, originalPrice: 3500, image: "📷", rating: 4.7, inStock: true, specs: "24.2MP, 4K, Vlogging" },
-            { id: 7, name: "Sony fx3", price: 3500, originalPrice: 5500, image: "📷", rating: 4.9, inStock: true, specs: "10.2MP, 4K 120fps, Cinema" },
-            { id: 8, name: "Sony nx100", price: 1500, originalPrice: 2800, image: "📷", rating: 4.4, inStock: true, specs: "Camcorder, 4K" },
-            { id: 9, name: "Insta 360 x3", price: 1000, originalPrice: 1800, image: "📷", rating: 4.6, inStock: true, specs: "5.7K, 360° Camera" },
-            { id: 10, name: "GoPro 12", price: 800, originalPrice: 1500, image: "🎥", rating: 4.5, inStock: true, specs: "5.3K, Action Camera" },
+            { id: 1,  name: "Canon EOS 200d mark2",  price: 700,  originalPrice: 1200, image: "📷", rating: 4.5, inStock: true, specs: "24.1MP, 4K Video" },
+            { id: 2,  name: "Canon EOS 200d",         price: 600,  originalPrice: 1000, image: "📷", rating: 4.3, inStock: true, specs: "24.2MP, Full HD" },
+            { id: 3,  name: "Canon m50",              price: 1500, originalPrice: 2500, image: "📷", rating: 4.6, inStock: true, specs: "24.1MP, 4K, Mirrorless" },
+            { id: 4,  name: "Sony alpha 7 mark 3",    price: 2500, originalPrice: 4000, image: "📷", rating: 4.8, inStock: true, specs: "24.2MP, Full Frame, 4K" },
+            { id: 5,  name: "Sony alpha 7 mark 4",    price: 3000, originalPrice: 5000, image: "📷", rating: 4.9, inStock: true, specs: "33MP, Full Frame, 4K 60fps" },
+            { id: 6,  name: "Sony zv e10",            price: 2000, originalPrice: 3500, image: "📷", rating: 4.7, inStock: true, specs: "24.2MP, 4K, Vlogging" },
+            { id: 7,  name: "Sony fx3",               price: 3500, originalPrice: 5500, image: "📷", rating: 4.9, inStock: true, specs: "10.2MP, 4K 120fps, Cinema" },
+            { id: 8,  name: "Sony nx100",             price: 1500, originalPrice: 2800, image: "📷", rating: 4.4, inStock: true, specs: "Camcorder, 4K" },
+            { id: 9,  name: "Insta 360 x3",           price: 1000, originalPrice: 1800, image: "📷", rating: 4.6, inStock: true, specs: "5.7K, 360° Camera" },
+            { id: 10, name: "GoPro 12",               price: 800,  originalPrice: 1500, image: "🎥", rating: 4.5, inStock: true, specs: "5.3K, Action Camera" },
         ]
     },
     {
@@ -92,9 +92,9 @@ const rentalCategories = [
         accent: "#F2994A",
         tags: ["DJI", "Stabilizers", "Smooth Footage"],
         items: [
-            { id: 11, name: "DJI RS Mini", price: 1000, originalPrice: 1800, image: "⚖️", rating: 4.7, inStock: true, specs: "Compact, Lightweight" },
-            { id: 12, name: "DJI RS4", price: 1500, originalPrice: 2500, image: "⚖️", rating: 4.8, inStock: true, specs: "Professional, Payload 3kg" },
-            { id: 13, name: "DJI Mobile Gimbal", price: 400, originalPrice: 800, image: "📱", rating: 4.4, inStock: true, specs: "For Smartphones" },
+            { id: 11, name: "DJI RS Mini",       price: 1000, originalPrice: 1800, image: "⚖️", rating: 4.7, inStock: true, specs: "Compact, Lightweight" },
+            { id: 12, name: "DJI RS4",           price: 1500, originalPrice: 2500, image: "⚖️", rating: 4.8, inStock: true, specs: "Professional, Payload 3kg" },
+            { id: 13, name: "DJI Mobile Gimbal", price: 400,  originalPrice: 800,  image: "📱", rating: 4.4, inStock: true, specs: "For Smartphones" },
         ]
     },
     {
@@ -107,13 +107,12 @@ const rentalCategories = [
         tags: ["DJI", "Aerial", "4K"],
         items: [
             { id: 14, name: "DJI Mini 4 Pro", price: 2500, originalPrice: 4500, image: "🚁", rating: 4.9, inStock: true, specs: "4K HDR, 45min Flight" },
-            { id: 15, name: "DJI Air 3S", price: 2500, originalPrice: 4200, image: "🚁", rating: 4.8, inStock: true, specs: "Dual Camera, 4K" },
-            { id: 16, name: "DJI Neo 2", price: 2000, originalPrice: 3500, image: "🚁", rating: 4.6, inStock: true, specs: "Compact, 4K" },
+            { id: 15, name: "DJI Air 3S",     price: 2500, originalPrice: 4200, image: "🚁", rating: 4.8, inStock: true, specs: "Dual Camera, 4K" },
+            { id: 16, name: "DJI Neo 2",      price: 2000, originalPrice: 3500, image: "🚁", rating: 4.6, inStock: true, specs: "Compact, 4K" },
         ]
     },
 ];
 
-// ─── PARENT "RENTALS" CARD ──────────────────────────────────────────────────
 const rentalsParent = {
     id: "05",
     title: "Rentals",
@@ -130,13 +129,14 @@ const rentalsParent = {
 const allCards: any[] = [...services, rentalsParent];
 
 const navItems = [
-    { label: "Home", href: "/" },
-    { label: "About", href: "/about" },
-    { label: "Services", href: "/service" },
+    { label: "Home",      href: "/" },
+    { label: "About",     href: "/about" },
+    { label: "Services",  href: "/service" },
     { label: "Portfolio", href: "/portfolio" },
-    { label: "Contact", href: "/contact" },
+    { label: "Contact",   href: "/contact" },
 ];
 
+// ─── TYPES ───────────────────────────────────────────────────────────────────
 interface ServiceFormData {
     name: string;
     mobile: string;
@@ -157,17 +157,24 @@ interface RentalFormData {
     requirements: string;
 }
 
+interface LoggedInUser {
+    name: string;
+    email: string;
+    role?: string;
+}
+
 // ─── HELPERS ────────────────────────────────────────────────────────────────
 const isUserLoggedIn = () => {
     const token = localStorage.getItem("token");
-    const user = localStorage.getItem("user");
+    const user  = localStorage.getItem("user");
     return !!(token && user);
 };
 
-const getUserData = () => {
+const getUserData = (): LoggedInUser | null => {
     const user = localStorage.getItem("user");
     if (user) {
-        try { return JSON.parse(user); } catch { return null; }
+        try { return JSON.parse(user); }
+        catch { return null; }
     }
     return null;
 };
@@ -200,7 +207,7 @@ function FadeIn({ children, delay = 0, y = 20, className = "", as: Component = "
     );
 }
 
-// ─── CONTACT BUTTON ─────────────────────────────────────────────────────────
+// ─── CONTACT BUTTON ──────────────────────────────────────────────────────────
 function ContactButton({ label = "CONTACT ME", href = "/contact" }: { label?: string; href?: string }) {
     return (
         <motion.a
@@ -225,8 +232,12 @@ function ContactButton({ label = "CONTACT ME", href = "/contact" }: { label?: st
     );
 }
 
-// ─── MAGNETIC BUTTON ────────────────────────────────────────────────────────
-function MagneticButton({ children, className, onClick }: { children: React.ReactNode; className?: string; onClick?: () => void }) {
+// ─── MAGNETIC BUTTON ─────────────────────────────────────────────────────────
+function MagneticButton({ children, className, onClick }: {
+    children: React.ReactNode;
+    className?: string;
+    onClick?: () => void;
+}) {
     const ref = useRef<HTMLDivElement>(null);
     const x = useMotionValue(0);
     const y = useMotionValue(0);
@@ -241,15 +252,26 @@ function MagneticButton({ children, className, onClick }: { children: React.Reac
     };
 
     return (
-        <motion.div ref={ref} style={{ x: springX, y: springY }} onMouseMove={handleMouseMove} onMouseLeave={() => { x.set(0); y.set(0); }} className={className} onClick={onClick}>
+        <motion.div
+            ref={ref}
+            style={{ x: springX, y: springY }}
+            onMouseMove={handleMouseMove}
+            onMouseLeave={() => { x.set(0); y.set(0); }}
+            className={className}
+            onClick={onClick}
+        >
             {children}
         </motion.div>
     );
 }
 
-// ─── SCROLL 3D REVEAL ───────────────────────────────────────────────────────
+// ─── SCROLL 3D REVEAL ────────────────────────────────────────────────────────
 function Scroll3DReveal({
-    children, rotateFrom = [20, 0, 0], translateFrom = [0, 80, -120], scaleFrom = 0.8, className = "",
+    children,
+    rotateFrom = [20, 0, 0],
+    translateFrom = [0, 80, -120],
+    scaleFrom = 0.8,
+    className = "",
 }: {
     children: React.ReactNode;
     rotateFrom?: [number, number, number];
@@ -262,10 +284,10 @@ function Scroll3DReveal({
     const rotateX = useTransform(scrollYProgress, [0, 1], [rotateFrom[0], 0]);
     const rotateY = useTransform(scrollYProgress, [0, 1], [rotateFrom[1], 0]);
     const rotateZ = useTransform(scrollYProgress, [0, 1], [rotateFrom[2], 0]);
-    const x = useTransform(scrollYProgress, [0, 1], [translateFrom[0], 0]);
-    const y = useTransform(scrollYProgress, [0, 1], [translateFrom[1], 0]);
-    const z = useTransform(scrollYProgress, [0, 1], [translateFrom[2], 0]);
-    const scale = useTransform(scrollYProgress, [0, 1], [scaleFrom, 1]);
+    const x       = useTransform(scrollYProgress, [0, 1], [translateFrom[0], 0]);
+    const y       = useTransform(scrollYProgress, [0, 1], [translateFrom[1], 0]);
+    const z       = useTransform(scrollYProgress, [0, 1], [translateFrom[2], 0]);
+    const scale   = useTransform(scrollYProgress, [0, 1], [scaleFrom, 1]);
     const opacity = useTransform(scrollYProgress, [0, 0.35, 1], [0, 0.6, 1]);
 
     return (
@@ -277,7 +299,7 @@ function Scroll3DReveal({
     );
 }
 
-// ─── SCROLL 3D CARD ─────────────────────────────────────────────────────────
+// ─── SCROLL 3D CARD ──────────────────────────────────────────────────────────
 function Scroll3DCard({ children, index = 0, direction = "up" }: {
     children: React.ReactNode;
     index?: number;
@@ -287,20 +309,20 @@ function Scroll3DCard({ children, index = 0, direction = "up" }: {
     const { scrollYProgress } = useScroll({ target: ref, offset: ["start 95%", "center 55%"] });
 
     const dirMap: Record<string, [number, number, number, number, number, number]> = {
-        left: [-8, -15, 3, -40, 30, -60],
-        right: [-8, 15, -3, 40, 30, -60],
-        up: [-15, 0, 0, 0, 60, -80],
-        down: [15, 0, 0, 0, -60, -80],
+        left:  [-8, -15,  3, -40,  30, -60],
+        right: [-8,  15, -3,  40,  30, -60],
+        up:    [-15,  0,  0,   0,  60, -80],
+        down:  [ 15,  0,  0,   0, -60, -80],
     };
     const [frX, frY, frZ, frTX, frTY, frTZ] = dirMap[direction];
 
     const rotateX = useTransform(scrollYProgress, [0, 1], [frX, 0]);
     const rotateY = useTransform(scrollYProgress, [0, 1], [frY, 0]);
     const rotateZ = useTransform(scrollYProgress, [0, 1], [frZ, 0]);
-    const x = useTransform(scrollYProgress, [0, 1], [frTX, 0]);
-    const y = useTransform(scrollYProgress, [0, 1], [frTY, 0]);
-    const z = useTransform(scrollYProgress, [0, 1], [frTZ, 0]);
-    const scale = useTransform(scrollYProgress, [0, 1], [0.8, 1]);
+    const x       = useTransform(scrollYProgress, [0, 1], [frTX, 0]);
+    const y       = useTransform(scrollYProgress, [0, 1], [frTY, 0]);
+    const z       = useTransform(scrollYProgress, [0, 1], [frTZ, 0]);
+    const scale   = useTransform(scrollYProgress, [0, 1], [0.8, 1]);
     const opacity = useTransform(scrollYProgress, [0, 0.4, 1], [0, 0.5, 1]);
 
     return (
@@ -312,9 +334,197 @@ function Scroll3DCard({ children, index = 0, direction = "up" }: {
     );
 }
 
-// ═══════════════════════════════════════════════════════════════════════════
-// ─── NEW: RENTAL CATEGORIES SELECTOR MODAL ──────────────────────────────────
-// ═══════════════════════════════════════════════════════════════════════════
+// ─── USER AVATAR DROPDOWN ────────────────────────────────────────────────────
+function UserNavButton({ user }: { user: LoggedInUser | null }) {
+    const [open, setOpen] = useState(false);
+    const ref = useRef<HTMLDivElement>(null);
+
+    // Close on outside click
+    useEffect(() => {
+        const handler = (e: MouseEvent) => {
+            if (ref.current && !ref.current.contains(e.target as Node)) {
+                setOpen(false);
+            }
+        };
+        document.addEventListener("mousedown", handler);
+        return () => document.removeEventListener("mousedown", handler);
+    }, []);
+
+    const handleLogout = () => {
+        localStorage.removeItem("token");
+        localStorage.removeItem("user");
+        window.location.reload();
+    };
+
+    // ── Not logged in ──────────────────────────────────────────────────────
+    if (!user) {
+        return (
+            <a
+                href="/login"
+                className="text-sm md:text-lg lg:text-[1.4rem] font-medium uppercase tracking-wider hover:opacity-70 transition-opacity duration-200"
+                style={{ color: "#D7E2EA" }}
+            >
+                Signup / Login
+            </a>
+        );
+    }
+
+    // ── Logged in ──────────────────────────────────────────────────────────
+    const firstName = user.name.split(" ")[0];
+    const initial   = firstName.charAt(0).toUpperCase();
+
+    return (
+        <div ref={ref} style={{ position: "relative" }}>
+            <button
+                onClick={() => setOpen(prev => !prev)}
+                className="flex items-center gap-2 hover:opacity-80 transition-opacity"
+                style={{ background: "none", border: "none", cursor: "pointer", padding: 0 }}
+            >
+                {/* Avatar circle */}
+                <div
+                    className="flex items-center justify-center font-bold text-black rounded-full flex-shrink-0"
+                    style={{
+                        width: 36, height: 36,
+                        background: "linear-gradient(135deg, #9B51E0, #F2994A)",
+                        fontSize: 14,
+                    }}
+                >
+                    {initial}
+                </div>
+                <span
+                    className="text-sm md:text-base lg:text-[1.1rem] font-medium uppercase tracking-wider hidden md:block"
+                    style={{ color: "#F2994A" }}
+                >
+                    👋 {firstName.toUpperCase()}
+                </span>
+                {/* Chevron */}
+                <svg
+                    className="w-3 h-3 hidden md:block transition-transform duration-200"
+                    style={{
+                        color: "#F2994A",
+                        transform: open ? "rotate(180deg)" : "rotate(0deg)",
+                    }}
+                    fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                >
+                    <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                </svg>
+            </button>
+
+            {/* Dropdown */}
+            <AnimatePresence>
+                {open && (
+                    <motion.div
+                        initial={{ opacity: 0, y: -8, scale: 0.95 }}
+                        animate={{ opacity: 1, y: 0, scale: 1 }}
+                        exit={{ opacity: 0, y: -8, scale: 0.95 }}
+                        transition={{ duration: 0.18, ease: [0.22, 1, 0.36, 1] }}
+                        style={{
+                            position: "absolute",
+                            top: "calc(100% + 12px)",
+                            right: 0,
+                            minWidth: 220,
+                            background: "rgba(18,18,26,0.98)",
+                            backdropFilter: "blur(20px)",
+                            border: "1px solid rgba(155,81,224,0.3)",
+                            borderRadius: 14,
+                            boxShadow: "0 20px 60px rgba(0,0,0,0.5), 0 0 30px rgba(155,81,224,0.15)",
+                            overflow: "hidden",
+                            zIndex: 9999,
+                        }}
+                    >
+                        {/* User info header */}
+                        <div style={{
+                            padding: "14px 16px",
+                            borderBottom: "1px solid rgba(255,255,255,0.06)",
+                            background: "linear-gradient(135deg, rgba(155,81,224,0.08), rgba(242,153,74,0.05))",
+                        }}>
+                            <div className="flex items-center gap-3">
+                                <div
+                                    className="flex items-center justify-center font-bold text-black rounded-full flex-shrink-0"
+                                    style={{
+                                        width: 40, height: 40,
+                                        background: "linear-gradient(135deg, #9B51E0, #F2994A)",
+                                        fontSize: 16,
+                                    }}
+                                >
+                                    {initial}
+                                </div>
+                                <div style={{ minWidth: 0 }}>
+                                    <p style={{ fontSize: 13, fontWeight: 600, color: "#E8E8EF", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>
+                                        {user.name}
+                                    </p>
+                                    <p style={{ fontSize: 10, color: "#666688", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", marginTop: 2 }}>
+                                        {user.email}
+                                    </p>
+                                </div>
+                            </div>
+                            {/* Online badge */}
+                            <div style={{ marginTop: 10, display: "inline-flex", alignItems: "center", gap: 5, padding: "3px 8px", background: "rgba(0,201,167,0.1)", borderRadius: 20, border: "1px solid rgba(0,201,167,0.2)" }}>
+                                <span style={{ width: 6, height: 6, borderRadius: "50%", background: "#00C9A7", display: "inline-block" }} />
+                                <span style={{ fontSize: 10, color: "#00C9A7", fontWeight: 600 }}>Online</span>
+                            </div>
+                        </div>
+
+                        {/* Menu links */}
+                        <div style={{ padding: "6px 0" }}>
+                            {[
+                                { label: "My Profile",   icon: "👤", href: "/dashboard" },
+                            ].map(link => (
+                                <a
+                                    key={link.label}
+                                    href={link.href}
+                                    style={{
+                                        display: "flex",
+                                        alignItems: "center",
+                                        gap: 10,
+                                        padding: "10px 16px",
+                                        fontSize: 13,
+                                        color: "#CCCCE0",
+                                        textDecoration: "none",
+                                        transition: "background 0.15s",
+                                    }}
+                                    onMouseEnter={e => (e.currentTarget.style.background = "rgba(155,81,224,0.08)")}
+                                    onMouseLeave={e => (e.currentTarget.style.background = "transparent")}
+                                >
+                                    <span style={{ fontSize: 15, width: 18, textAlign: "center" }}>{link.icon}</span>
+                                    <span>{link.label}</span>
+                                </a>
+                            ))}
+
+                            <div style={{ height: 1, background: "rgba(255,255,255,0.05)", margin: "6px 0" }} />
+
+                            <button
+                                onClick={handleLogout}
+                                style={{
+                                    width: "100%",
+                                    display: "flex",
+                                    alignItems: "center",
+                                    gap: 10,
+                                    padding: "10px 16px",
+                                    fontSize: 13,
+                                    color: "#FF6B6B",
+                                    background: "none",
+                                    border: "none",
+                                    cursor: "pointer",
+                                    fontFamily: "inherit",
+                                    textAlign: "left",
+                                    transition: "background 0.15s",
+                                }}
+                                onMouseEnter={e => (e.currentTarget.style.background = "rgba(255,107,107,0.08)")}
+                                onMouseLeave={e => (e.currentTarget.style.background = "transparent")}
+                            >
+                                <span style={{ fontSize: 15, width: 18, textAlign: "center" }}>⎋</span>
+                                <span>Logout</span>
+                            </button>
+                        </div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
+        </div>
+    );
+}
+
+// ─── RENTAL CATEGORIES MODAL ─────────────────────────────────────────────────
 function RentalCategoriesModal({ isOpen, onClose, onCategorySelect }: {
     isOpen: boolean;
     onClose: () => void;
@@ -325,9 +535,7 @@ function RentalCategoriesModal({ isOpen, onClose, onCategorySelect }: {
             {isOpen && (
                 <>
                     <motion.div
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        exit={{ opacity: 0 }}
+                        initial={{ opacity: 0 }} animate={{ opacity: 1 }} exit={{ opacity: 0 }}
                         onClick={onClose}
                         className="fixed inset-0 bg-black/90 backdrop-blur-md z-50"
                     />
@@ -338,27 +546,26 @@ function RentalCategoriesModal({ isOpen, onClose, onCategorySelect }: {
                         transition={{ type: "spring", damping: 25, stiffness: 300 }}
                         className="fixed inset-x-2 sm:inset-x-4 top-4 sm:top-16 bottom-4 sm:bottom-16 z-50 overflow-y-auto rounded-2xl sm:rounded-3xl pointer-events-auto"
                     >
-                        <div className="relative w-full min-h-full rounded-2xl sm:rounded-3xl overflow-hidden"
+                        <div
+                            className="relative w-full min-h-full rounded-2xl sm:rounded-3xl overflow-hidden"
                             style={{
                                 background: "linear-gradient(135deg, rgba(25,25,35,0.98), rgba(15,15,20,0.98))",
                                 backdropFilter: "blur(20px)",
-                                border: `1px solid rgba(155, 81, 224, 0.5)`,
+                                border: "1px solid rgba(155, 81, 224, 0.5)",
                                 boxShadow: "0 0 60px rgba(155, 81, 224, 0.3)",
-                            }}>
+                            }}
+                        >
                             {/* Header */}
-                            <div className="sticky top-0 z-10 p-4 sm:p-6 border-b"
-                                style={{
-                                    background: "rgba(15,15,20,0.95)",
-                                    backdropFilter: "blur(20px)",
-                                    borderColor: "rgba(155, 81, 224, 0.3)",
-                                }}>
+                            <div
+                                className="sticky top-0 z-10 p-4 sm:p-6 border-b"
+                                style={{ background: "rgba(15,15,20,0.95)", backdropFilter: "blur(20px)", borderColor: "rgba(155, 81, 224, 0.3)" }}
+                            >
                                 <div className="flex items-start justify-between gap-3">
                                     <div className="flex items-center gap-3 sm:gap-4 min-w-0 flex-1">
-                                        <div className="text-3xl sm:text-4xl w-12 h-12 sm:w-14 sm:h-14 rounded-2xl flex items-center justify-center flex-shrink-0"
-                                            style={{
-                                                background: "linear-gradient(135deg, rgba(155, 81, 224, 0.2), rgba(242, 153, 74, 0.2))",
-                                                border: "1px solid rgba(155, 81, 224, 0.4)",
-                                            }}>
+                                        <div
+                                            className="text-3xl sm:text-4xl w-12 h-12 sm:w-14 sm:h-14 rounded-2xl flex items-center justify-center flex-shrink-0"
+                                            style={{ background: "linear-gradient(135deg, rgba(155,81,224,0.2), rgba(242,153,74,0.2))", border: "1px solid rgba(155,81,224,0.4)" }}
+                                        >
                                             🎬
                                         </div>
                                         <div className="min-w-0">
@@ -386,13 +593,14 @@ function RentalCategoriesModal({ isOpen, onClose, onCategorySelect }: {
                                 </div>
                             </div>
 
-                            {/* Body — 3 Category Cards */}
+                            {/* Category Cards */}
                             <div className="p-4 sm:p-6 md:p-8">
-                                <p className="text-[10px] sm:text-xs tracking-[0.3em] uppercase text-center mb-6 sm:mb-8"
-                                    style={{ color: "#F2994A", fontFamily: "'Space Mono', monospace" }}>
+                                <p
+                                    className="text-[10px] sm:text-xs tracking-[0.3em] uppercase text-center mb-6 sm:mb-8"
+                                    style={{ color: "#F2994A", fontFamily: "'Space Mono', monospace" }}
+                                >
                                     ─ Select Category ─
                                 </p>
-
                                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5 md:gap-6 max-w-5xl mx-auto">
                                     {rentalCategories.map((category, idx) => (
                                         <motion.div
@@ -404,85 +612,26 @@ function RentalCategoriesModal({ isOpen, onClose, onCategorySelect }: {
                                             whileTap={{ scale: 0.98 }}
                                             onClick={() => onCategorySelect(category)}
                                             className="relative group cursor-pointer rounded-2xl overflow-hidden"
-                                            style={{
-                                                background: "rgba(255,255,255,0.05)",
-                                                border: `2px solid ${category.accent}33`,
-                                                backdropFilter: "blur(20px)",
-                                            }}
+                                            style={{ background: "rgba(255,255,255,0.05)", border: `2px solid ${category.accent}33`, backdropFilter: "blur(20px)" }}
                                         >
-                                            {/* Glow on hover */}
-                                            <div
-                                                className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500"
-                                                style={{
-                                                    background: `radial-gradient(circle at center, ${category.accent}22 0%, transparent 70%)`,
-                                                }}
-                                            />
-
-                                            {/* Top accent line */}
-                                            <div
-                                                className="absolute top-0 left-0 right-0 h-1 origin-left scale-x-0 group-hover:scale-x-100 transition-transform duration-500"
-                                                style={{ background: `linear-gradient(90deg, ${category.accent}, transparent)` }}
-                                            />
-
+                                            <div className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-500" style={{ background: `radial-gradient(circle at center, ${category.accent}22 0%, transparent 70%)` }} />
+                                            <div className="absolute top-0 left-0 right-0 h-1 origin-left scale-x-0 group-hover:scale-x-100 transition-transform duration-500" style={{ background: `linear-gradient(90deg, ${category.accent}, transparent)` }} />
                                             <div className="relative p-6 sm:p-7 md:p-8 text-center">
-                                                {/* Icon */}
-                                                <motion.div
-                                                    className="text-6xl sm:text-7xl mb-4 sm:mb-5 inline-block"
-                                                    whileHover={{ rotate: [0, -10, 10, -5, 0], scale: 1.15 }}
-                                                    transition={{ duration: 0.5 }}
-                                                >
+                                                <motion.div className="text-6xl sm:text-7xl mb-4 sm:mb-5 inline-block" whileHover={{ rotate: [0, -10, 10, -5, 0], scale: 1.15 }} transition={{ duration: 0.5 }}>
                                                     {category.icon}
                                                 </motion.div>
-
-                                                {/* Title */}
-                                                <h3 className="text-xl sm:text-2xl font-bold mb-2 text-white">
-                                                    {category.title}
-                                                </h3>
-
-                                                {/* Description */}
-                                                <p className="text-gray-400 text-xs sm:text-sm mb-4 leading-relaxed">
-                                                    {category.desc}
-                                                </p>
-
-                                                {/* Item count badge */}
-                                                <div
-                                                    className="inline-flex items-center gap-2 px-3 sm:px-4 py-1.5 sm:py-2 rounded-full mb-4"
-                                                    style={{
-                                                        background: `${category.accent}15`,
-                                                        border: `1px solid ${category.accent}33`,
-                                                    }}
-                                                >
-                                                    <span className="w-2 h-2 rounded-full animate-pulse" style={{ background: category.accent }}></span>
-                                                    <span className="text-xs sm:text-sm font-semibold" style={{ color: category.accent }}>
-                                                        {category.items.length} Items Available
-                                                    </span>
+                                                <h3 className="text-xl sm:text-2xl font-bold mb-2 text-white">{category.title}</h3>
+                                                <p className="text-gray-400 text-xs sm:text-sm mb-4 leading-relaxed">{category.desc}</p>
+                                                <div className="inline-flex items-center gap-2 px-3 sm:px-4 py-1.5 sm:py-2 rounded-full mb-4" style={{ background: `${category.accent}15`, border: `1px solid ${category.accent}33` }}>
+                                                    <span className="w-2 h-2 rounded-full animate-pulse" style={{ background: category.accent }} />
+                                                    <span className="text-xs sm:text-sm font-semibold" style={{ color: category.accent }}>{category.items.length} Items Available</span>
                                                 </div>
-
-                                                {/* Tags */}
                                                 <div className="flex flex-wrap justify-center gap-1.5 mb-5">
-                                                    {category.tags.slice(0, 3).map((tag) => (
-                                                        <span
-                                                            key={tag}
-                                                            className="text-[9px] sm:text-[10px] px-2 py-0.5 rounded-full uppercase tracking-wider font-medium"
-                                                            style={{
-                                                                background: "rgba(255,255,255,0.05)",
-                                                                color: "rgba(255,255,255,0.5)",
-                                                                border: "1px solid rgba(255,255,255,0.08)",
-                                                            }}
-                                                        >
-                                                            {tag}
-                                                        </span>
+                                                    {category.tags.slice(0, 3).map(tag => (
+                                                        <span key={tag} className="text-[9px] sm:text-[10px] px-2 py-0.5 rounded-full uppercase tracking-wider font-medium" style={{ background: "rgba(255,255,255,0.05)", color: "rgba(255,255,255,0.5)", border: "1px solid rgba(255,255,255,0.08)" }}>{tag}</span>
                                                     ))}
                                                 </div>
-
-                                                {/* CTA Button */}
-                                                <motion.div
-                                                    className="inline-flex items-center gap-2 px-4 sm:px-5 py-2 sm:py-2.5 rounded-full text-xs sm:text-sm font-bold text-white transition-all group-hover:gap-3"
-                                                    style={{
-                                                        background: `linear-gradient(135deg, ${category.accent}, ${category.accent}AA)`,
-                                                        boxShadow: `0 4px 20px ${category.accent}40`,
-                                                    }}
-                                                >
+                                                <motion.div className="inline-flex items-center gap-2 px-4 sm:px-5 py-2 sm:py-2.5 rounded-full text-xs sm:text-sm font-bold text-white transition-all group-hover:gap-3" style={{ background: `linear-gradient(135deg, ${category.accent}, ${category.accent}AA)`, boxShadow: `0 4px 20px ${category.accent}40` }}>
                                                     Browse {category.title}
                                                     <span className="transition-transform group-hover:translate-x-1">→</span>
                                                 </motion.div>
@@ -490,16 +639,10 @@ function RentalCategoriesModal({ isOpen, onClose, onCategorySelect }: {
                                         </motion.div>
                                     ))}
                                 </div>
-
-                                {/* Bottom note */}
-                                <motion.div
-                                    initial={{ opacity: 0, y: 20 }}
-                                    animate={{ opacity: 1, y: 0 }}
-                                    transition={{ delay: 0.5 }}
-                                    className="mt-8 sm:mt-12 text-center"
-                                >
+                                <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ delay: 0.5 }} className="mt-8 sm:mt-12 text-center">
                                     <p className="text-xs sm:text-sm text-gray-400">
-                                        💡 Need help choosing? <a href="/contact" className="text-[#F2994A] hover:underline">Contact our team</a> for recommendations
+                                        💡 Need help choosing?{" "}
+                                        <a href="/contact" className="text-[#F2994A] hover:underline">Contact our team</a> for recommendations
                                     </p>
                                 </motion.div>
                             </div>
@@ -511,7 +654,7 @@ function RentalCategoriesModal({ isOpen, onClose, onCategorySelect }: {
     );
 }
 
-// ─── SERVICE INQUIRY MODAL ──────────────────────────────────────────────────
+// ─── SERVICE INQUIRY MODAL ───────────────────────────────────────────────────
 function ServiceInquiryModal({ service, isOpen, onClose, onSubmit }: {
     service: typeof services[0] | null;
     isOpen: boolean;
@@ -523,7 +666,7 @@ function ServiceInquiryModal({ service, isOpen, onClose, onSubmit }: {
         name: userData?.name || "",
         mobile: "",
         email: userData?.email || "",
-        requirements: ""
+        requirements: "",
     });
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [showSuccessPopup, setShowSuccessPopup] = useState(false);
@@ -531,11 +674,7 @@ function ServiceInquiryModal({ service, isOpen, onClose, onSubmit }: {
     useEffect(() => {
         const user = getUserData();
         if (user) {
-            setFormData(prev => ({
-                ...prev,
-                name: user.name || prev.name,
-                email: user.email || prev.email,
-            }));
+            setFormData(prev => ({ ...prev, name: user.name || prev.name, email: user.email || prev.email }));
         }
     }, [isOpen]);
 
@@ -576,12 +715,12 @@ function ServiceInquiryModal({ service, isOpen, onClose, onSubmit }: {
                                 transition={{ type: "spring", damping: 20, stiffness: 300 }}
                                 className="fixed inset-0 z-[100] flex items-center justify-center p-4 pointer-events-none"
                             >
-                                <div className="relative max-w-md w-full rounded-2xl overflow-hidden pointer-events-auto shadow-2xl"
-                                    style={{ background: "linear-gradient(135deg, rgba(30,30,40,0.98), rgba(20,20,30,0.98))", backdropFilter: "blur(20px)", border: `1px solid ${service.accent}66`, boxShadow: `0 0 60px ${service.accent}40` }}>
+                                <div
+                                    className="relative max-w-md w-full rounded-2xl overflow-hidden pointer-events-auto shadow-2xl"
+                                    style={{ background: "linear-gradient(135deg, rgba(30,30,40,0.98), rgba(20,20,30,0.98))", backdropFilter: "blur(20px)", border: `1px solid ${service.accent}66`, boxShadow: `0 0 60px ${service.accent}40` }}
+                                >
                                     <div className="p-5 sm:p-6 text-center">
-                                        <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ delay: 0.2, type: "spring", stiffness: 200 }}
-                                            className="w-16 h-16 sm:w-20 sm:h-20 mx-auto mb-4 rounded-full flex items-center justify-center"
-                                            style={{ background: `${service.accent}20`, border: `2px solid ${service.accent}` }}>
+                                        <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ delay: 0.2, type: "spring", stiffness: 200 }} className="w-16 h-16 sm:w-20 sm:h-20 mx-auto mb-4 rounded-full flex items-center justify-center" style={{ background: `${service.accent}20`, border: `2px solid ${service.accent}` }}>
                                             <span className="text-3xl sm:text-4xl">🎉</span>
                                         </motion.div>
                                         <h3 className="text-xl sm:text-2xl font-bold text-white mb-2">Thank You!</h3>
@@ -605,8 +744,10 @@ function ServiceInquiryModal({ service, isOpen, onClose, onSubmit }: {
                         transition={{ type: "spring", damping: 25, stiffness: 300 }}
                         className="fixed inset-0 z-50 flex items-center justify-center p-3 sm:p-4 pointer-events-none overflow-y-auto"
                     >
-                        <div className="relative w-full max-w-2xl rounded-2xl sm:rounded-3xl overflow-hidden pointer-events-auto my-4 sm:my-8 max-h-[95vh] sm:max-h-[90vh] overflow-y-auto"
-                            style={{ background: "linear-gradient(135deg, rgba(25,25,35,0.98), rgba(15,15,20,0.98))", backdropFilter: "blur(20px)", border: `1px solid ${service.accent}66`, boxShadow: `0 25px 50px -12px ${service.accent}40` }}>
+                        <div
+                            className="relative w-full max-w-2xl rounded-2xl sm:rounded-3xl overflow-hidden pointer-events-auto my-4 sm:my-8 max-h-[95vh] sm:max-h-[90vh] overflow-y-auto"
+                            style={{ background: "linear-gradient(135deg, rgba(25,25,35,0.98), rgba(15,15,20,0.98))", backdropFilter: "blur(20px)", border: `1px solid ${service.accent}66`, boxShadow: `0 25px 50px -12px ${service.accent}40` }}
+                        >
                             <div className="sticky top-0 z-10 relative p-4 sm:p-6 border-b" style={{ borderColor: `${service.accent}33`, background: `linear-gradient(90deg, ${service.accent}08, rgba(15,15,20,0.95))`, backdropFilter: "blur(20px)" }}>
                                 <div className="flex items-center gap-3 sm:gap-4 pr-10">
                                     <div className="text-3xl sm:text-4xl w-12 h-12 sm:w-14 sm:h-14 rounded-2xl flex items-center justify-center flex-shrink-0" style={{ background: `${service.accent}20`, border: `1px solid ${service.accent}44` }}>{service.icon}</div>
@@ -645,10 +786,7 @@ function ServiceInquiryModal({ service, isOpen, onClose, onSubmit }: {
                                     whileHover={{ scale: 1.02 }}
                                     whileTap={{ scale: 0.98 }}
                                     className="w-full py-3 rounded-full font-bold uppercase tracking-wider text-white text-sm transition-all"
-                                    style={{
-                                        background: "linear-gradient(135deg, #9B51E0 0%, #F2994A 100%)",
-                                        boxShadow: "0 0 30px rgba(155, 81, 224, 0.4)",
-                                    }}
+                                    style={{ background: "linear-gradient(135deg, #9B51E0 0%, #F2994A 100%)", boxShadow: "0 0 30px rgba(155, 81, 224, 0.4)" }}
                                 >
                                     {isSubmitting ? "Sending..." : "Submit Inquiry →"}
                                 </motion.button>
@@ -661,7 +799,7 @@ function ServiceInquiryModal({ service, isOpen, onClose, onSubmit }: {
     );
 }
 
-// ─── RENTAL PRODUCTS MODAL (with Back button) ───────────────────────────────
+// ─── RENTAL PRODUCTS MODAL ───────────────────────────────────────────────────
 function RentalProductsModal({ category, isOpen, onClose, onBack, onRentClick }: {
     category: typeof rentalCategories[0] | null;
     isOpen: boolean;
@@ -670,7 +808,7 @@ function RentalProductsModal({ category, isOpen, onClose, onBack, onRentClick }:
     onRentClick: (product: any) => void;
 }) {
     if (!category) return null;
-    const formatPrice = (price: number) => `₹${price.toLocaleString('en-IN')}`;
+    const formatPrice = (price: number) => `₹${price.toLocaleString("en-IN")}`;
 
     return (
         <AnimatePresence>
@@ -684,19 +822,14 @@ function RentalProductsModal({ category, isOpen, onClose, onBack, onRentClick }:
                         transition={{ type: "spring", damping: 25, stiffness: 300 }}
                         className="fixed inset-x-2 sm:inset-x-4 top-4 sm:top-20 bottom-4 sm:bottom-20 z-50 overflow-y-auto rounded-2xl sm:rounded-3xl pointer-events-auto"
                     >
-                        <div className="relative w-full min-h-full rounded-2xl sm:rounded-3xl overflow-hidden"
-                            style={{ background: "linear-gradient(135deg, rgba(25,25,35,0.98), rgba(15,15,20,0.98))", backdropFilter: "blur(20px)", border: `1px solid ${category.accent}66` }}>
+                        <div
+                            className="relative w-full min-h-full rounded-2xl sm:rounded-3xl overflow-hidden"
+                            style={{ background: "linear-gradient(135deg, rgba(25,25,35,0.98), rgba(15,15,20,0.98))", backdropFilter: "blur(20px)", border: `1px solid ${category.accent}66` }}
+                        >
                             <div className="sticky top-0 z-10 p-4 sm:p-6 border-b" style={{ background: "rgba(15,15,20,0.95)", backdropFilter: "blur(20px)", borderColor: `${category.accent}33` }}>
                                 <div className="flex items-start justify-between gap-3">
                                     <div className="flex items-center gap-3 sm:gap-4 min-w-0 flex-1">
-                                        {/* Back button */}
-                                        <button
-                                            onClick={onBack}
-                                            className="w-9 h-9 sm:w-10 sm:h-10 flex items-center justify-center rounded-full bg-white/5 text-gray-400 hover:text-white transition-colors active:scale-90 flex-shrink-0"
-                                            title="Back to categories"
-                                        >
-                                            ←
-                                        </button>
+                                        <button onClick={onBack} className="w-9 h-9 sm:w-10 sm:h-10 flex items-center justify-center rounded-full bg-white/5 text-gray-400 hover:text-white transition-colors active:scale-90 flex-shrink-0" title="Back to categories">←</button>
                                         <div className="text-3xl sm:text-4xl w-12 h-12 sm:w-14 sm:h-14 rounded-2xl flex items-center justify-center flex-shrink-0" style={{ background: `${category.accent}20`, border: `1px solid ${category.accent}44` }}>{category.icon}</div>
                                         <div className="min-w-0">
                                             <h2 className="text-lg sm:text-2xl font-bold text-white">{category.title}</h2>
@@ -738,10 +871,7 @@ function RentalProductsModal({ category, isOpen, onClose, onBack, onRentClick }:
                                                 {product.inStock && <span className="inline-block text-green-400 text-xs mb-3 font-medium">✓ In Stock</span>}
                                                 <motion.button
                                                     type="button"
-                                                    onClick={(e) => {
-                                                        e.stopPropagation();
-                                                        onRentClick(product);
-                                                    }}
+                                                    onClick={e => { e.stopPropagation(); onRentClick(product); }}
                                                     whileTap={{ scale: 0.98 }}
                                                     className="w-full py-2.5 rounded-lg font-semibold text-sm transition-all text-white"
                                                     style={{ background: `linear-gradient(135deg, ${category.accent}, ${category.accent}CC)` }}
@@ -761,7 +891,7 @@ function RentalProductsModal({ category, isOpen, onClose, onBack, onRentClick }:
     );
 }
 
-// ─── RENTAL CHECKOUT MODAL ──────────────────────────────────────────────────
+// ─── RENTAL CHECKOUT MODAL ───────────────────────────────────────────────────
 function RentalCheckoutModal({ product, category, isOpen, onClose, onSubmit }: {
     product: any;
     category: any;
@@ -770,28 +900,17 @@ function RentalCheckoutModal({ product, category, isOpen, onClose, onSubmit }: {
     onSubmit: (data: RentalFormData) => Promise<boolean>;
 }) {
     const userData = getUserData();
-    const [rentalDays, setRentalDays] = useState(1);
-    const [formData, setFormData] = useState({
-        name: userData?.name || "",
-        mobile: "",
-        email: userData?.email || "",
-        requirements: ""
-    });
+    const [rentalDays, setRentalDays]   = useState(1);
+    const [formData, setFormData]       = useState({ name: userData?.name || "", mobile: "", email: userData?.email || "", requirements: "" });
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [showSuccessPopup, setShowSuccessPopup] = useState(false);
 
-    const totalPrice = product ? product.price * rentalDays : 0;
-    const formatPrice = (price: number) => `₹${price.toLocaleString('en-IN')}`;
+    const totalPrice  = product ? product.price * rentalDays : 0;
+    const formatPrice = (price: number) => `₹${price.toLocaleString("en-IN")}`;
 
     useEffect(() => {
         const user = getUserData();
-        if (user) {
-            setFormData(prev => ({
-                ...prev,
-                name: user.name || prev.name,
-                email: user.email || prev.email,
-            }));
-        }
+        if (user) setFormData(prev => ({ ...prev, name: user.name || prev.name, email: user.email || prev.email }));
     }, [isOpen]);
 
     const handleSubmit = async (e: React.FormEvent) => {
@@ -828,12 +947,9 @@ function RentalCheckoutModal({ product, category, isOpen, onClose, onSubmit }: {
                                 transition={{ type: "spring", damping: 20, stiffness: 300 }}
                                 className="fixed inset-0 z-[100] flex items-center justify-center p-4 pointer-events-none"
                             >
-                                <div className="relative max-w-md w-full rounded-2xl overflow-hidden pointer-events-auto shadow-2xl"
-                                    style={{ background: "linear-gradient(135deg, rgba(30,30,40,0.98), rgba(20,20,30,0.98))", backdropFilter: "blur(20px)", border: `1px solid ${category.accent}66`, boxShadow: `0 0 60px ${category.accent}40` }}>
+                                <div className="relative max-w-md w-full rounded-2xl overflow-hidden pointer-events-auto shadow-2xl" style={{ background: "linear-gradient(135deg, rgba(30,30,40,0.98), rgba(20,20,30,0.98))", backdropFilter: "blur(20px)", border: `1px solid ${category.accent}66`, boxShadow: `0 0 60px ${category.accent}40` }}>
                                     <div className="p-5 sm:p-6 text-center">
-                                        <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ delay: 0.2, type: "spring", stiffness: 200 }}
-                                            className="w-16 h-16 sm:w-20 sm:h-20 mx-auto mb-4 rounded-full flex items-center justify-center"
-                                            style={{ background: `${category.accent}20`, border: `2px solid ${category.accent}` }}>
+                                        <motion.div initial={{ scale: 0 }} animate={{ scale: 1 }} transition={{ delay: 0.2, type: "spring", stiffness: 200 }} className="w-16 h-16 sm:w-20 sm:h-20 mx-auto mb-4 rounded-full flex items-center justify-center" style={{ background: `${category.accent}20`, border: `2px solid ${category.accent}` }}>
                                             <span className="text-3xl sm:text-4xl">🎉</span>
                                         </motion.div>
                                         <h3 className="text-xl sm:text-2xl font-bold text-white mb-2">Thank You!</h3>
@@ -857,8 +973,10 @@ function RentalCheckoutModal({ product, category, isOpen, onClose, onSubmit }: {
                         exit={{ opacity: 0, scale: 0.9, y: 20 }}
                         className="fixed inset-0 z-[70] flex items-center justify-center p-3 sm:p-4 pointer-events-none overflow-y-auto"
                     >
-                        <div className="relative w-full max-w-4xl rounded-2xl sm:rounded-3xl overflow-hidden pointer-events-auto my-4 sm:my-8 max-h-[95vh] overflow-y-auto"
-                            style={{ background: "linear-gradient(135deg, rgba(25,25,35,0.98), rgba(15,15,20,0.98))", backdropFilter: "blur(20px)", border: `1px solid ${category.accent}66`, boxShadow: `0 0 40px ${category.accent}20` }}>
+                        <div
+                            className="relative w-full max-w-4xl rounded-2xl sm:rounded-3xl overflow-hidden pointer-events-auto my-4 sm:my-8 max-h-[95vh] overflow-y-auto"
+                            style={{ background: "linear-gradient(135deg, rgba(25,25,35,0.98), rgba(15,15,20,0.98))", backdropFilter: "blur(20px)", border: `1px solid ${category.accent}66`, boxShadow: `0 0 40px ${category.accent}20` }}
+                        >
                             <div className="sticky top-0 z-10 relative p-4 sm:p-6 border-b" style={{ borderColor: `${category.accent}33`, background: `linear-gradient(90deg, ${category.accent}08, rgba(15,15,20,0.95))`, backdropFilter: "blur(20px)" }}>
                                 <div className="flex items-center gap-3 pr-10">
                                     <div className="text-2xl sm:text-3xl flex-shrink-0">{product.image}</div>
@@ -870,6 +988,7 @@ function RentalCheckoutModal({ product, category, isOpen, onClose, onSubmit }: {
                                 <button onClick={onClose} className="absolute top-4 right-4 sm:top-6 sm:right-6 w-9 h-9 flex items-center justify-center rounded-full bg-white/5 text-gray-400 hover:text-white text-2xl sm:text-3xl transition-colors active:scale-90">×</button>
                             </div>
                             <div className="grid md:grid-cols-2 gap-4 sm:gap-6 p-4 sm:p-6">
+                                {/* Product info */}
                                 <div className="space-y-3 sm:space-y-4">
                                     <div className="text-6xl sm:text-8xl bg-white/10 rounded-2xl p-6 sm:p-8 text-center" style={{ border: `1px solid ${category.accent}44` }}>{product.image}</div>
                                     <h3 className="text-lg sm:text-xl font-bold text-white text-center">{product.name}</h3>
@@ -889,23 +1008,24 @@ function RentalCheckoutModal({ product, category, isOpen, onClose, onSubmit }: {
                                         <p className="text-gray-300 text-xs sm:text-sm">{product.specs}</p>
                                     </div>
                                 </div>
+                                {/* Form */}
                                 <div>
                                     <form onSubmit={handleSubmit} className="space-y-3 sm:space-y-4">
                                         <div>
                                             <label className="block text-xs sm:text-sm font-semibold mb-2 text-gray-200">Full Name *</label>
-                                            <input type="text" required value={formData.name} onChange={(e) => setFormData({ ...formData, name: e.target.value })} className="w-full px-3 sm:px-4 py-2.5 sm:py-3 rounded-xl bg-white/10 border border-white/20 focus:border-[#9B51E0] focus:outline-none focus:ring-1 focus:ring-[#9B51E0] text-white placeholder-gray-400 transition-all text-sm" placeholder="Enter your full name" />
+                                            <input type="text" required value={formData.name} onChange={e => setFormData({ ...formData, name: e.target.value })} className="w-full px-3 sm:px-4 py-2.5 sm:py-3 rounded-xl bg-white/10 border border-white/20 focus:border-[#9B51E0] focus:outline-none focus:ring-1 focus:ring-[#9B51E0] text-white placeholder-gray-400 transition-all text-sm" placeholder="Enter your full name" />
                                         </div>
                                         <div>
                                             <label className="block text-xs sm:text-sm font-semibold mb-2 text-gray-200">Mobile Number *</label>
-                                            <input type="tel" required value={formData.mobile} onChange={(e) => setFormData({ ...formData, mobile: e.target.value })} className="w-full px-3 sm:px-4 py-2.5 sm:py-3 rounded-xl bg-white/10 border border-white/20 focus:border-[#9B51E0] focus:outline-none focus:ring-1 focus:ring-[#9B51E0] text-white placeholder-gray-400 transition-all text-sm" placeholder="+91 98765 43210" />
+                                            <input type="tel" required value={formData.mobile} onChange={e => setFormData({ ...formData, mobile: e.target.value })} className="w-full px-3 sm:px-4 py-2.5 sm:py-3 rounded-xl bg-white/10 border border-white/20 focus:border-[#9B51E0] focus:outline-none focus:ring-1 focus:ring-[#9B51E0] text-white placeholder-gray-400 transition-all text-sm" placeholder="+91 98765 43210" />
                                         </div>
                                         <div>
                                             <label className="block text-xs sm:text-sm font-semibold mb-2 text-gray-200">Email Address *</label>
-                                            <input type="email" required value={formData.email} onChange={(e) => setFormData({ ...formData, email: e.target.value })} className="w-full px-3 sm:px-4 py-2.5 sm:py-3 rounded-xl bg-white/10 border border-white/20 focus:border-[#9B51E0] focus:outline-none focus:ring-1 focus:ring-[#9B51E0] text-white placeholder-gray-400 transition-all text-sm" placeholder="you@example.com" />
+                                            <input type="email" required value={formData.email} onChange={e => setFormData({ ...formData, email: e.target.value })} className="w-full px-3 sm:px-4 py-2.5 sm:py-3 rounded-xl bg-white/10 border border-white/20 focus:border-[#9B51E0] focus:outline-none focus:ring-1 focus:ring-[#9B51E0] text-white placeholder-gray-400 transition-all text-sm" placeholder="you@example.com" />
                                         </div>
                                         <div>
                                             <label className="block text-xs sm:text-sm font-semibold mb-2 text-gray-200">Rental Duration (Days) *</label>
-                                            <input type="number" min="1" max="30" required value={rentalDays} onChange={(e) => setRentalDays(parseInt(e.target.value) || 1)} className="w-full px-3 sm:px-4 py-2.5 sm:py-3 rounded-xl bg-white/10 border border-white/20 focus:border-[#9B51E0] focus:outline-none focus:ring-1 focus:ring-[#9B51E0] text-white transition-all text-sm" />
+                                            <input type="number" min="1" max="30" required value={rentalDays} onChange={e => setRentalDays(parseInt(e.target.value) || 1)} className="w-full px-3 sm:px-4 py-2.5 sm:py-3 rounded-xl bg-white/10 border border-white/20 focus:border-[#9B51E0] focus:outline-none focus:ring-1 focus:ring-[#9B51E0] text-white transition-all text-sm" />
                                         </div>
                                         <div className="p-3 sm:p-4 rounded-xl" style={{ background: `${category.accent}15`, border: `1px solid ${category.accent}33` }}>
                                             <p className="text-white text-xs sm:text-sm font-semibold mb-2 sm:mb-3">Price Summary</p>
@@ -919,19 +1039,9 @@ function RentalCheckoutModal({ product, category, isOpen, onClose, onSubmit }: {
                                         </div>
                                         <div>
                                             <label className="block text-xs sm:text-sm font-semibold mb-2 text-gray-200">Special Requests</label>
-                                            <textarea rows={3} value={formData.requirements} onChange={(e) => setFormData({ ...formData, requirements: e.target.value })} className="w-full px-3 sm:px-4 py-2.5 sm:py-3 rounded-xl bg-white/10 border border-white/20 focus:border-[#9B51E0] focus:outline-none focus:ring-1 focus:ring-[#9B51E0] text-white placeholder-gray-400 resize-none transition-all text-sm" placeholder="Delivery location, pickup time, special instructions..." />
+                                            <textarea rows={3} value={formData.requirements} onChange={e => setFormData({ ...formData, requirements: e.target.value })} className="w-full px-3 sm:px-4 py-2.5 sm:py-3 rounded-xl bg-white/10 border border-white/20 focus:border-[#9B51E0] focus:outline-none focus:ring-1 focus:ring-[#9B51E0] text-white placeholder-gray-400 resize-none transition-all text-sm" placeholder="Delivery location, pickup time, special instructions..." />
                                         </div>
-                                        <motion.button
-                                            type="submit"
-                                            disabled={isSubmitting}
-                                            whileHover={{ scale: 1.02 }}
-                                            whileTap={{ scale: 0.98 }}
-                                            className="w-full py-3 sm:py-3.5 rounded-full font-bold uppercase tracking-wider text-white text-sm transition-all"
-                                            style={{
-                                                background: "linear-gradient(135deg, #9B51E0 0%, #F2994A 100%)",
-                                                boxShadow: "0 0 30px rgba(155, 81, 224, 0.4)",
-                                            }}
-                                        >
+                                        <motion.button type="submit" disabled={isSubmitting} whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} className="w-full py-3 sm:py-3.5 rounded-full font-bold uppercase tracking-wider text-white text-sm transition-all" style={{ background: "linear-gradient(135deg, #9B51E0 0%, #F2994A 100%)", boxShadow: "0 0 30px rgba(155, 81, 224, 0.4)" }}>
                                             {isSubmitting ? "Processing..." : "Confirm Rental →"}
                                         </motion.button>
                                         <p className="text-[10px] sm:text-xs text-gray-400 text-center mt-2 sm:mt-3">By confirming, you agree to our rental terms and conditions</p>
@@ -946,12 +1056,12 @@ function RentalCheckoutModal({ product, category, isOpen, onClose, onSubmit }: {
     );
 }
 
-// ─── SERVICE CARD ───────────────────────────────────────────────────────────
+// ─── SERVICE CARD ────────────────────────────────────────────────────────────
 function ServiceCard({ item, index, onClick }: { item: any; index: number; onClick: () => void }) {
     const [hovered, setHovered] = useState(false);
-    const cardRef = useRef<HTMLDivElement>(null);
-    const rotateX = useMotionValue(0);
-    const rotateY = useMotionValue(0);
+    const cardRef  = useRef<HTMLDivElement>(null);
+    const rotateX  = useMotionValue(0);
+    const rotateY  = useMotionValue(0);
     const springRX = useSpring(rotateX, { stiffness: 200, damping: 20 });
     const springRY = useSpring(rotateY, { stiffness: 200, damping: 20 });
 
@@ -977,29 +1087,22 @@ function ServiceCard({ item, index, onClick }: { item: any; index: number; onCli
                 className="relative group cursor-pointer h-full active:scale-95 transition-transform"
             >
                 <motion.div animate={{ opacity: hovered ? 1 : 0 }} className="absolute inset-0 rounded-2xl blur-xl -z-10" style={{ background: `radial-gradient(ellipse at center, ${item.accent}33 0%, transparent 70%)` }} />
-                <div className="relative rounded-2xl p-4 sm:p-5 md:p-6 h-full border transition-all duration-300 flex flex-col"
+                <div
+                    className="relative rounded-2xl p-4 sm:p-5 md:p-6 h-full border transition-all duration-300 flex flex-col"
                     style={{
-                        background: isRental
-                            ? "linear-gradient(135deg, rgba(155, 81, 224, 0.08), rgba(242, 153, 74, 0.08))"
-                            : "rgba(255,255,255,0.05)",
+                        background: isRental ? "linear-gradient(135deg, rgba(155,81,224,0.08), rgba(242,153,74,0.08))" : "rgba(255,255,255,0.05)",
                         backdropFilter: "blur(20px)",
-                        borderColor: hovered ? item.accent + "55" : isRental ? "rgba(155, 81, 224, 0.3)" : "rgba(255,255,255,0.1)"
-                    }}>
-
-                    {/* Special badge for Rentals */}
+                        borderColor: hovered ? item.accent + "55" : isRental ? "rgba(155,81,224,0.3)" : "rgba(255,255,255,0.1)",
+                    }}
+                >
                     {isRental && (
                         <div
                             className="absolute -top-2 -right-2 px-2.5 py-1 rounded-full text-[9px] sm:text-[10px] font-bold uppercase tracking-wider"
-                            style={{
-                                background: "linear-gradient(135deg, #9B51E0, #F2994A)",
-                                color: "#fff",
-                                boxShadow: "0 4px 15px rgba(155, 81, 224, 0.4)",
-                            }}
+                            style={{ background: "linear-gradient(135deg, #9B51E0, #F2994A)", color: "#fff", boxShadow: "0 4px 15px rgba(155,81,224,0.4)" }}
                         >
                             New
                         </div>
                     )}
-
                     <div className="text-[10px] sm:text-xs font-mono mb-3 sm:mb-4 tracking-widest" style={{ color: item.accent + "cc" }}>{item.id}</div>
                     <motion.div animate={{ scale: hovered ? 1.15 : 1, rotate: hovered ? 10 : 0 }} className="text-3xl sm:text-4xl mb-3 sm:mb-5" style={{ color: item.accent }}>{item.icon}</motion.div>
                     <h3 className="text-lg sm:text-xl font-semibold mb-2 sm:mb-3 tracking-tight text-white">{item.title}</h3>
@@ -1011,7 +1114,7 @@ function ServiceCard({ item, index, onClick }: { item: any; index: number; onCli
                     </div>
                     {isRental && (
                         <div className="text-[11px] sm:text-xs text-gray-300 flex items-center gap-2">
-                            <span className="w-2 h-2 rounded-full animate-pulse" style={{ background: item.accent }}></span>
+                            <span className="w-2 h-2 rounded-full animate-pulse" style={{ background: item.accent }} />
                             {item.totalItems}+ items across 3 categories
                         </div>
                     )}
@@ -1024,39 +1127,48 @@ function ServiceCard({ item, index, onClick }: { item: any; index: number; onCli
     );
 }
 
-// ─── MAIN SERVICE PAGE ──────────────────────────────────────────────────────
+// ─── MAIN SERVICE PAGE ───────────────────────────────────────────────────────
 function ServicePage() {
     const navigate = useNavigate();
     const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
-    const [selectedService, setSelectedService] = useState<typeof services[0] | null>(null);
-    const [isServiceModalOpen, setIsServiceModalOpen] = useState(false);
 
-    // NEW: Rental flow states
+    // ── Logged-in user state (fixes the hardcoded name bug) ───────────────
+    const [loggedInUser, setLoggedInUser] = useState<LoggedInUser | null>(null);
+
+    const [selectedService, setSelectedService]               = useState<typeof services[0] | null>(null);
+    const [isServiceModalOpen, setIsServiceModalOpen]         = useState(false);
     const [isRentalCategoriesOpen, setIsRentalCategoriesOpen] = useState(false);
     const [selectedRentalCategory, setSelectedRentalCategory] = useState<typeof rentalCategories[0] | null>(null);
     const [isRentalProductsModalOpen, setIsRentalProductsModalOpen] = useState(false);
+    const [selectedProduct, setSelectedProduct]               = useState<any>(null);
+    const [isCheckoutModalOpen, setIsCheckoutModalOpen]       = useState(false);
+    const [mobileMenuOpen, setMobileMenuOpen]                 = useState(false);
 
-    const [selectedProduct, setSelectedProduct] = useState<any>(null);
-    const [isCheckoutModalOpen, setIsCheckoutModalOpen] = useState(false);
-    const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-
+    // Load user from localStorage
     useEffect(() => {
-        const handleEsc = (e: KeyboardEvent) => {
-            if (e.key === 'Escape') setMobileMenuOpen(false);
-        };
-        window.addEventListener('keydown', handleEsc);
-        return () => window.removeEventListener('keydown', handleEsc);
+        const userData = getUserData();
+        if (userData && isUserLoggedIn()) {
+            setLoggedInUser(userData);
+        } else {
+            setLoggedInUser(null);
+        }
     }, []);
 
     useEffect(() => {
-        document.body.style.overflow = mobileMenuOpen ? 'hidden' : 'unset';
-        return () => { document.body.style.overflow = 'unset'; };
+        const handleEsc = (e: KeyboardEvent) => { if (e.key === "Escape") setMobileMenuOpen(false); };
+        window.addEventListener("keydown", handleEsc);
+        return () => window.removeEventListener("keydown", handleEsc);
+    }, []);
+
+    useEffect(() => {
+        document.body.style.overflow = mobileMenuOpen ? "hidden" : "unset";
+        return () => { document.body.style.overflow = "unset"; };
     }, [mobileMenuOpen]);
 
     useEffect(() => {
         const link = document.createElement("link");
-        link.rel = "stylesheet";
-        link.href = "https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800;900&family=Space+Mono:wght@400;700&display=swap";
+        link.rel   = "stylesheet";
+        link.href  = "https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800;900&family=Space+Mono:wght@400;700&display=swap";
         document.head.appendChild(link);
         const handleMouseMove = (e: MouseEvent) => setMousePos({ x: e.clientX, y: e.clientY });
         window.addEventListener("mousemove", handleMouseMove);
@@ -1065,33 +1177,23 @@ function ServicePage() {
 
     const handleCardClick = (item: any) => {
         if (!isUserLoggedIn()) {
-            navigate({
-                to: "/login",
-                state: {
-                    returnTo: "/service",
-                    message: "Please login or signup to continue with your inquiry."
-                }
-            });
+            navigate({ to: "/login", state: { returnTo: "/service", message: "Please login or signup to continue with your inquiry." } });
             return;
         }
-
         if (item.type === "service") {
             setSelectedService(item);
             setIsServiceModalOpen(true);
         } else if (item.type === "rental") {
-            // Open the categories selector first
             setIsRentalCategoriesOpen(true);
         }
     };
 
-    // NEW: When a category is selected from the categories modal
     const handleCategorySelect = (category: typeof rentalCategories[0]) => {
         setSelectedRentalCategory(category);
         setIsRentalCategoriesOpen(false);
         setIsRentalProductsModalOpen(true);
     };
 
-    // NEW: Back to categories from products
     const handleBackToCategories = () => {
         setIsRentalProductsModalOpen(false);
         setSelectedRentalCategory(null);
@@ -1100,13 +1202,7 @@ function ServicePage() {
 
     const handleRentClick = (product: any) => {
         if (!isUserLoggedIn()) {
-            navigate({
-                to: "/login",
-                state: {
-                    returnTo: "/service",
-                    message: "Please login or signup to continue with your rental."
-                }
-            });
+            navigate({ to: "/login", state: { returnTo: "/service", message: "Please login or signup to continue with your rental." } });
             return;
         }
         setSelectedProduct(product);
@@ -1127,64 +1223,45 @@ function ServicePage() {
         } catch { return false; }
     };
 
-    // Replace your existing handleRentalSubmit function
     const handleRentalSubmit = async (data: RentalFormData): Promise<boolean> => {
         try {
             const apiUrl = import.meta.env.VITE_API_URL || "http://localhost:5000";
-
-            const payload = {
-                name: data.name,
-                mobile: data.mobile,
-                email: data.email,
-                productId: data.productId,
-                productName: data.productName,
-                categoryName: data.categoryName,
-                pricePerDay: data.pricePerDay,
-                rentalDays: data.rentalDays,
-                totalPrice: data.totalPrice,
-                requirements: data.requirements,
-            };
-
             const res = await fetch(`${apiUrl}/api/rental-inquiry`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
-                    // Include auth token if available
-                    ...(localStorage.getItem("token") && {
-                        "Authorization": `Bearer ${localStorage.getItem("token")}`
-                    })
+                    ...(localStorage.getItem("token") && { Authorization: `Bearer ${localStorage.getItem("token")}` }),
                 },
-                body: JSON.stringify(payload),
+                body: JSON.stringify({
+                    name: data.name, mobile: data.mobile, email: data.email,
+                    productId: data.productId, productName: data.productName,
+                    categoryName: data.categoryName, pricePerDay: data.pricePerDay,
+                    rentalDays: data.rentalDays, totalPrice: data.totalPrice,
+                    requirements: data.requirements,
+                }),
             });
-
             const result = await res.json();
-
-            if (!res.ok) {
-                console.error("Rental submission failed:", result.message);
-                return false;
-            }
-
+            if (!res.ok) { console.error("Rental failed:", result.message); return false; }
             return true;
-        } catch (error) {
-            console.error("Network error:", error);
-            return false;
-        }
+        } catch (err) { console.error("Network error:", err); return false; }
     };
+
+    // ── First name for display ─────────────────────────────────────────────
+    const displayFirstName = loggedInUser?.name?.split(" ")[0]?.toUpperCase() || "";
 
     return (
         <div className="min-h-screen overflow-x-hidden" style={{ background: "#0C0C0C", fontFamily: "'Syne', sans-serif" }}>
+            {/* Cursor glow */}
             <motion.div
                 className="fixed pointer-events-none z-50 rounded-full hidden md:block"
-                style={{
-                    width: 400, height: 400,
-                    background: "radial-gradient(circle, rgba(155,81,224,0.08) 0%, transparent 70%)",
-                    x: mousePos.x - 200, y: mousePos.y - 200,
-                }}
+                style={{ width: 400, height: 400, background: "radial-gradient(circle, rgba(155,81,224,0.08) 0%, transparent 70%)", x: mousePos.x - 200, y: mousePos.y - 200 }}
                 transition={{ type: "spring", stiffness: 150, damping: 20 }}
             />
 
-            {/* HERO SECTION */}
+            {/* ── HERO ──────────────────────────────────────────────────────── */}
             <section className="relative min-h-screen flex flex-col" style={{ overflowX: "clip" }}>
+
+                {/* Mobile hamburger */}
                 <button
                     onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
                     className="fixed top-4 right-4 z-50 md:hidden w-11 h-11 flex flex-col items-center justify-center gap-1.5 bg-black/60 backdrop-blur-md rounded-lg border border-white/10 active:scale-95 transition-transform"
@@ -1195,6 +1272,7 @@ function ServicePage() {
                     <span className={`w-5 h-0.5 bg-white transition-all duration-300 ${mobileMenuOpen ? "-rotate-45 -translate-y-2" : ""}`} />
                 </button>
 
+                {/* Mobile menu overlay */}
                 <AnimatePresence>
                     {mobileMenuOpen && (
                         <motion.div
@@ -1211,81 +1289,59 @@ function ServicePage() {
                                         href={item.href}
                                         initial={{ opacity: 0, y: 20 }}
                                         animate={{ opacity: 1, y: 0 }}
-                                        transition={{ delay: idx * 0.1 }}
+                                        transition={{ delay: idx * 0.08 }}
                                         className="text-2xl font-medium uppercase tracking-wider hover:text-[#F2994A] transition-colors duration-200"
-                                        style={{
-                                            color: item.label === "Services" ? "#F2994A" : "#D7E2EA",
-                                        }}
+                                        style={{ color: item.label === "Services" ? "#F2994A" : "#D7E2EA" }}
                                     >
                                         {item.label}
                                     </motion.a>
                                 ))}
+
+                                {/* Mobile: show user name OR login link */}
                                 <motion.a
-                                    href="/login"
+                                    href={loggedInUser ? "/profile" : "/login"}
                                     initial={{ opacity: 0, y: 20 }}
                                     animate={{ opacity: 1, y: 0 }}
-                                    transition={{ delay: 0.4 }}
+                                    transition={{ delay: navItems.length * 0.08 }}
                                     className="text-2xl font-medium uppercase tracking-wider hover:text-[#F2994A] transition-colors duration-200"
-                                    style={{ color: "#D7E2EA" }}
+                                    style={{ color: loggedInUser ? "#F2994A" : "#D7E2EA" }}
                                 >
-                                    Signup/Login
+                                    {loggedInUser ? `👋 ${displayFirstName}` : "Signup / Login"}
                                 </motion.a>
                             </div>
                         </motion.div>
                     )}
                 </AnimatePresence>
 
-                <FadeIn
-                    as="nav"
-                    delay={0}
-                    y={-20}
-                    className="hidden md:flex justify-between px-6 md:px-10 pt-6 md:pt-8"
-                >
-                    {navItems.map((item) => (
+                {/* Desktop Nav */}
+                <FadeIn as="nav" delay={0} y={-20} className="hidden md:flex justify-between items-center px-6 md:px-10 pt-6 md:pt-8">
+                    {navItems.map(item => (
                         <a
                             key={item.label}
                             href={item.href}
                             className="text-sm md:text-lg lg:text-[1.4rem] font-medium uppercase tracking-wider hover:opacity-70 transition-opacity duration-200"
-                            style={{
-                                color: item.label === "Services" ? "#F2994A" : "#D7E2EA",
-                            }}
+                            style={{ color: item.label === "Services" ? "#F2994A" : "#D7E2EA" }}
                         >
                             {item.label}
                         </a>
                     ))}
 
-                    <a
-                        href="/login"
-                        className="text-sm md:text-lg lg:text-[1.4rem] font-medium uppercase tracking-wider hover:opacity-70 transition-opacity duration-200 flex items-center gap-2"
-                        style={{ color: "#D7E2EA" }}
-                    >
-                        👋 SUMIT
-                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                        </svg>
-                    </a>
+                    {/* ── USER NAV BUTTON (fixes the bug) ── */}
+                    <UserNavButton user={loggedInUser} />
                 </FadeIn>
 
+                {/* Hero text */}
                 <div className="flex-1 flex flex-col justify-center relative px-4 pt-16 md:pt-0">
                     <div className="w-full overflow-hidden flex justify-center">
                         <FadeIn delay={0.15} y={40} className="w-full flex justify-center">
                             <h1
                                 className="hero-heading font-black uppercase tracking-tight leading-none text-center"
-                                style={{
-                                    ...gradientStyle,
-                                    fontSize: "min(15vw, 10vw, 280px)",
-                                    fontFamily: "'Syne', sans-serif",
-                                    letterSpacing: "-0.04em",
-                                    whiteSpace: "nowrap",
-                                    lineHeight: "0.9",
-                                    padding: "0 8px",
-                                }}
+                                style={{ ...gradientStyle, fontSize: "min(15vw, 10vw, 280px)", fontFamily: "'Syne', sans-serif", letterSpacing: "-0.04em", whiteSpace: "nowrap", lineHeight: "0.9", padding: "0 8px" }}
                             >
                                 Services
                             </h1>
                         </FadeIn>
                     </div>
-
                     <FadeIn delay={0.4} y={20} className="flex justify-center mt-4 sm:mt-6">
                         <div className="flex items-center gap-2 sm:gap-3 md:gap-4">
                             <div className="h-px w-8 sm:w-12 md:w-24" style={{ background: "linear-gradient(90deg, transparent, #9B51E0)" }} />
@@ -1299,44 +1355,29 @@ function ServicePage() {
 
                 <div className="flex flex-col sm:flex-row justify-between items-start sm:items-end px-4 sm:px-6 md:px-10 pb-5 sm:pb-7 md:pb-10 relative z-20 gap-4">
                     <FadeIn delay={0.35} y={20} className="w-full sm:w-auto">
-                        <p
-                            className="font-light uppercase tracking-wide leading-snug max-w-[200px] sm:max-w-[160px] md:max-w-[200px] lg:max-w-[260px] text-[10px] sm:text-xs md:text-sm lg:text-base"
-                            style={{ color: "#D7E2EA" }}
-                        >
+                        <p className="font-light uppercase tracking-wide leading-snug max-w-[200px] sm:max-w-[160px] md:max-w-[200px] lg:max-w-[260px] text-[10px] sm:text-xs md:text-sm lg:text-base" style={{ color: "#D7E2EA" }}>
                             PREMIUM DIGITAL SERVICES + PROFESSIONAL EQUIPMENT RENTAL
                         </p>
                     </FadeIn>
-
                     <FadeIn delay={0.5} y={20} className="w-full sm:w-auto flex justify-end">
                         <ContactButton label="GET STARTED" href="#all-services" />
                     </FadeIn>
                 </div>
             </section>
 
-            {/* STATS */}
+            {/* ── STATS ─────────────────────────────────────────────────────── */}
             <section className="relative py-12 sm:py-16 md:py-24 px-4 sm:px-6 md:px-12 lg:px-20">
                 <Scroll3DReveal rotateFrom={[15, 0, 0]} translateFrom={[0, 60, -80]} scaleFrom={0.85}>
                     <div className="grid grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 max-w-5xl mx-auto">
                         {[
-                            { value: "4", label: "Core Services", icon: "⚡" },
-                            { value: "16+", label: "Equipment Items", icon: "📷" },
-                            { value: "24/7", label: "Support", icon: "💬" },
-                            { value: "100%", label: "Satisfaction", icon: "⭐" },
+                            { value: "4",    label: "Core Services",   icon: "⚡" },
+                            { value: "16+",  label: "Equipment Items", icon: "📷" },
+                            { value: "24/7", label: "Support",         icon: "💬" },
+                            { value: "100%", label: "Satisfaction",    icon: "⭐" },
                         ].map((stat, i) => (
-                            <motion.div
-                                key={i}
-                                whileHover={{ y: -5, scale: 1.02 }}
-                                className="p-4 sm:p-6 rounded-2xl text-center"
-                                style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)" }}
-                            >
+                            <motion.div key={i} whileHover={{ y: -5, scale: 1.02 }} className="p-4 sm:p-6 rounded-2xl text-center" style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)" }}>
                                 <div className="text-2xl sm:text-3xl mb-2">{stat.icon}</div>
-                                <div className="text-2xl sm:text-3xl md:text-4xl font-bold mb-1"
-                                    style={{
-                                        background: "linear-gradient(135deg, #9B51E0, #F2994A)",
-                                        WebkitBackgroundClip: "text",
-                                        WebkitTextFillColor: "transparent",
-                                    }}
-                                >
+                                <div className="text-2xl sm:text-3xl md:text-4xl font-bold mb-1" style={{ background: "linear-gradient(135deg, #9B51E0, #F2994A)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent" }}>
                                     {stat.value}
                                 </div>
                                 <div className="text-gray-400 text-[10px] sm:text-xs md:text-sm">{stat.label}</div>
@@ -1346,20 +1387,14 @@ function ServicePage() {
                 </Scroll3DReveal>
             </section>
 
-            {/* SERVICES & RENTALS GRID */}
+            {/* ── SERVICES GRID ─────────────────────────────────────────────── */}
             <section id="all-services" className="relative py-12 sm:py-16 md:py-24 lg:py-32 px-4 sm:px-6 md:px-12 lg:px-20">
                 <Scroll3DReveal rotateFrom={[15, -8, 0]} translateFrom={[40, 60, -80]}>
                     <div className="text-center mb-8 sm:mb-12 md:mb-16">
-                        <p className="text-[9px] sm:text-[10px] md:text-xs tracking-[0.3em] sm:tracking-[0.4em] uppercase mb-2 sm:mb-3 md:mb-4" style={{ color: "#F2994A", fontFamily: "'Space Mono', monospace" }}>
-                            ─ Explore All ─
-                        </p>
-                        <h2 className="text-2xl sm:text-3xl md:text-5xl lg:text-6xl font-black uppercase" style={{ ...gradientStyle, fontFamily: "'Syne', sans-serif" }}>
-                            What We Offer
-                        </h2>
+                        <p className="text-[9px] sm:text-[10px] md:text-xs tracking-[0.3em] sm:tracking-[0.4em] uppercase mb-2 sm:mb-3 md:mb-4" style={{ color: "#F2994A", fontFamily: "'Space Mono', monospace" }}>─ Explore All ─</p>
+                        <h2 className="text-2xl sm:text-3xl md:text-5xl lg:text-6xl font-black uppercase" style={{ ...gradientStyle, fontFamily: "'Syne', sans-serif" }}>What We Offer</h2>
                     </div>
                 </Scroll3DReveal>
-
-                {/* 5 cards now: 4 services + 1 unified Rentals */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-3 sm:gap-4 md:gap-5 max-w-7xl mx-auto">
                     {allCards.map((item, i) => (
                         <ServiceCard key={item.id} item={item} index={i} onClick={() => handleCardClick(item)} />
@@ -1367,57 +1402,30 @@ function ServicePage() {
                 </div>
             </section>
 
-            {/* PROCESS */}
+            {/* ── PROCESS ───────────────────────────────────────────────────── */}
             <section className="relative py-12 sm:py-16 md:py-24 lg:py-32 px-4 sm:px-6 md:px-12 lg:px-20">
                 <Scroll3DReveal rotateFrom={[0, 30, 0]} translateFrom={[-60, 40, -80]}>
                     <div className="text-center mb-8 sm:mb-12 md:mb-16">
-                        <p className="text-[9px] sm:text-[10px] md:text-xs tracking-[0.3em] sm:tracking-[0.4em] uppercase mb-2 sm:mb-3 md:mb-4" style={{ color: "#F2994A", fontFamily: "'Space Mono', monospace" }}>
-                            ─ How It Works ─
-                        </p>
-                        <h2 className="text-2xl sm:text-3xl md:text-5xl lg:text-6xl font-black uppercase" style={{ ...gradientStyle, fontFamily: "'Syne', sans-serif" }}>
-                            Simple Process
-                        </h2>
+                        <p className="text-[9px] sm:text-[10px] md:text-xs tracking-[0.3em] sm:tracking-[0.4em] uppercase mb-2 sm:mb-3 md:mb-4" style={{ color: "#F2994A", fontFamily: "'Space Mono', monospace" }}>─ How It Works ─</p>
+                        <h2 className="text-2xl sm:text-3xl md:text-5xl lg:text-6xl font-black uppercase" style={{ ...gradientStyle, fontFamily: "'Syne', sans-serif" }}>Simple Process</h2>
                     </div>
                 </Scroll3DReveal>
-
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 max-w-7xl mx-auto">
                     {[
                         { step: "01", title: "Choose Service", description: "Select a service or rental that fits your project needs." },
-                        { step: "02", title: "Fill Form", description: "Provide your details and requirements through our simple form." },
-                        { step: "03", title: "We Connect", description: "Our team reaches out within 24 hours to discuss your project." },
-                        { step: "04", title: "Get Started", description: "We deliver high-quality results on time, every time." },
+                        { step: "02", title: "Fill Form",      description: "Provide your details and requirements through our simple form." },
+                        { step: "03", title: "We Connect",    description: "Our team reaches out within 24 hours to discuss your project." },
+                        { step: "04", title: "Get Started",   description: "We deliver high-quality results on time, every time." },
                     ].map((item, index) => {
                         const rotations: Array<[number, number, number]> = [[-15, 20, 5], [-15, -20, -5], [15, 20, -5], [15, -20, 5]];
                         return (
-                            <Scroll3DReveal
-                                key={index}
-                                rotateFrom={rotations[index % rotations.length]}
-                                translateFrom={[index % 2 === 0 ? -40 : 40, 60, -90]}
-                                scaleFrom={0.7}
-                            >
-                                <motion.div
-                                    whileHover={{ y: -8 }}
-                                    whileTap={{ scale: 0.97 }}
-                                    className="p-4 sm:p-5 md:p-6 rounded-2xl text-center h-full"
-                                    style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)" }}
-                                >
-                                    <div
-                                        className="text-4xl sm:text-5xl md:text-6xl font-black mb-2 sm:mb-3"
-                                        style={{
-                                            background: "linear-gradient(135deg, #9B51E0, #F2994A)",
-                                            WebkitBackgroundClip: "text",
-                                            WebkitTextFillColor: "transparent",
-                                            opacity: 0.8,
-                                        }}
-                                    >
+                            <Scroll3DReveal key={index} rotateFrom={rotations[index % rotations.length]} translateFrom={[index % 2 === 0 ? -40 : 40, 60, -90]} scaleFrom={0.7}>
+                                <motion.div whileHover={{ y: -8 }} whileTap={{ scale: 0.97 }} className="p-4 sm:p-5 md:p-6 rounded-2xl text-center h-full" style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)" }}>
+                                    <div className="text-4xl sm:text-5xl md:text-6xl font-black mb-2 sm:mb-3" style={{ background: "linear-gradient(135deg, #9B51E0, #F2994A)", WebkitBackgroundClip: "text", WebkitTextFillColor: "transparent", opacity: 0.8 }}>
                                         {item.step}
                                     </div>
-                                    <h3 className="text-base sm:text-lg md:text-xl font-bold mb-2 sm:mb-3" style={{ color: "#F2994A" }}>
-                                        {item.title}
-                                    </h3>
-                                    <p className="text-gray-400 text-[11px] sm:text-xs md:text-sm leading-relaxed">
-                                        {item.description}
-                                    </p>
+                                    <h3 className="text-base sm:text-lg md:text-xl font-bold mb-2 sm:mb-3" style={{ color: "#F2994A" }}>{item.title}</h3>
+                                    <p className="text-gray-400 text-[11px] sm:text-xs md:text-sm leading-relaxed">{item.description}</p>
                                 </motion.div>
                             </Scroll3DReveal>
                         );
@@ -1425,19 +1433,15 @@ function ServicePage() {
                 </div>
             </section>
 
-            {/* CTA */}
+            {/* ── CTA ───────────────────────────────────────────────────────── */}
             <section className="relative py-16 sm:py-20 md:py-32 px-4 sm:px-6 text-center overflow-hidden">
                 <div className="absolute inset-0 opacity-10" style={{ background: "radial-gradient(ellipse at center, #9B51E0 0%, transparent 65%)" }} />
-
                 <Scroll3DReveal rotateFrom={[30, 0, 0]} translateFrom={[0, 100, -200]} scaleFrom={0.65}>
                     <div className="relative z-10">
                         <p className="text-[9px] sm:text-[10px] tracking-[0.3em] sm:tracking-[0.4em] uppercase mb-4 sm:mb-6" style={{ color: "#F2994A", fontFamily: "'Space Mono', monospace" }}>
                             ─ Need Custom Requirements? ─
                         </p>
-                        <h2
-                            className="font-black leading-[1.1] sm:leading-[1.2] tracking-tighter mb-6 sm:mb-8 md:mb-10 uppercase"
-                            style={{ ...gradientStyle, fontSize: "clamp(1.75rem, 7vw, 5rem)", fontFamily: "'Syne', sans-serif" }}
-                        >
+                        <h2 className="font-black leading-[1.1] sm:leading-[1.2] tracking-tighter mb-6 sm:mb-8 md:mb-10 uppercase" style={{ ...gradientStyle, fontSize: "clamp(1.75rem, 7vw, 5rem)", fontFamily: "'Syne', sans-serif" }}>
                             Let's Talk<br />About Your<br />Project.
                         </h2>
                         <ContactButton label="Contact Us" href="/contact" />
@@ -1445,7 +1449,7 @@ function ServicePage() {
                 </Scroll3DReveal>
             </section>
 
-            {/* FOOTER */}
+            {/* ── FOOTER ────────────────────────────────────────────────────── */}
             <div className="px-4 sm:px-6 md:px-8 py-5 sm:py-6 flex flex-col sm:flex-row items-center justify-between gap-3 sm:gap-4 border-t" style={{ borderColor: "rgba(255,255,255,0.05)" }}>
                 <span className="text-[9px] sm:text-[10px] tracking-[0.2em] sm:tracking-[0.3em] uppercase text-center" style={{ color: "rgba(255,255,255,0.2)", fontFamily: "'Space Mono', monospace" }}>
                     © 2025 Crewholic. All rights reserved.
@@ -1456,22 +1460,18 @@ function ServicePage() {
                 </div>
             </div>
 
-            {/* MODALS — NEW FLOW: Rentals → Categories → Products → Checkout */}
+            {/* ── MODALS ────────────────────────────────────────────────────── */}
             <ServiceInquiryModal
                 service={selectedService}
                 isOpen={isServiceModalOpen}
                 onClose={() => setIsServiceModalOpen(false)}
                 onSubmit={handleServiceSubmit}
             />
-
-            {/* NEW: Categories selector modal */}
             <RentalCategoriesModal
                 isOpen={isRentalCategoriesOpen}
                 onClose={() => setIsRentalCategoriesOpen(false)}
                 onCategorySelect={handleCategorySelect}
             />
-
-            {/* Products list (with Back button) */}
             <RentalProductsModal
                 category={selectedRentalCategory}
                 isOpen={isRentalProductsModalOpen}
@@ -1479,7 +1479,6 @@ function ServicePage() {
                 onBack={handleBackToCategories}
                 onRentClick={handleRentClick}
             />
-
             <RentalCheckoutModal
                 product={selectedProduct}
                 category={selectedRentalCategory}
