@@ -13,9 +13,9 @@ const exportRoutes = require("./backend/routes/export");
 const Order = require("./backend/models/Order");
 const orderRoutes = require("./backend/routes/orderRoutes");
 const generateExcelFile = require("./backend/utils/generateExcel");
+const rentalInquiryRoutes = require("./backend/routes/rentalInquiry");
 
 const app = express();
-app.use(express.json());
 
 app.use(
     cors({
@@ -26,10 +26,15 @@ app.use(
             "https://crewholic.vercel.app",
             "https://crewholic-djzl6zjxv-sumit-kumar-routs-projects.vercel.app",
         ],
+        methods: ["GET", "POST", "PUT", "PATCH", "DELETE", "OPTIONS"],
+        allowedHeaders: ["Content-Type", "Authorization"],
         credentials: true,
     })
 );
 
+app.use(express.json());
+
+app.use("/api/rental-inquiry", rentalInquiryRoutes);
 app.use("/api/export", exportRoutes);
 app.use("/api/orders", orderRoutes);
 
@@ -268,27 +273,6 @@ async function createMainAdmin() {
     }
 }
 
-mongoose
-    .connect(MONGO_URI)
-    .then(async () => {
-        console.log("✅ MongoDB Connected");
-
-        await createMainAdmin();
-        await safeGenerateExcel();
-
-        cron.schedule("* * * * *", async () => {
-            console.log("⏰ Auto updating Excel...");
-            await safeGenerateExcel();
-        });
-
-        app.listen(PORT, () => {
-            console.log(`🚀 Server running on port ${PORT}`);
-        });
-    })
-    .catch((err) => {
-        console.log("❌ DB Error:", err);
-    });
-
 app.get("/", (req, res) => {
     res.send("🚀 Backend Running Successfully");
 });
@@ -315,15 +299,10 @@ app.get("/api/me", verifyToken, async (req, res) => {
 app.get("/api/admin/dashboard", verifyAdmin, async (req, res) => {
     try {
         const role = req.user.role;
-
         const orderFilter = {};
 
         if (role === ROLES.EVENT_ADMIN) {
             orderFilter.service = { $regex: "event", $options: "i" };
-        }
-
-        if (role === ROLES.FINANCE_ADMIN) {
-            // Finance admin can see all orders for payment/revenue.
         }
 
         if (role === ROLES.MARKETING_ADMIN) {
@@ -358,10 +337,10 @@ app.get("/api/admin/dashboard", verifyAdmin, async (req, res) => {
             Order.countDocuments({ ...orderFilter, status: "cancelled" }),
             role === ROLES.MAIN_ADMIN
                 ? User.find({})
-                    .select("-password")
-                    .sort({ createdAt: -1 })
-                    .limit(50)
-                    .lean()
+                      .select("-password")
+                      .sort({ createdAt: -1 })
+                      .limit(50)
+                      .lean()
                 : [],
             Order.find(orderFilter).sort({ createdAt: -1 }).limit(50).lean(),
             Order.aggregate([
@@ -1243,3 +1222,24 @@ app.get("/api/test-order", async (req, res) => {
         });
     }
 });
+
+mongoose
+    .connect(MONGO_URI)
+    .then(async () => {
+        console.log("✅ MongoDB Connected");
+
+        await createMainAdmin();
+        await safeGenerateExcel();
+
+        cron.schedule("* * * * *", async () => {
+            console.log("⏰ Auto updating Excel...");
+            await safeGenerateExcel();
+        });
+
+        app.listen(PORT, () => {
+            console.log(`🚀 Server running on port ${PORT}`);
+        });
+    })
+    .catch((err) => {
+        console.log("❌ DB Error:", err);
+    });

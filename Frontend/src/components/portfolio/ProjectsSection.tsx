@@ -144,7 +144,7 @@ export function ProjectsSection() {
         className="hero-heading font-black uppercase text-center leading-none tracking-tight mb-16 sm:mb-20 md:mb-24"
         style={{ fontSize: "clamp(3rem, 12vw, 160px)" }}
       >
-        Project
+        Portfolio
       </h2>
       <div className="max-w-6xl mx-auto">
         {PROJECTS.map((p, i) => {

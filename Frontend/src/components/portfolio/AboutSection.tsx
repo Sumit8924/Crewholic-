@@ -69,7 +69,7 @@ export function AboutSection() {
             className="hero-heading font-black uppercase leading-none tracking-tight text-center"
             style={{ fontSize: "clamp(3rem, 12vw, 160px)" }}
           >
-            About me
+            About us
           </h2>
         </FadeIn>
         <div className="flex flex-col items-center gap-16 sm:gap-20 md:gap-24">

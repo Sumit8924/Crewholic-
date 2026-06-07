@@ -1,37 +1,29 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable prettier/prettier */
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
-import { useEffect, useState } from "react";
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { useEffect, useRef, useState } from "react";
 import logo from "../components/portfolio/skr.png";
 
 export const Route = createFileRoute("/login")({
     component: LoginPage,
 });
 
-declare const google: any;
+declare global {
+    interface Window {
+        google?: any;
+    }
+}
 
 const API_URL =
     import.meta.env.VITE_API_URL || "https://crewholic-1-if9w.onrender.com/api";
 
-const GOOGLE_CLIENT_ID =
-    "558245818414-enstkh3b5cdrcvvdrms8njnvp7fhrch6.apps.googleusercontent.com";
-
-const ADMIN_ROLES = [
-    "main_admin",
-    "event_admin",
-    "finance_admin",
-    "marketing_admin",
-    "rental_admin",
-    "web_admin",
-];
-
 function LoginPage() {
-    const navigate = useNavigate();
-
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [showPassword, setShowPassword] = useState(false);
     const [loading, setLoading] = useState(false);
+    const googleInitialized = useRef(false);
+    const googleScriptLoaded = useRef(false);
 
     const [toastMessage, setToastMessage] = useState<{
         text: string;
@@ -39,49 +31,72 @@ function LoginPage() {
     } | null>(null);
 
     useEffect(() => {
-        loadGoogleScript();
+        // FIX: Add meta tag for Cross-Origin-Opener-Policy compatibility
+        const existingMeta = document.querySelector('meta[http-equiv="Cross-Origin-Opener-Policy"]');
+        if (!existingMeta) {
+            const meta = document.createElement("meta");
+            meta.setAttribute("http-equiv", "Cross-Origin-Opener-Policy");
+            meta.setAttribute("content", "same-origin-allow-popups");
+            document.head.appendChild(meta);
+        }
+
+        const timer = setTimeout(() => {
+            loadGoogleScript();
+        }, 500);
+
+        return () => clearTimeout(timer);
     }, []);
 
     const showMessage = (text: string, isError = false) => {
         setToastMessage({ text, isError });
-        setTimeout(() => setToastMessage(null), 3000);
+        setTimeout(() => setToastMessage(null), 4000);
     };
 
-    const role = localStorage.getItem("role");
+    const getRedirectPath = (user: any) => {
+        const role = user?.role || "user";
+
+        switch (role) {
+            case "superadmin":
+            case "main_admin":
+                return "/admin";
+            case "rental_admin":
+                return "/rental";
+            case "event_admin":
+                return "/event";
+            case "finance_admin":
+                return "/finance";
+            case "marketing_admin":
+                return "/marketing";
+            case "web_admin":
+                return "/webpanel";
+            default:
+                return "/dashboard";
+        }
+    };
+
     const redirectAfterLogin = (user: any) => {
-    switch (role) {
-        case "main_admin":
-            navigate({ to: "/admin" });
-            break;
-
-        case "event_admin":
-            navigate({ to: "/event" });
-            break;
-
-        case "finance_admin":
-            navigate({ to: "/finance" });
-            break;
-
-        case "marketing_admin":
-            navigate({ to: "/marketing" });
-            break;
-
-        case "rental_admin":
-            navigate({ to: "/rental" });
-            break;
-
-        case "web_admin":
-            navigate({ to: "/webpanel" });
-            break;
-
-        default:
-            navigate({ to: "/dashboard" });
-    }
+        window.location.href = getRedirectPath(user);
     };
 
     const loadGoogleScript = () => {
-        if (document.querySelector('script[src="https://accounts.google.com/gsi/client"]')) {
-            setTimeout(initializeGoogleOAuth, 500);
+        if (!GOOGLE_CLIENT_ID) {
+            showMessage("Google Client ID missing. Check Frontend .env file.", true);
+            return;
+        }
+
+        // FIX: Prevent duplicate script loading
+        if (googleScriptLoaded.current) {
+            waitForGoogleAndInitialize();
+            return;
+        }
+
+        const existingScript = document.querySelector(
+            'script[src="https://accounts.google.com/gsi/client"]'
+        );
+
+        if (existingScript) {
+            googleScriptLoaded.current = true;
+            waitForGoogleAndInitialize();
             return;
         }
 
@@ -89,41 +104,93 @@ function LoginPage() {
         script.src = "https://accounts.google.com/gsi/client";
         script.async = true;
         script.defer = true;
-        script.onload = initializeGoogleOAuth;
+        script.onload = () => {
+            googleScriptLoaded.current = true;
+            waitForGoogleAndInitialize();
+        };
+        script.onerror = () => {
+            showMessage("Google script failed to load. Check your internet connection.", true);
+        };
+
         document.body.appendChild(script);
     };
 
-    const initializeGoogleOAuth = () => {
-        if (typeof google === "undefined") {
-            console.error("Google Identity Services not loaded");
-            return;
-        }
+    const waitForGoogleAndInitialize = () => {
+        let count = 0;
 
-        google.accounts.id.initialize({
-            client_id: GOOGLE_CLIENT_ID,
-            callback: handleGoogleCredentialResponse,
-            auto_select: false,
-            cancel_on_tap_outside: true,
-        });
+        const interval = setInterval(() => {
+            count++;
+
+            if (window.google?.accounts?.id) {
+                clearInterval(interval);
+                initializeGoogleOAuth();
+            }
+
+            if (count > 30) {
+                clearInterval(interval);
+                showMessage(
+                    "Google Sign-In failed to load. Please refresh the page.",
+                    true
+                );
+            }
+        }, 200);
+    };
+
+    const initializeGoogleOAuth = () => {
+        if (googleInitialized.current) return;
 
         const googleBtn = document.getElementById("googleLoginBtn");
 
-        if (googleBtn) {
-            googleBtn.innerHTML = "";
+        if (!googleBtn) {
+            showMessage("Google button container not found", true);
+            return;
+        }
 
-            google.accounts.id.renderButton(googleBtn, {
+        googleInitialized.current = true;
+        googleBtn.innerHTML = "";
+
+        try {
+            window.google.accounts.id.initialize({
+                client_id: GOOGLE_CLIENT_ID,
+                callback: handleGoogleCredentialResponse,
+                auto_select: false,
+                cancel_on_tap_outside: true,
+                // FIX: Use "popup" UX mode to avoid COOP/postMessage issues
+                ux_mode: "popup",
+            });
+
+            window.google.accounts.id.renderButton(googleBtn, {
                 theme: "filled_black",
                 size: "large",
                 width: 300,
                 text: "signin_with",
                 shape: "pill",
             });
+        } catch (err: any) {
+            console.error("Google OAuth init error:", err);
+            showMessage(
+                "Google Sign-In could not initialize. Make sure localhost:3000 is added in Google Cloud Console.",
+                true
+            );
         }
+    };
+
+    const saveLoginData = (data: any) => {
+        const user = data.user || {};
+        localStorage.setItem("user", JSON.stringify(user));
+        localStorage.setItem("token", data.token || "");
+        localStorage.setItem("role", user?.role || "user");
+        localStorage.setItem("permissions", JSON.stringify(user?.permissions || []));
     };
 
     const handleGoogleCredentialResponse = async (response: any) => {
         try {
             setLoading(true);
+
+            if (!response?.credential) {
+                showMessage("Google credential missing. Please try again.", true);
+                return;
+            }
 
             const res = await fetch(`${API_URL}/auth/google`, {
                 method: "POST",
@@ -135,29 +202,29 @@ function LoginPage() {
                 }),
             });
 
-            const data = await res.json();
-
-            if (!res.ok) {
-                showMessage(data.msg || "Google login failed", true);
+            // FIX: Handle non-JSON responses gracefully (e.g. 500 HTML error pages)
+            const contentType = res.headers.get("content-type");
+            if (!contentType || !contentType.includes("application/json")) {
+                showMessage(`Server error (${res.status}). Please try again later.`, true);
                 return;
             }
 
-            localStorage.setItem("user", JSON.stringify(data.user));
-            localStorage.setItem("token", data.token || "");
-            localStorage.setItem("role", data.user?.role || "user");
-            localStorage.setItem(
-                "permissions",
-                JSON.stringify(data.user?.permissions || [])
-            );
+            const data = await res.json();
 
-            showMessage("Google login successful");
+            if (!res.ok) {
+                showMessage(data.msg || data.error || "Google login failed.", true);
+                return;
+            }
 
-            setTimeout(() => {
-                redirectAfterLogin(data.user);
-            }, 800);
-        } catch (error) {
-            console.error(error);
-            showMessage("Google login failed. Please try again.", true);
+            saveLoginData(data);
+            redirectAfterLogin(data.user);
+        } catch (error: any) {
+            console.error("Google login error:", error);
+            if (error?.message?.includes("NetworkError") || error?.message?.includes("Failed to fetch")) {
+                showMessage("Network error. Check your connection or backend server.", true);
+            } else {
+                showMessage("Google login failed. Please try again.", true);
+            }
         } finally {
             setLoading(false);
         }
@@ -166,8 +233,8 @@ function LoginPage() {
     const handleLogin = async (e: React.FormEvent) => {
         e.preventDefault();
 
-        if (!email || !password) {
-            showMessage("Please fill in all fields", true);
+        if (!email.trim() || !password.trim()) {
+            showMessage("Please fill in all fields.", true);
             return;
         }
 
@@ -180,34 +247,37 @@ function LoginPage() {
                     "Content-Type": "application/json",
                 },
                 body: JSON.stringify({
-                    email,
-                    password,
+                    email: email.trim(),
+                    password: password.trim(),
                 }),
             });
+
+            // FIX: Safe JSON parsing
+            const contentType = res.headers.get("content-type");
+            if (!contentType || !contentType.includes("application/json")) {
+                showMessage(`Server error (${res.status}). Please try again later.`, true);
+                return;
+            }
 
             const data = await res.json();
 
             if (!res.ok) {
-                showMessage(data.msg || "Login failed. Please check your credentials.", true);
+                showMessage(
+                    data.msg || data.error || "Login failed. Please check your credentials.",
+                    true
+                );
                 return;
             }
 
-            localStorage.setItem("user", JSON.stringify(data.user));
-            localStorage.setItem("token", data.token || "");
-            localStorage.setItem("role", data.user?.role || "user");
-            localStorage.setItem(
-                "permissions",
-                JSON.stringify(data.user?.permissions || [])
-            );
-
-            showMessage("Login successful");
-
-            setTimeout(() => {
-                redirectAfterLogin(data.user);
-            }, 800);
-        } catch (error) {
-            console.error(error);
-            showMessage("Server error. Please try again later.", true);
+            saveLoginData(data);
+            redirectAfterLogin(data.user);
+        } catch (error: any) {
+            console.error("Login error:", error);
+            if (error?.message?.includes("Failed to fetch")) {
+                showMessage("Cannot reach server. Is the backend running?", true);
+            } else {
+                showMessage("Server error. Please try again later.", true);
+            }
         } finally {
             setLoading(false);
         }
@@ -331,11 +401,21 @@ function LoginPage() {
           font-weight: 500;
           color: white;
           outline: none;
+          transition: border-color 0.2s, box-shadow 0.2s;
+        }
+
+        .form-control-modern::placeholder {
+          color: rgba(154, 164, 191, 0.6);
         }
 
         .form-control-modern:focus {
           border-color: #F2994A;
           box-shadow: 0 0 0 3px rgba(242, 153, 74, 0.25);
+        }
+
+        .form-control-modern:disabled {
+          opacity: 0.5;
+          cursor: not-allowed;
         }
 
         .password-toggle {
@@ -346,6 +426,11 @@ function LoginPage() {
           color: rgba(215, 226, 234, 0.6);
           cursor: pointer;
           font-size: 0.9rem;
+          transition: color 0.2s;
+        }
+
+        .password-toggle:hover {
+          color: #F2994A;
         }
 
         .forgot-link-wrapper {
@@ -357,6 +442,11 @@ function LoginPage() {
           font-size: 0.75rem;
           color: #F2994A;
           text-decoration: none;
+          transition: opacity 0.2s;
+        }
+
+        .forgot-link:hover {
+          opacity: 0.75;
         }
 
         .login-btn {
@@ -373,6 +463,12 @@ function LoginPage() {
           justify-content: center;
           gap: 8px;
           cursor: pointer;
+          transition: opacity 0.2s, transform 0.1s;
+        }
+
+        .login-btn:hover:not(:disabled) {
+          opacity: 0.9;
+          transform: translateY(-1px);
         }
 
         .login-btn:disabled {
@@ -399,6 +495,21 @@ function LoginPage() {
           margin-bottom: 1rem;
           display: flex;
           justify-content: center;
+          min-height: 44px;
+          align-items: center;
+        }
+
+        /* FIX: Notice banner for Google Cloud Console setup */
+        .google-notice {
+          background: rgba(155, 81, 224, 0.08);
+          border: 1px solid rgba(155, 81, 224, 0.25);
+          border-radius: 12px;
+          padding: 10px 14px;
+          margin-bottom: 1rem;
+          font-size: 0.75rem;
+          color: #9aa4bf;
+          line-height: 1.5;
+          display: none;
         }
 
         .signup-wrapper {
@@ -413,6 +524,11 @@ function LoginPage() {
           font-weight: 700;
           text-decoration: none;
           margin-left: 6px;
+          transition: opacity 0.2s;
+        }
+
+        .signup-link:hover {
+          opacity: 0.75;
         }
 
         .toast-message {
@@ -420,7 +536,7 @@ function LoginPage() {
           bottom: 2rem;
           left: 50%;
           transform: translateX(-50%);
-          background: rgba(0,0,0,0.9);
+          background: rgba(10, 10, 25, 0.95);
           padding: 12px 28px;
           border-radius: 60px;
           font-weight: 500;
@@ -428,10 +544,18 @@ function LoginPage() {
           border-left: 4px solid #F2994A;
           color: white;
           z-index: 9999;
+          white-space: nowrap;
+          box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+          animation: slideUp 0.3s ease;
         }
 
         .toast-message.error {
           border-left-color: #ff5e5e;
+        }
+
+        @keyframes slideUp {
+          from { opacity: 0; transform: translateX(-50%) translateY(10px); }
+          to { opacity: 1; transform: translateX(-50%) translateY(0); }
         }
 
         @media (max-width: 480px) {
@@ -442,6 +566,13 @@ function LoginPage() {
           .brand-title {
             font-size: 1.75rem;
           }
+
+          .toast-message {
+            white-space: normal;
+            text-align: center;
+            width: 90%;
+            bottom: 1rem;
+          }
         }
       `}</style>
 
@@ -451,7 +582,6 @@ function LoginPage() {
                         <div className="logo-circle">
                             <img src={logo} alt="CREWHOLIC Logo" />
                         </div>
-
                         <h1 className="brand-title">CREWHOLIC</h1>
                         <p className="brand-tagline">Fusion-Powered Digital Agency</p>
                     </div>
@@ -469,6 +599,7 @@ function LoginPage() {
                                 value={email}
                                 onChange={(e) => setEmail(e.target.value)}
                                 required
+                                disabled={loading}
                             />
                         </div>
 
@@ -481,8 +612,8 @@ function LoginPage() {
                                 value={password}
                                 onChange={(e) => setPassword(e.target.value)}
                                 required
+                                disabled={loading}
                             />
-
                             <i
                                 className={`fas ${showPassword ? "fa-eye-slash" : "fa-eye"} password-toggle`}
                                 onClick={() => setShowPassword(!showPassword)}
@@ -527,3 +658,5 @@ function LoginPage() {
         </>
     );
 }
+
+export default LoginPage;
