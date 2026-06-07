@@ -1,5 +1,6 @@
 require("dotenv").config();
 
+const path = require("path");
 const { OAuth2Client } = require("google-auth-library");
 const express = require("express");
 const mongoose = require("mongoose");
@@ -14,6 +15,7 @@ const Order = require("./backend/models/Order");
 const orderRoutes = require("./backend/routes/orderRoutes");
 const generateExcelFile = require("./backend/utils/generateExcel");
 const rentalInquiryRoutes = require("./backend/routes/rentalInquiry");
+const cloudinary = require("./backend/config/cloudinary");
 
 const app = express();
 
@@ -33,6 +35,11 @@ app.use(
 );
 
 app.use(express.json());
+
+app.use(
+    "/uploads",
+    express.static(path.join(__dirname, "backend", "uploads"))
+);
 
 app.use("/api/rental-inquiry", rentalInquiryRoutes);
 app.use("/api/export", exportRoutes);
@@ -337,10 +344,10 @@ app.get("/api/admin/dashboard", verifyAdmin, async (req, res) => {
             Order.countDocuments({ ...orderFilter, status: "cancelled" }),
             role === ROLES.MAIN_ADMIN
                 ? User.find({})
-                      .select("-password")
-                      .sort({ createdAt: -1 })
-                      .limit(50)
-                      .lean()
+                    .select("-password")
+                    .sort({ createdAt: -1 })
+                    .limit(50)
+                    .lean()
                 : [],
             Order.find(orderFilter).sort({ createdAt: -1 }).limit(50).lean(),
             Order.aggregate([
@@ -549,6 +556,23 @@ app.patch(
         }
     }
 );
+app.get("/api/test-cloudinary", async (req, res) => {
+    try {
+        const result = await cloudinary.api.ping();
+
+        res.json({
+            success: true,
+            result,
+        });
+    } catch (err) {
+        console.error("Cloudinary error:", err);
+
+        res.status(500).json({
+            success: false,
+            error: err.message,
+        });
+    }
+});
 
 app.post("/api/service-inquiry", async (req, res) => {
     try {
@@ -653,6 +677,39 @@ app.get("/api/test-email", async (req, res) => {
         res.status(500).json({
             msg: "Email Failed",
             error: err.response?.body || err.message,
+        });
+    }
+});
+app.get("/api/service-inquiry", async (req, res) => {
+    try {
+        const inquiries = await Order.find({
+            amount: 0,
+            service: { $exists: true },
+        })
+            .sort({ createdAt: -1 })
+            .lean();
+
+        const formatted = inquiries.map((item) => ({
+            _id: item._id,
+            id: item._id,
+            name: item.customerName,
+            mobile: item.customerPhone,
+            email: item.customerEmail,
+            service: item.service,
+            timeline: item.timeline || "",
+            requirements: item.features || "",
+            status: item.status || "Pending",
+            createdAt: item.createdAt,
+            updatedAt: item.updatedAt,
+        }));
+
+        res.json({
+            inquiries: formatted,
+        });
+    } catch (err) {
+        res.status(500).json({
+            msg: "Failed to fetch service inquiries",
+            error: err.message,
         });
     }
 });

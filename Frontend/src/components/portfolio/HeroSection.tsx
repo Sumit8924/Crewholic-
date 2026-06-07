@@ -43,9 +43,20 @@ export function HeroSection() {
 
     try {
       const userData = JSON.parse(user);
+      const role = userData?.role;
 
-      if (userData?.role === "admin") {
+      if (role === "main_admin") {
         window.location.href = "/admin";
+      } else if (role === "rental_admin") {
+        window.location.href = "/rental";
+      } else if (role === "finance_admin") {
+        window.location.href = "/finance";
+      } else if (role === "event_admin") {
+        window.location.href = "/event";
+      } else if (role === "marketing_admin") {
+        window.location.href = "/marketing";
+      } else if (role === "web_admin") {
+        window.location.href = "/webpanel";
       } else {
         window.location.href = "/dashboard";
       }

@@ -1,4 +1,5 @@
-import { useEffect, useRef, useState } from "react";
+/* eslint-disable prettier/prettier */
+import { useEffect, useRef, useState, useCallback } from "react";
 
 const IMAGES = [
   "https://motionsites.ai/assets/hero-space-voyage-preview-eECLH3Yc.gif",
@@ -27,21 +28,151 @@ const IMAGES = [
 const ROW1 = IMAGES.slice(0, 11);
 const ROW2 = IMAGES.slice(11);
 
+// ─── TILE ─────────────────────────────────────────────────────────────────
 function Tile({ src }: { src: string }) {
   return (
     <img
       src={src}
       loading="lazy"
       alt=""
-      className="rounded-2xl object-cover shrink-0"
+      draggable={false}
+      className="rounded-2xl object-cover shrink-0 select-none pointer-events-none"
       style={{ width: 420, height: 270 }}
     />
   );
 }
 
+// ─── DRAGGABLE ROW ────────────────────────────────────────────────────────
+function DraggableRow({
+  images,
+  baseOffset,
+  direction = 1,
+  rowId,
+}: {
+  images: string[];
+  baseOffset: number;
+  direction?: 1 | -1;
+  rowId: string;
+}) {
+  // drag state
+  const isDragging   = useRef(false);
+  const startX       = useRef(0);
+  const dragOffset   = useRef(0);
+  const lastDragX    = useRef(0);
+  const velocity     = useRef(0);
+  const rafId        = useRef<number>(0);
+  const momentumRef  = useRef(0);
+
+  const [manualOffset, setManualOffset] = useState(0);
+  const [cursor, setCursor]             = useState<"grab" | "grabbing">("grab");
+
+  // ── momentum decay ─────────────────────────────────────────────────────
+  const runMomentum = useCallback(() => {
+    velocity.current *= 0.93;           // friction
+    if (Math.abs(velocity.current) < 0.3) {
+      velocity.current = 0;
+      return;
+    }
+    momentumRef.current += velocity.current;
+    setManualOffset(momentumRef.current);
+    rafId.current = requestAnimationFrame(runMomentum);
+  }, []);
+
+  // ── pointer events ─────────────────────────────────────────────────────
+  const onPointerDown = useCallback((e: React.PointerEvent) => {
+    cancelAnimationFrame(rafId.current);
+    isDragging.current  = true;
+    startX.current      = e.clientX;
+    dragOffset.current  = momentumRef.current;
+    lastDragX.current   = e.clientX;
+    velocity.current    = 0;
+    setCursor("grabbing");
+    (e.currentTarget as HTMLElement).setPointerCapture(e.pointerId);
+  }, []);
+
+  const onPointerMove = useCallback((e: React.PointerEvent) => {
+    if (!isDragging.current) return;
+    const dx      = e.clientX - startX.current;
+    const newVal  = dragOffset.current + dx;
+    velocity.current  = e.clientX - lastDragX.current;
+    lastDragX.current = e.clientX;
+    momentumRef.current = newVal;
+    setManualOffset(newVal);
+  }, []);
+
+  const onPointerUp = useCallback(() => {
+    if (!isDragging.current) return;
+    isDragging.current = false;
+    setCursor("grab");
+    rafId.current = requestAnimationFrame(runMomentum);
+  }, [runMomentum]);
+
+  // ── touch events ───────────────────────────────────────────────────────
+  const touchStartX = useRef(0);
+
+  const onTouchStart = useCallback((e: React.TouchEvent) => {
+    cancelAnimationFrame(rafId.current);
+    touchStartX.current = e.touches[0].clientX;
+    dragOffset.current  = momentumRef.current;
+    lastDragX.current   = e.touches[0].clientX;
+    velocity.current    = 0;
+    isDragging.current  = true;
+  }, []);
+
+  const onTouchMove = useCallback((e: React.TouchEvent) => {
+    if (!isDragging.current) return;
+    const dx     = e.touches[0].clientX - touchStartX.current;
+    const newVal = dragOffset.current + dx;
+    velocity.current    = e.touches[0].clientX - lastDragX.current;
+    lastDragX.current   = e.touches[0].clientX;
+    momentumRef.current = newVal;
+    setManualOffset(newVal);
+  }, []);
+
+  const onTouchEnd = useCallback(() => {
+    isDragging.current = false;
+    rafId.current = requestAnimationFrame(runMomentum);
+  }, [runMomentum]);
+
+  // ── cleanup ────────────────────────────────────────────────────────────
+  useEffect(() => () => cancelAnimationFrame(rafId.current), []);
+
+  // ── combine scroll + drag offsets ──────────────────────────────────────
+  // direction: row1 goes +baseOffset, row2 goes -baseOffset
+  const totalTx = direction * baseOffset + manualOffset;
+
+  const repeated = [...images, ...images, ...images];
+
+  return (
+    <div
+      id={rowId}
+      className="flex gap-3"
+      style={{
+        transform:  `translateX(${totalTx}px)`,
+        willChange: "transform",
+        cursor,
+        userSelect: "none",
+        touchAction: "pan-y",          // allow vertical scroll, intercept horizontal
+      }}
+      onPointerDown={onPointerDown}
+      onPointerMove={onPointerMove}
+      onPointerUp={onPointerUp}
+      onPointerLeave={onPointerUp}
+      onTouchStart={onTouchStart}
+      onTouchMove={onTouchMove}
+      onTouchEnd={onTouchEnd}
+    >
+      {repeated.map((src, i) => (
+        <Tile key={`${rowId}-${i}`} src={src} />
+      ))}
+    </div>
+  );
+}
+
+// ─── MARQUEE SECTION ──────────────────────────────────────────────────────
 export function MarqueeSection() {
-  const ref = useRef<HTMLDivElement>(null);
-  const [offset, setOffset] = useState(0);
+  const ref            = useRef<HTMLDivElement>(null);
+  const [scrollOffset, setScrollOffset] = useState(0);
 
   useEffect(() => {
     const onScroll = () => {
@@ -49,7 +180,7 @@ export function MarqueeSection() {
       if (!el) return;
       const top = el.getBoundingClientRect().top + window.scrollY;
       const val = (window.scrollY - top + window.innerHeight) * 0.3;
-      setOffset(val);
+      setScrollOffset(val);
     };
     onScroll();
     window.addEventListener("scroll", onScroll, { passive: true });
@@ -60,11 +191,7 @@ export function MarqueeSection() {
     };
   }, []);
 
-  const row1Tx = offset - 200;
-  const row2Tx = -(offset - 200);
-
-  const r1 = [...ROW1, ...ROW1, ...ROW1];
-  const r2 = [...ROW2, ...ROW2, ...ROW2];
+  const baseOffset = scrollOffset - 200;
 
   return (
     <section
@@ -73,22 +200,21 @@ export function MarqueeSection() {
       style={{ backgroundColor: "#0C0C0C" }}
     >
       <div className="flex flex-col gap-3">
-        <div
-          className="flex gap-3"
-          style={{ transform: `translateX(${row1Tx}px)`, willChange: "transform" }}
-        >
-          {r1.map((src, i) => (
-            <Tile key={`r1-${i}`} src={src} />
-          ))}
-        </div>
-        <div
-          className="flex gap-3"
-          style={{ transform: `translateX(${row2Tx}px)`, willChange: "transform" }}
-        >
-          {r2.map((src, i) => (
-            <Tile key={`r2-${i}`} src={src} />
-          ))}
-        </div>
+        {/* Row 1 — moves right on scroll, user can drag */}
+        <DraggableRow
+          rowId="row1"
+          images={ROW1}
+          baseOffset={baseOffset}
+          direction={1}
+        />
+
+        {/* Row 2 — moves left on scroll, user can drag */}
+        <DraggableRow
+          rowId="row2"
+          images={ROW2}
+          baseOffset={baseOffset}
+          direction={-1}
+        />
       </div>
     </section>
   );

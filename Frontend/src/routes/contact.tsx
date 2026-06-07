@@ -32,6 +32,7 @@ const locations = [
 ];
 
 const navItems = [
+    { label: "Home", href: "/" },
     { label: "About", href: "/about" },
     { label: "Services", href: "/service" },
     { label: "Portfolio", href: "/portfolio" },

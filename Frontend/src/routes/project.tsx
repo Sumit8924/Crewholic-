@@ -33,8 +33,8 @@ const projects = [
         after: "Custom Next.js stack, 0.8s load time, 5.3% conversion rate.",
         stats: [
             { label: "Conversion Rate", before: "1.2%", after: "5.3%", delta: "+340%" },
-            { label: "Page Load",       before: "6.1s",  after: "0.8s",  delta: "−87%" },
-            { label: "Revenue / mo",    before: "₹2.1L", after: "₹9.4L", delta: "+347%" },
+            { label: "Page Load", before: "6.1s", after: "0.8s", delta: "−87%" },
+            { label: "Revenue / mo", before: "₹2.1L", after: "₹9.4L", delta: "+347%" },
         ],
         cover: "🛒",
         coverGradient: "linear-gradient(135deg, #FF6B2B22 0%, #FF6B2B08 100%)",
@@ -52,9 +52,9 @@ const projects = [
         before: "₹80K monthly ad spend with 1.4x ROAS, 120 leads/month.",
         after: "₹80K spend, 8.4x ROAS, 720 leads/month, #1 SEO rank for 3 keywords.",
         stats: [
-            { label: "ROAS",           before: "1.4x",  after: "8.4x",  delta: "+500%" },
-            { label: "Monthly Leads",  before: "120",   after: "720",   delta: "+500%" },
-            { label: "Organic Traffic",before: "1.2K",  after: "18K",   delta: "+1400%" },
+            { label: "ROAS", before: "1.4x", after: "8.4x", delta: "+500%" },
+            { label: "Monthly Leads", before: "120", after: "720", delta: "+500%" },
+            { label: "Organic Traffic", before: "1.2K", after: "18K", delta: "+1400%" },
         ],
         cover: "📈",
         coverGradient: "linear-gradient(135deg, #A855F722 0%, #A855F708 100%)",
@@ -72,9 +72,9 @@ const projects = [
         before: "0 social presence, 400 followers, no content strategy.",
         after: "48 assets delivered, 2.8M impressions, 22K new followers, 38K profile visits.",
         stats: [
-            { label: "Impressions",    before: "~0",    after: "2.8M",  delta: "∞" },
-            { label: "Followers",      before: "400",   after: "22.4K", delta: "+5500%" },
-            { label: "Engagement",     before: "0.3%",  after: "8.7%",  delta: "+2800%" },
+            { label: "Impressions", before: "~0", after: "2.8M", delta: "∞" },
+            { label: "Followers", before: "400", after: "22.4K", delta: "+5500%" },
+            { label: "Engagement", before: "0.3%", after: "8.7%", delta: "+2800%" },
         ],
         cover: "🎬",
         coverGradient: "linear-gradient(135deg, #4ecdc422 0%, #4ecdc408 100%)",
@@ -92,9 +92,9 @@ const projects = [
         before: "Excel sheets, no real-time data, 4hr reporting lag.",
         after: "Live dashboard, <200ms queries, automated daily reports.",
         stats: [
-            { label: "Report Lag",     before: "4 hrs",  after: "<1 min", delta: "−97%" },
-            { label: "Data Points",    before: "5K/day", after: "500K/day", delta: "+9900%" },
-            { label: "Staff Saved",    before: "—",      after: "40 hrs/wk", delta: "New" },
+            { label: "Report Lag", before: "4 hrs", after: "<1 min", delta: "−97%" },
+            { label: "Data Points", before: "5K/day", after: "500K/day", delta: "+9900%" },
+            { label: "Staff Saved", before: "—", after: "40 hrs/wk", delta: "New" },
         ],
         cover: "🏥",
         coverGradient: "linear-gradient(135deg, #FF6B2B22 0%, #FF6B2B08 100%)",
@@ -112,9 +112,9 @@ const projects = [
         before: "Sporadic posting, 800 LinkedIn followers, 4 deals/quarter.",
         after: "Consistent content, 14K followers, 18 enterprise deals/quarter.",
         stats: [
-            { label: "Pipeline Value", before: "₹28L",  after: "₹89L",  delta: "+218%" },
+            { label: "Pipeline Value", before: "₹28L", after: "₹89L", delta: "+218%" },
             { label: "LinkedIn Followers", before: "800", after: "14K", delta: "+1650%" },
-            { label: "Deals/Quarter",  before: "4",     after: "18",    delta: "+350%" },
+            { label: "Deals/Quarter", before: "4", after: "18", delta: "+350%" },
         ],
         cover: "🚀",
         coverGradient: "linear-gradient(135deg, #f59e0b22 0%, #f59e0b08 100%)",
@@ -132,9 +132,9 @@ const projects = [
         before: "No documentation, no post-event content, 0 digital amplification.",
         after: "120 assets, 6.1M reach, 41K new followers, 4 brand sponsors activated.",
         stats: [
-            { label: "Total Reach",    before: "~0",    after: "6.1M",  delta: "∞" },
-            { label: "Content Pieces", before: "0",     after: "120+",  delta: "New" },
-            { label: "Sponsors Won",   before: "0",     after: "4",     delta: "New" },
+            { label: "Total Reach", before: "~0", after: "6.1M", delta: "∞" },
+            { label: "Content Pieces", before: "0", after: "120+", delta: "New" },
+            { label: "Sponsors Won", before: "0", after: "4", delta: "New" },
         ],
         cover: "🎵",
         coverGradient: "linear-gradient(135deg, #ec489922 0%, #ec489908 100%)",
@@ -152,9 +152,9 @@ const projects = [
         before: "No mobile presence, customers using competitor apps.",
         after: "iOS + Android, 50K downloads M1, 4.8★ rating, 91% retention.",
         stats: [
-            { label: "Downloads (M1)", before: "0",    after: "50K",  delta: "New" },
-            { label: "App Rating",     before: "N/A",  after: "4.8★", delta: "Top 3%" },
-            { label: "D30 Retention",  before: "—",    after: "91%",  delta: "Best-in-class" },
+            { label: "Downloads (M1)", before: "0", after: "50K", delta: "New" },
+            { label: "App Rating", before: "N/A", after: "4.8★", delta: "Top 3%" },
+            { label: "D30 Retention", before: "—", after: "91%", delta: "Best-in-class" },
         ],
         cover: "💳",
         coverGradient: "linear-gradient(135deg, #06b6d422 0%, #06b6d408 100%)",
@@ -172,9 +172,9 @@ const projects = [
         before: "Dated brand, low-res assets, premium products perceived as generic.",
         after: "New identity, 80+ assets, premium positioning, +210% SKU sales.",
         stats: [
-            { label: "Premium Sales",  before: "₹3.4L", after: "₹10.5L", delta: "+210%" },
-            { label: "Brand Assets",   before: "12",    after: "80+",   delta: "+567%" },
-            { label: "Avg Order Value",before: "₹340",  after: "₹890",  delta: "+162%" },
+            { label: "Premium Sales", before: "₹3.4L", after: "₹10.5L", delta: "+210%" },
+            { label: "Brand Assets", before: "12", after: "80+", delta: "+567%" },
+            { label: "Avg Order Value", before: "₹340", after: "₹890", delta: "+162%" },
         ],
         cover: "🌿",
         coverGradient: "linear-gradient(135deg, #84cc1622 0%, #84cc1608 100%)",
@@ -201,10 +201,10 @@ function Scroll3DReveal({
     const rotateX = useTransform(scrollYProgress, [0, 1], [rotateFrom[0], 0]);
     const rotateY = useTransform(scrollYProgress, [0, 1], [rotateFrom[1], 0]);
     const rotateZ = useTransform(scrollYProgress, [0, 1], [rotateFrom[2], 0]);
-    const x       = useTransform(scrollYProgress, [0, 1], [translateFrom[0], 0]);
-    const y       = useTransform(scrollYProgress, [0, 1], [translateFrom[1], 0]);
-    const z       = useTransform(scrollYProgress, [0, 1], [translateFrom[2], 0]);
-    const scale   = useTransform(scrollYProgress, [0, 1], [scaleFrom, 1]);
+    const x = useTransform(scrollYProgress, [0, 1], [translateFrom[0], 0]);
+    const y = useTransform(scrollYProgress, [0, 1], [translateFrom[1], 0]);
+    const z = useTransform(scrollYProgress, [0, 1], [translateFrom[2], 0]);
+    const scale = useTransform(scrollYProgress, [0, 1], [scaleFrom, 1]);
     const opacity = useTransform(scrollYProgress, [0, 0.35, 1], [0, 0.6, 1]);
     return (
         <div ref={ref} className={className} style={{ perspective: "1200px" }}>
@@ -225,19 +225,19 @@ function Scroll3DCard({
     const ref = useRef<HTMLDivElement>(null);
     const { scrollYProgress } = useScroll({ target: ref, offset: ["start 95%", "center 55%"] });
     const dirMap: Record<string, [number, number, number, number, number, number]> = {
-        left:  [-8, -15, 3,  -60, 40, -80],
-        right: [-8,  15, -3,  60, 40, -80],
-        up:    [-20,  0, 0,   0,  80, -100],
-        down:  [ 20,  0, 0,   0, -80, -100],
+        left: [-8, -15, 3, -60, 40, -80],
+        right: [-8, 15, -3, 60, 40, -80],
+        up: [-20, 0, 0, 0, 80, -100],
+        down: [20, 0, 0, 0, -80, -100],
     };
     const [frX, frY, frZ, frTX, frTY, frTZ] = dirMap[direction];
     const rotateX = useTransform(scrollYProgress, [0, 1], [frX, 0]);
     const rotateY = useTransform(scrollYProgress, [0, 1], [frY, 0]);
     const rotateZ = useTransform(scrollYProgress, [0, 1], [frZ, 0]);
-    const x       = useTransform(scrollYProgress, [0, 1], [frTX, 0]);
-    const y       = useTransform(scrollYProgress, [0, 1], [frTY, 0]);
-    const z       = useTransform(scrollYProgress, [0, 1], [frTZ, 0]);
-    const scale   = useTransform(scrollYProgress, [0, 1], [0.75, 1]);
+    const x = useTransform(scrollYProgress, [0, 1], [frTX, 0]);
+    const y = useTransform(scrollYProgress, [0, 1], [frTY, 0]);
+    const z = useTransform(scrollYProgress, [0, 1], [frTZ, 0]);
+    const scale = useTransform(scrollYProgress, [0, 1], [0.75, 1]);
     const opacity = useTransform(scrollYProgress, [0, 0.4, 1], [0, 0.5, 1]);
     return (
         <div ref={ref} style={{ perspective: "900px" }}>
@@ -492,7 +492,7 @@ function ProjectCard({
     };
     const onLeave = () => { rX.set(0); rY.set(0); setHovered(false); };
 
-    const dirs: Array<"left"|"right"|"up"|"down"> = ["left","up","right","down","left","right","up","down"];
+    const dirs: Array<"left" | "right" | "up" | "down"> = ["left", "up", "right", "down", "left", "right", "up", "down"];
 
     return (
         <Scroll3DCard direction={dirs[index % dirs.length]}>
@@ -617,8 +617,8 @@ function ProjectsPage() {
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
     const { scrollY } = useScroll();
-    const heroY       = useTransform(scrollY, [0, 600], [0, -80]);
-    const heroScale   = useTransform(scrollY, [0, 600], [1, 0.92]);
+    const heroY = useTransform(scrollY, [0, 600], [0, -80]);
+    const heroScale = useTransform(scrollY, [0, 600], [1, 0.92]);
     const heroOpacity = useTransform(scrollY, [0, 380], [1, 0]);
 
     // Close mobile menu on escape key
@@ -660,7 +660,7 @@ function ProjectsPage() {
         { label: "Home", href: "/" },
         { label: "About", href: "/about" },
         { label: "Services", href: "/service" },
-        { label: "Projects", href: "/project" },
+        { label: "Portfolio", href: "/portfolio" },
         { label: "Contact", href: "/contact" },
     ];
 
@@ -761,14 +761,14 @@ function ProjectsPage() {
 
                     {/* PORTFOLIO Heading - Fixed for mobile (full word visible) */}
                     <div className="w-full flex justify-center items-center overflow-visible px-2">
-                        <motion.h1 
-                            initial={{ opacity: 0, y: 40, scale: 0.96 }} 
+                        <motion.h1
+                            initial={{ opacity: 0, y: 40, scale: 0.96 }}
                             animate={{ opacity: 1, y: 0, scale: 1 }}
                             transition={{ duration: 0.9, delay: 0.3, ease: [0.22, 1, 0.36, 1] }}
                             className="font-extrabold leading-[1.1] tracking-tighter text-center w-full"
-                            style={{ 
-                                ...gradientStyle, 
-                                fontSize: "clamp(32px, 7vw, 180px)", 
+                            style={{
+                                ...gradientStyle,
+                                fontSize: "clamp(32px, 7vw, 180px)",
                                 fontFamily: "'Syne', sans-serif",
                                 whiteSpace: "nowrap",
                                 letterSpacing: "clamp(-0.01em, -0.2vw, -0.02em)"
