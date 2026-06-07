@@ -15,7 +15,7 @@ declare global {
 }
 
 const API_URL =
-    import.meta.env.VITE_API_URL || "https://crewholic-1-if9w.onrender.com/api";
+    import.meta.env.VITE_API_URL || "https://crewholic-1-if9w.onrender.com";
 
 function LoginPage() {
     const [email, setEmail] = useState("");
@@ -192,7 +192,7 @@ function LoginPage() {
                 return;
             }
 
-            const res = await fetch(`${API_URL}/auth/google`, {
+            const res = await fetch(`${API_URL}/api/auth/google`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -241,7 +241,7 @@ function LoginPage() {
         try {
             setLoading(true);
 
-            const res = await fetch(`${API_URL}/login`, {
+            const res = await fetch(`${API_URL}/api/login`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
