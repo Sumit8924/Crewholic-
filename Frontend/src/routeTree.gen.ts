@@ -17,6 +17,7 @@ import { Route as ProjectRouteImport } from './routes/project'
 import { Route as PortfolioRouteImport } from './routes/portfolio'
 import { Route as MarketingRouteImport } from './routes/marketing'
 import { Route as LoginRouteImport } from './routes/login'
+import { Route as ForgotPasswordRouteImport } from './routes/forgot-password'
 import { Route as FinanceRouteImport } from './routes/finance'
 import { Route as EventRouteImport } from './routes/event'
 import { Route as DashboardRouteImport } from './routes/dashboard'
@@ -65,6 +66,11 @@ const LoginRoute = LoginRouteImport.update({
   path: '/login',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ForgotPasswordRoute = ForgotPasswordRouteImport.update({
+  id: '/forgot-password',
+  path: '/forgot-password',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const FinanceRoute = FinanceRouteImport.update({
   id: '/finance',
   path: '/finance',
@@ -109,6 +115,7 @@ export interface FileRoutesByFullPath {
   '/dashboard': typeof DashboardRoute
   '/event': typeof EventRoute
   '/finance': typeof FinanceRoute
+  '/forgot-password': typeof ForgotPasswordRoute
   '/login': typeof LoginRoute
   '/marketing': typeof MarketingRoute
   '/portfolio': typeof PortfolioRoute
@@ -126,6 +133,7 @@ export interface FileRoutesByTo {
   '/dashboard': typeof DashboardRoute
   '/event': typeof EventRoute
   '/finance': typeof FinanceRoute
+  '/forgot-password': typeof ForgotPasswordRoute
   '/login': typeof LoginRoute
   '/marketing': typeof MarketingRoute
   '/portfolio': typeof PortfolioRoute
@@ -144,6 +152,7 @@ export interface FileRoutesById {
   '/dashboard': typeof DashboardRoute
   '/event': typeof EventRoute
   '/finance': typeof FinanceRoute
+  '/forgot-password': typeof ForgotPasswordRoute
   '/login': typeof LoginRoute
   '/marketing': typeof MarketingRoute
   '/portfolio': typeof PortfolioRoute
@@ -163,6 +172,7 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/event'
     | '/finance'
+    | '/forgot-password'
     | '/login'
     | '/marketing'
     | '/portfolio'
@@ -180,6 +190,7 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/event'
     | '/finance'
+    | '/forgot-password'
     | '/login'
     | '/marketing'
     | '/portfolio'
@@ -197,6 +208,7 @@ export interface FileRouteTypes {
     | '/dashboard'
     | '/event'
     | '/finance'
+    | '/forgot-password'
     | '/login'
     | '/marketing'
     | '/portfolio'
@@ -215,6 +227,7 @@ export interface RootRouteChildren {
   DashboardRoute: typeof DashboardRoute
   EventRoute: typeof EventRoute
   FinanceRoute: typeof FinanceRoute
+  ForgotPasswordRoute: typeof ForgotPasswordRoute
   LoginRoute: typeof LoginRoute
   MarketingRoute: typeof MarketingRoute
   PortfolioRoute: typeof PortfolioRoute
@@ -283,6 +296,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof LoginRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/forgot-password': {
+      id: '/forgot-password'
+      path: '/forgot-password'
+      fullPath: '/forgot-password'
+      preLoaderRoute: typeof ForgotPasswordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/finance': {
       id: '/finance'
       path: '/finance'
@@ -343,6 +363,7 @@ const rootRouteChildren: RootRouteChildren = {
   DashboardRoute: DashboardRoute,
   EventRoute: EventRoute,
   FinanceRoute: FinanceRoute,
+  ForgotPasswordRoute: ForgotPasswordRoute,
   LoginRoute: LoginRoute,
   MarketingRoute: MarketingRoute,
   PortfolioRoute: PortfolioRoute,

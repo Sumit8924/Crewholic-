@@ -128,6 +128,37 @@ const rentalsParent = {
 
 const allCards: any[] = [...services, rentalsParent];
 
+const API_BASE = import.meta.env.VITE_API_URL || "http://localhost:5000";
+const AVAILABILITY_STORAGE_KEY = "crewholic_product_availability";
+
+interface ProductAvailability {
+    productId: number;
+    productName?: string;
+    categoryName?: string;
+    isAvailable: boolean;
+    unavailableReason?: string;
+    updatedAt?: string;
+}
+
+type AvailabilityMap = Record<number, { isAvailable: boolean; reason: string; updatedAt: string }>;
+
+const readAvailabilityFromStorage = (): AvailabilityMap => {
+    try {
+        const raw = localStorage.getItem(AVAILABILITY_STORAGE_KEY);
+        return raw ? JSON.parse(raw) : {};
+    } catch {
+        return {};
+    }
+};
+
+const saveAvailabilityToStorage = (map: AvailabilityMap) => {
+    try {
+        localStorage.setItem(AVAILABILITY_STORAGE_KEY, JSON.stringify(map));
+    } catch {
+        // ignore localStorage errors
+    }
+};
+
 const navItems = [
     { label: "Home",      href: "/" },
     { label: "About",     href: "/about" },
@@ -525,10 +556,11 @@ function UserNavButton({ user }: { user: LoggedInUser | null }) {
 }
 
 // ─── RENTAL CATEGORIES MODAL ─────────────────────────────────────────────────
-function RentalCategoriesModal({ isOpen, onClose, onCategorySelect }: {
+function RentalCategoriesModal({ isOpen, onClose, onCategorySelect, categories = rentalCategories }: {
     isOpen: boolean;
     onClose: () => void;
     onCategorySelect: (category: typeof rentalCategories[0]) => void;
+    categories?: typeof rentalCategories;
 }) {
     return (
         <AnimatePresence>
@@ -602,7 +634,7 @@ function RentalCategoriesModal({ isOpen, onClose, onCategorySelect }: {
                                     ─ Select Category ─
                                 </p>
                                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 sm:gap-5 md:gap-6 max-w-5xl mx-auto">
-                                    {rentalCategories.map((category, idx) => (
+                                    {categories.map((category, idx) => (
                                         <motion.div
                                             key={category.id}
                                             initial={{ opacity: 0, y: 30, scale: 0.95 }}
@@ -838,49 +870,75 @@ function RentalProductsModal({ category, isOpen, onClose, onBack, onRentClick }:
                                     </div>
                                     <button onClick={onClose} className="w-9 h-9 sm:w-10 sm:h-10 flex items-center justify-center rounded-full bg-white/5 text-gray-400 hover:text-white text-2xl sm:text-3xl transition-colors active:scale-90 flex-shrink-0">×</button>
                                 </div>
-                                <p className="text-gray-300 text-xs sm:text-sm mt-3 sm:mt-4">{category.items.length} equipment available for rent</p>
+                                <p className="text-gray-300 text-xs sm:text-sm mt-3 sm:mt-4">{category.items.filter((item: any) => item.inStock !== false).length} equipment available • {category.items.filter((item: any) => item.inStock === false).length} unavailable</p>
                             </div>
                             <div className="p-4 sm:p-6">
                                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4 sm:gap-5">
-                                    {category.items.map((product, idx) => (
-                                        <motion.div
-                                            key={product.id}
-                                            initial={{ opacity: 0, y: 20 }}
-                                            animate={{ opacity: 1, y: 0 }}
-                                            transition={{ delay: idx * 0.05 }}
-                                            whileHover={{ y: -5, transition: { duration: 0.2 } }}
-                                            whileTap={{ scale: 0.98 }}
-                                            className="rounded-xl overflow-hidden border transition-all duration-300 cursor-pointer"
-                                            style={{ background: "rgba(255,255,255,0.08)", borderColor: "rgba(255,255,255,0.15)" }}
-                                            onClick={() => onRentClick(product)}
-                                        >
-                                            <div className="p-4 sm:p-5">
-                                                <div className="text-5xl sm:text-6xl text-center py-3 sm:py-4">{product.image}</div>
-                                                <h3 className="font-bold text-base sm:text-lg text-white mb-2">{product.name}</h3>
-                                                <p className="text-gray-300 text-xs mb-3">{product.specs}</p>
-                                                <div className="flex items-center gap-2 mb-3">
-                                                    <span className="text-yellow-400 text-xs sm:text-sm">★ {product.rating}</span>
-                                                    <span className="text-gray-300 text-[10px] sm:text-xs">(120+ reviews)</span>
+                                    {category.items.map((product, idx) => {
+                                        const isAvailable = product.inStock !== false;
+
+                                        return (
+                                            <motion.div
+                                                key={product.id}
+                                                initial={{ opacity: 0, y: 20 }}
+                                                animate={{ opacity: 1, y: 0 }}
+                                                transition={{ delay: idx * 0.05 }}
+                                                whileHover={isAvailable ? { y: -5, transition: { duration: 0.2 } } : {}}
+                                                whileTap={isAvailable ? { scale: 0.98 } : {}}
+                                                className={`rounded-xl overflow-hidden border transition-all duration-300 ${isAvailable ? "cursor-pointer" : "cursor-not-allowed"}`}
+                                                style={{
+                                                    background: isAvailable ? "rgba(255,255,255,0.08)" : "rgba(255,107,107,0.06)",
+                                                    borderColor: isAvailable ? "rgba(255,255,255,0.15)" : "rgba(255,107,107,0.35)",
+                                                    opacity: isAvailable ? 1 : 0.55,
+                                                    filter: isAvailable ? "none" : "grayscale(0.75)",
+                                                }}
+                                                onClick={() => {
+                                                    if (isAvailable) onRentClick(product);
+                                                }}
+                                            >
+                                                <div className="p-4 sm:p-5">
+                                                    <div className="text-5xl sm:text-6xl text-center py-3 sm:py-4">{product.image}</div>
+                                                    <h3 className="font-bold text-base sm:text-lg text-white mb-2">{product.name}</h3>
+                                                    <p className="text-gray-300 text-xs mb-3">{product.specs}</p>
+                                                    <div className="flex items-center gap-2 mb-3">
+                                                        <span className="text-yellow-400 text-xs sm:text-sm">★ {product.rating}</span>
+                                                        <span className="text-gray-300 text-[10px] sm:text-xs">(120+ reviews)</span>
+                                                    </div>
+                                                    <div className="mb-2 sm:mb-3">
+                                                        <span className="text-xl sm:text-2xl font-bold" style={{ color: category.accent }}>{formatPrice(product.price)}</span>
+                                                        <span className="text-gray-400 line-through text-xs sm:text-sm ml-2">{formatPrice(product.originalPrice)}</span>
+                                                    </div>
+                                                    <span className="text-green-400 text-xs block mb-1">{Math.round((1 - product.price / product.originalPrice) * 100)}% off</span>
+                                                    <p className="text-gray-300 text-xs mb-3">per day</p>
+
+                                                    {isAvailable ? (
+                                                        <span className="inline-block text-green-400 text-xs mb-3 font-medium">✓ In Stock</span>
+                                                    ) : (
+                                                        <span className="inline-block text-red-400 text-xs mb-3 font-medium">✕ Not Available{product.unavailableReason ? ` — ${product.unavailableReason}` : ""}</span>
+                                                    )}
+
+                                                    <motion.button
+                                                        type="button"
+                                                        disabled={!isAvailable}
+                                                        onClick={e => {
+                                                            e.stopPropagation();
+                                                            if (isAvailable) onRentClick(product);
+                                                        }}
+                                                        whileTap={isAvailable ? { scale: 0.98 } : {}}
+                                                        className="w-full py-2.5 rounded-lg font-semibold text-sm transition-all text-white"
+                                                        style={{
+                                                            background: isAvailable
+                                                                ? `linear-gradient(135deg, ${category.accent}, ${category.accent}CC)`
+                                                                : "linear-gradient(135deg, #444, #222)",
+                                                            cursor: isAvailable ? "pointer" : "not-allowed",
+                                                        }}
+                                                    >
+                                                        {isAvailable ? "Rent Now →" : "Not Available"}
+                                                    </motion.button>
                                                 </div>
-                                                <div className="mb-2 sm:mb-3">
-                                                    <span className="text-xl sm:text-2xl font-bold" style={{ color: category.accent }}>{formatPrice(product.price)}</span>
-                                                    <span className="text-gray-400 line-through text-xs sm:text-sm ml-2">{formatPrice(product.originalPrice)}</span>
-                                                </div>
-                                                <span className="text-green-400 text-xs block mb-1">{Math.round((1 - product.price / product.originalPrice) * 100)}% off</span>
-                                                <p className="text-gray-300 text-xs mb-3">per day</p>
-                                                {product.inStock && <span className="inline-block text-green-400 text-xs mb-3 font-medium">✓ In Stock</span>}
-                                                <motion.button
-                                                    type="button"
-                                                    onClick={e => { e.stopPropagation(); onRentClick(product); }}
-                                                    whileTap={{ scale: 0.98 }}
-                                                    className="w-full py-2.5 rounded-lg font-semibold text-sm transition-all text-white"
-                                                    style={{ background: `linear-gradient(135deg, ${category.accent}, ${category.accent}CC)` }}
-                                                >
-                                                    Rent Now →
-                                                </motion.button>
-                                            </div>
-                                        </motion.div>
-                                    ))}
+                                            </motion.div>
+                                        );
+                                    })}
                                 </div>
                             </div>
                         </div>
@@ -915,7 +973,7 @@ function RentalCheckoutModal({ product, category, isOpen, onClose, onSubmit }: {
 
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
-        if (isSubmitting || !product) return;
+        if (isSubmitting || !product || product.inStock === false) return;
         setIsSubmitting(true);
         const success = await onSubmit({ ...formData, productId: product.id, productName: product.name, categoryName: category.title, pricePerDay: product.price, rentalDays, totalPrice });
         setIsSubmitting(false);
@@ -1143,6 +1201,7 @@ function ServicePage() {
     const [selectedProduct, setSelectedProduct]               = useState<any>(null);
     const [isCheckoutModalOpen, setIsCheckoutModalOpen]       = useState(false);
     const [mobileMenuOpen, setMobileMenuOpen]                 = useState(false);
+    const [availabilityMap, setAvailabilityMap]               = useState<AvailabilityMap>({});
 
     // Load user from localStorage
     useEffect(() => {
@@ -1152,6 +1211,81 @@ function ServicePage() {
         } else {
             setLoggedInUser(null);
         }
+    }, []);
+
+    useEffect(() => {
+        const buildDefaultMap = (savedMap: AvailabilityMap = {}) => {
+            const map: AvailabilityMap = {};
+            rentalCategories.forEach(category => {
+                category.items.forEach(item => {
+                    map[item.id] = savedMap[item.id] || {
+                        isAvailable: item.inStock !== false,
+                        reason: "",
+                        updatedAt: "",
+                    };
+                });
+            });
+            return map;
+        };
+
+        const loadAvailability = async () => {
+            const savedMap = readAvailabilityFromStorage();
+
+            try {
+                const endpoints = [
+                    `${API_BASE}/api/product-availability`,
+                    `${API_BASE}/api/rental-availability`,
+                ];
+
+                for (const endpoint of endpoints) {
+                    try {
+                        const res = await fetch(endpoint);
+                        if (!res.ok) continue;
+
+                        const data = await res.json();
+                        const arr: ProductAvailability[] = Array.isArray(data) ? data : (data?.data || data?.items || []);
+
+                        if (Array.isArray(arr)) {
+                            const map = buildDefaultMap(savedMap);
+
+                            arr.forEach(item => {
+                                if (typeof item.productId === "number") {
+                                    map[item.productId] = {
+                                        isAvailable: item.isAvailable ?? true,
+                                        reason: item.unavailableReason || "",
+                                        updatedAt: item.updatedAt || "",
+                                    };
+                                }
+                            });
+
+                            setAvailabilityMap(map);
+                            saveAvailabilityToStorage(map);
+                            return;
+                        }
+                    } catch {
+                        // try next endpoint
+                    }
+                }
+
+                setAvailabilityMap(buildDefaultMap(savedMap));
+            } catch {
+                setAvailabilityMap(buildDefaultMap(savedMap));
+            }
+        };
+
+        loadAvailability();
+
+        const handleStorage = () => {
+            setAvailabilityMap(readAvailabilityFromStorage());
+        };
+
+        window.addEventListener("storage", handleStorage);
+        window.addEventListener("crewholicAvailabilityUpdated", handleStorage);
+
+        return () => {
+            window.removeEventListener("storage", handleStorage);
+            window.removeEventListener("crewholicAvailabilityUpdated", handleStorage);
+        };
     }, []);
 
     useEffect(() => {
@@ -1174,6 +1308,19 @@ function ServicePage() {
         window.addEventListener("mousemove", handleMouseMove);
         return () => window.removeEventListener("mousemove", handleMouseMove);
     }, []);
+
+    const enhancedRentalCategories = rentalCategories.map(category => ({
+        ...category,
+        items: category.items.map(item => {
+            const availability = availabilityMap[item.id];
+
+            return {
+                ...item,
+                inStock: availability ? availability.isAvailable : item.inStock,
+                unavailableReason: availability?.reason || "",
+            };
+        }),
+    }));
 
     const handleCardClick = (item: any) => {
         if (!isUserLoggedIn()) {
@@ -1201,10 +1348,15 @@ function ServicePage() {
     };
 
     const handleRentClick = (product: any) => {
+        if (product?.inStock === false) {
+            return;
+        }
+
         if (!isUserLoggedIn()) {
             navigate({ to: "/login", state: { returnTo: "/service", message: "Please login or signup to continue with your rental." } });
             return;
         }
+
         setSelectedProduct(product);
         setIsRentalProductsModalOpen(false);
         setIsCheckoutModalOpen(true);
@@ -1471,6 +1623,7 @@ function ServicePage() {
                 isOpen={isRentalCategoriesOpen}
                 onClose={() => setIsRentalCategoriesOpen(false)}
                 onCategorySelect={handleCategorySelect}
+                categories={enhancedRentalCategories}
             />
             <RentalProductsModal
                 category={selectedRentalCategory}

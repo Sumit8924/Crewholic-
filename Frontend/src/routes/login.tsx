@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable prettier/prettier */
-import { createFileRoute, Link } from "@tanstack/react-router";
+import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
 import logo from "../components/portfolio/skr.png";
 
@@ -17,7 +17,11 @@ declare global {
 const API_URL =
     import.meta.env.VITE_API_URL || "https://crewholic-1-if9w.onrender.com";
 
+const GOOGLE_CLIENT_ID = import.meta.env.VITE_GOOGLE_CLIENT_ID || "";
+
 function LoginPage() {
+    const navigate = useNavigate();
+
     const [email, setEmail] = useState("");
     const [password, setPassword] = useState("");
     const [showPassword, setShowPassword] = useState(false);
@@ -31,8 +35,9 @@ function LoginPage() {
     } | null>(null);
 
     useEffect(() => {
-        // FIX: Add meta tag for Cross-Origin-Opener-Policy compatibility
-        const existingMeta = document.querySelector('meta[http-equiv="Cross-Origin-Opener-Policy"]');
+        const existingMeta = document.querySelector(
+            'meta[http-equiv="Cross-Origin-Opener-Policy"]'
+        );
         if (!existingMeta) {
             const meta = document.createElement("meta");
             meta.setAttribute("http-equiv", "Cross-Origin-Opener-Policy");
@@ -52,9 +57,9 @@ function LoginPage() {
         setTimeout(() => setToastMessage(null), 4000);
     };
 
-    const getRedirectPath = (user: any) => {
+    // ── FIX: use TanStack Router navigate instead of window.location.href ──
+    const getRedirectPath = (user: any): string => {
         const role = user?.role || "user";
-
         switch (role) {
             case "superadmin":
             case "main_admin":
@@ -75,7 +80,9 @@ function LoginPage() {
     };
 
     const redirectAfterLogin = (user: any) => {
-        window.location.href = getRedirectPath(user);
+        const path = getRedirectPath(user);
+        // Uses TanStack Router — no page reload, no refresh needed
+        navigate({ to: path as any });
     };
 
     const loadGoogleScript = () => {
@@ -84,7 +91,6 @@ function LoginPage() {
             return;
         }
 
-        // FIX: Prevent duplicate script loading
         if (googleScriptLoaded.current) {
             waitForGoogleAndInitialize();
             return;
@@ -109,7 +115,10 @@ function LoginPage() {
             waitForGoogleAndInitialize();
         };
         script.onerror = () => {
-            showMessage("Google script failed to load. Check your internet connection.", true);
+            showMessage(
+                "Google script failed to load. Check your internet connection.",
+                true
+            );
         };
 
         document.body.appendChild(script);
@@ -117,15 +126,12 @@ function LoginPage() {
 
     const waitForGoogleAndInitialize = () => {
         let count = 0;
-
         const interval = setInterval(() => {
             count++;
-
             if (window.google?.accounts?.id) {
                 clearInterval(interval);
                 initializeGoogleOAuth();
             }
-
             if (count > 30) {
                 clearInterval(interval);
                 showMessage(
@@ -140,7 +146,6 @@ function LoginPage() {
         if (googleInitialized.current) return;
 
         const googleBtn = document.getElementById("googleLoginBtn");
-
         if (!googleBtn) {
             showMessage("Google button container not found", true);
             return;
@@ -155,7 +160,6 @@ function LoginPage() {
                 callback: handleGoogleCredentialResponse,
                 auto_select: false,
                 cancel_on_tap_outside: true,
-                // FIX: Use "popup" UX mode to avoid COOP/postMessage issues
                 ux_mode: "popup",
             });
 
@@ -169,7 +173,7 @@ function LoginPage() {
         } catch (err: any) {
             console.error("Google OAuth init error:", err);
             showMessage(
-                "Google Sign-In could not initialize. Make sure localhost:3000 is added in Google Cloud Console.",
+                "Google Sign-In could not initialize. Make sure your domain is added in Google Cloud Console.",
                 true
             );
         }
@@ -180,7 +184,10 @@ function LoginPage() {
         localStorage.setItem("user", JSON.stringify(user));
         localStorage.setItem("token", data.token || "");
         localStorage.setItem("role", user?.role || "user");
-        localStorage.setItem("permissions", JSON.stringify(user?.permissions || []));
+        localStorage.setItem(
+            "permissions",
+            JSON.stringify(user?.permissions || [])
+        );
     };
 
     const handleGoogleCredentialResponse = async (response: any) => {
@@ -194,15 +201,10 @@ function LoginPage() {
 
             const res = await fetch(`${API_URL}/api/auth/google`, {
                 method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
-                body: JSON.stringify({
-                    credential: response.credential,
-                }),
+                headers: { "Content-Type": "application/json" },
+                body: JSON.stringify({ credential: response.credential }),
             });
 
-            // FIX: Handle non-JSON responses gracefully (e.g. 500 HTML error pages)
             const contentType = res.headers.get("content-type");
             if (!contentType || !contentType.includes("application/json")) {
                 showMessage(`Server error (${res.status}). Please try again later.`, true);
@@ -220,8 +222,14 @@ function LoginPage() {
             redirectAfterLogin(data.user);
         } catch (error: any) {
             console.error("Google login error:", error);
-            if (error?.message?.includes("NetworkError") || error?.message?.includes("Failed to fetch")) {
-                showMessage("Network error. Check your connection or backend server.", true);
+            if (
+                error?.message?.includes("NetworkError") ||
+                error?.message?.includes("Failed to fetch")
+            ) {
+                showMessage(
+                    "Network error. Check your connection or backend server.",
+                    true
+                );
             } else {
                 showMessage("Google login failed. Please try again.", true);
             }
@@ -243,16 +251,13 @@ function LoginPage() {
 
             const res = await fetch(`${API_URL}/api/login`, {
                 method: "POST",
-                headers: {
-                    "Content-Type": "application/json",
-                },
+                headers: { "Content-Type": "application/json" },
                 body: JSON.stringify({
                     email: email.trim(),
                     password: password.trim(),
                 }),
             });
 
-            // FIX: Safe JSON parsing
             const contentType = res.headers.get("content-type");
             if (!contentType || !contentType.includes("application/json")) {
                 showMessage(`Server error (${res.status}). Please try again later.`, true);
@@ -286,298 +291,315 @@ function LoginPage() {
     return (
         <>
             <style>{`
-        * {
-          margin: 0;
-          padding: 0;
-          box-sizing: border-box;
-        }
+                * {
+                    margin: 0;
+                    padding: 0;
+                    box-sizing: border-box;
+                }
 
-        body {
-          font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
-          background: #010103;
-          overflow-x: hidden;
-        }
+                body {
+                    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+                    background: #010103;
+                    overflow-x: hidden;
+                }
 
-        .login-container {
-          position: relative;
-          min-height: 100vh;
-          width: 100%;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          padding: 2rem;
-          background: radial-gradient(circle at 20% 30%, #0a0a1a, #000000);
-        }
+                .login-container {
+                    position: relative;
+                    min-height: 100vh;
+                    width: 100%;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    padding: 2rem;
+                    background: radial-gradient(circle at 20% 30%, #0a0a1a, #000000);
+                }
 
-        .crewholic-card {
-          width: 100%;
-          max-width: 460px;
-          background: rgba(8, 8, 18, 0.75);
-          backdrop-filter: blur(20px);
-          border-radius: 2rem;
-          border: 1px solid rgba(155, 81, 224, 0.2);
-          box-shadow: 0 30px 50px -20px rgba(0,0,0,0.8), 0 0 0 0.5px rgba(155,81,224,0.15) inset;
-          padding: 2.5rem 2rem;
-        }
+                .crewholic-card {
+                    width: 100%;
+                    max-width: 460px;
+                    background: rgba(8, 8, 18, 0.75);
+                    backdrop-filter: blur(20px);
+                    border-radius: 2rem;
+                    border: 1px solid rgba(155, 81, 224, 0.2);
+                    box-shadow:
+                        0 30px 50px -20px rgba(0,0,0,0.8),
+                        0 0 0 0.5px rgba(155,81,224,0.15) inset;
+                    padding: 2.5rem 2rem;
+                }
 
-        .brand-wrapper {
-          text-align: center;
-          margin-bottom: 2rem;
-        }
+                .brand-wrapper {
+                    text-align: center;
+                    margin-bottom: 2rem;
+                }
 
-        .logo-circle {
-          width: 88px;
-          height: 88px;
-          margin: 0 auto 1rem;
-          border-radius: 50%;
-          background: linear-gradient(135deg, #9B51E0, #F2994A);
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          box-shadow: 0 12px 24px -8px rgba(155,81,224,0.4);
-        }
+                .logo-circle {
+                    width: 88px;
+                    height: 88px;
+                    margin: 0 auto 1rem;
+                    border-radius: 50%;
+                    background: linear-gradient(135deg, #9B51E0, #F2994A);
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    box-shadow: 0 12px 24px -8px rgba(155,81,224,0.4);
+                }
 
-        .logo-circle img {
-          width: 70%;
-          height: 70%;
-          object-fit: contain;
-        }
+                .logo-circle img {
+                    width: 70%;
+                    height: 70%;
+                    object-fit: contain;
+                }
 
-        .brand-title {
-          font-size: 2rem;
-          font-weight: 800;
-          background: linear-gradient(120deg, #FFFFFF, #D7E2EA);
-          -webkit-background-clip: text;
-          color: transparent;
-          margin-bottom: 0.25rem;
-        }
+                .brand-title {
+                    font-size: 2rem;
+                    font-weight: 800;
+                    background: linear-gradient(120deg, #FFFFFF, #D7E2EA);
+                    -webkit-background-clip: text;
+                    color: transparent;
+                    margin-bottom: 0.25rem;
+                }
 
-        .brand-tagline {
-          font-size: 0.75rem;
-          text-transform: uppercase;
-          color: #9B51E0;
-          font-weight: 500;
-          opacity: 0.8;
-        }
+                .brand-tagline {
+                    font-size: 0.75rem;
+                    text-transform: uppercase;
+                    color: #9B51E0;
+                    font-weight: 500;
+                    opacity: 0.8;
+                }
 
-        .form-heading {
-          font-size: 1.5rem;
-          font-weight: 700;
-          margin-bottom: 0.5rem;
-          color: #F5F7FF;
-        }
+                .form-heading {
+                    font-size: 1.5rem;
+                    font-weight: 700;
+                    margin-bottom: 0.5rem;
+                    color: #F5F7FF;
+                }
 
-        .form-subheading {
-          color: #9aa4bf;
-          font-size: 0.85rem;
-          margin-bottom: 1.8rem;
-          border-left: 2px solid #F2994A;
-          padding-left: 12px;
-        }
+                .form-subheading {
+                    color: #9aa4bf;
+                    font-size: 0.85rem;
+                    margin-bottom: 1.8rem;
+                    border-left: 2px solid #F2994A;
+                    padding-left: 12px;
+                }
 
-        .input-group-modern {
-          position: relative;
-          margin-bottom: 1.25rem;
-        }
+                .input-group-modern {
+                    position: relative;
+                    margin-bottom: 1.25rem;
+                }
 
-        .input-icon {
-          position: absolute;
-          left: 18px;
-          top: 50%;
-          transform: translateY(-50%);
-          color: #9B51E0;
-          font-size: 1rem;
-          z-index: 2;
-          opacity: 0.7;
-        }
+                .input-icon {
+                    position: absolute;
+                    left: 18px;
+                    top: 50%;
+                    transform: translateY(-50%);
+                    color: #9B51E0;
+                    font-size: 1rem;
+                    z-index: 2;
+                    opacity: 0.7;
+                    pointer-events: none;
+                }
 
-        .form-control-modern {
-          width: 100%;
-          background: rgba(20, 22, 40, 0.7);
-          border: 1px solid rgba(155, 81, 224, 0.3);
-          border-radius: 44px;
-          padding: 0.9rem 1rem 0.9rem 2.8rem;
-          font-size: 0.95rem;
-          font-weight: 500;
-          color: white;
-          outline: none;
-          transition: border-color 0.2s, box-shadow 0.2s;
-        }
+                .form-control-modern {
+                    width: 100%;
+                    background: rgba(20, 22, 40, 0.7);
+                    border: 1px solid rgba(155, 81, 224, 0.3);
+                    border-radius: 44px;
+                    padding: 0.9rem 3rem 0.9rem 2.8rem;
+                    font-size: 0.95rem;
+                    font-weight: 500;
+                    color: white;
+                    outline: none;
+                    transition: border-color 0.2s, box-shadow 0.2s;
+                }
 
-        .form-control-modern::placeholder {
-          color: rgba(154, 164, 191, 0.6);
-        }
+                .form-control-modern::placeholder {
+                    color: rgba(154, 164, 191, 0.6);
+                }
 
-        .form-control-modern:focus {
-          border-color: #F2994A;
-          box-shadow: 0 0 0 3px rgba(242, 153, 74, 0.25);
-        }
+                .form-control-modern:focus {
+                    border-color: #F2994A;
+                    box-shadow: 0 0 0 3px rgba(242, 153, 74, 0.25);
+                }
 
-        .form-control-modern:disabled {
-          opacity: 0.5;
-          cursor: not-allowed;
-        }
+                .form-control-modern:disabled {
+                    opacity: 0.5;
+                    cursor: not-allowed;
+                }
 
-        .password-toggle {
-          position: absolute;
-          right: 18px;
-          top: 50%;
-          transform: translateY(-50%);
-          color: rgba(215, 226, 234, 0.6);
-          cursor: pointer;
-          font-size: 0.9rem;
-          transition: color 0.2s;
-        }
+                /* ── Password toggle button ── */
+                .password-toggle-btn {
+                    position: absolute;
+                    right: 16px;
+                    top: 50%;
+                    transform: translateY(-50%);
+                    background: none;
+                    border: none;
+                    padding: 4px 6px;
+                    cursor: pointer;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    border-radius: 50%;
+                    transition: background 0.2s;
+                    z-index: 3;
+                }
 
-        .password-toggle:hover {
-          color: #F2994A;
-        }
+                .password-toggle-btn:hover {
+                    background: rgba(242, 153, 74, 0.12);
+                }
 
-        .forgot-link-wrapper {
-          text-align: right;
-          margin: -0.2rem 0 1.5rem 0;
-        }
+                .password-toggle-btn svg {
+                    width: 18px;
+                    height: 18px;
+                    color: rgba(154, 164, 191, 0.6);
+                    transition: color 0.2s;
+                    display: block;
+                }
 
-        .forgot-link {
-          font-size: 0.75rem;
-          color: #F2994A;
-          text-decoration: none;
-          transition: opacity 0.2s;
-        }
+                .password-toggle-btn:hover svg {
+                    color: #F2994A;
+                }
 
-        .forgot-link:hover {
-          opacity: 0.75;
-        }
+                .forgot-link-wrapper {
+                    text-align: right;
+                    margin: -0.2rem 0 1.5rem 0;
+                }
 
-        .login-btn {
-          background: linear-gradient(105deg, #9B51E0 0%, #F2994A 100%);
-          border: none;
-          width: 100%;
-          padding: 0.9rem 0;
-          border-radius: 60px;
-          font-weight: 700;
-          font-size: 1rem;
-          color: white;
-          display: flex;
-          align-items: center;
-          justify-content: center;
-          gap: 8px;
-          cursor: pointer;
-          transition: opacity 0.2s, transform 0.1s;
-        }
+                .forgot-link {
+                    font-size: 0.75rem;
+                    color: #F2994A;
+                    text-decoration: none;
+                    transition: opacity 0.2s;
+                }
 
-        .login-btn:hover:not(:disabled) {
-          opacity: 0.9;
-          transform: translateY(-1px);
-        }
+                .forgot-link:hover {
+                    opacity: 0.75;
+                }
 
-        .login-btn:disabled {
-          opacity: 0.6;
-          cursor: not-allowed;
-        }
+                .login-btn {
+                    background: linear-gradient(105deg, #9B51E0 0%, #F2994A 100%);
+                    border: none;
+                    width: 100%;
+                    padding: 0.9rem 0;
+                    border-radius: 60px;
+                    font-weight: 700;
+                    font-size: 1rem;
+                    color: white;
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    gap: 8px;
+                    cursor: pointer;
+                    transition: opacity 0.2s, transform 0.1s;
+                }
 
-        .divider-modern {
-          display: flex;
-          align-items: center;
-          gap: 12px;
-          color: #4b5575;
-          font-size: 0.7rem;
-          margin: 1.5rem 0;
-        }
+                .login-btn:hover:not(:disabled) {
+                    opacity: 0.9;
+                    transform: translateY(-1px);
+                }
 
-        .divider-line {
-          flex: 1;
-          height: 1px;
-          background: linear-gradient(90deg, transparent, rgba(155,81,224,0.4), transparent);
-        }
+                .login-btn:disabled {
+                    opacity: 0.6;
+                    cursor: not-allowed;
+                }
 
-        .google-btn-wrapper {
-          margin-bottom: 1rem;
-          display: flex;
-          justify-content: center;
-          min-height: 44px;
-          align-items: center;
-        }
+                .divider-modern {
+                    display: flex;
+                    align-items: center;
+                    gap: 12px;
+                    color: #4b5575;
+                    font-size: 0.7rem;
+                    margin: 1.5rem 0;
+                }
 
-        /* FIX: Notice banner for Google Cloud Console setup */
-        .google-notice {
-          background: rgba(155, 81, 224, 0.08);
-          border: 1px solid rgba(155, 81, 224, 0.25);
-          border-radius: 12px;
-          padding: 10px 14px;
-          margin-bottom: 1rem;
-          font-size: 0.75rem;
-          color: #9aa4bf;
-          line-height: 1.5;
-          display: none;
-        }
+                .divider-line {
+                    flex: 1;
+                    height: 1px;
+                    background: linear-gradient(
+                        90deg,
+                        transparent,
+                        rgba(155,81,224,0.4),
+                        transparent
+                    );
+                }
 
-        .signup-wrapper {
-          text-align: center;
-          margin-top: 1.5rem;
-          font-size: 0.85rem;
-          color: #9aa4bf;
-        }
+                .google-btn-wrapper {
+                    margin-bottom: 1rem;
+                    display: flex;
+                    justify-content: center;
+                    min-height: 44px;
+                    align-items: center;
+                }
 
-        .signup-link {
-          color: #F2994A;
-          font-weight: 700;
-          text-decoration: none;
-          margin-left: 6px;
-          transition: opacity 0.2s;
-        }
+                .signup-wrapper {
+                    text-align: center;
+                    margin-top: 1.5rem;
+                    font-size: 0.85rem;
+                    color: #9aa4bf;
+                }
 
-        .signup-link:hover {
-          opacity: 0.75;
-        }
+                .signup-link {
+                    color: #F2994A;
+                    font-weight: 700;
+                    text-decoration: none;
+                    margin-left: 6px;
+                    transition: opacity 0.2s;
+                }
 
-        .toast-message {
-          position: fixed;
-          bottom: 2rem;
-          left: 50%;
-          transform: translateX(-50%);
-          background: rgba(10, 10, 25, 0.95);
-          padding: 12px 28px;
-          border-radius: 60px;
-          font-weight: 500;
-          font-size: 0.85rem;
-          border-left: 4px solid #F2994A;
-          color: white;
-          z-index: 9999;
-          white-space: nowrap;
-          box-shadow: 0 8px 32px rgba(0,0,0,0.4);
-          animation: slideUp 0.3s ease;
-        }
+                .signup-link:hover {
+                    opacity: 0.75;
+                }
 
-        .toast-message.error {
-          border-left-color: #ff5e5e;
-        }
+                /* ── Toast ── */
+                .toast-message {
+                    position: fixed;
+                    bottom: 2rem;
+                    left: 50%;
+                    transform: translateX(-50%);
+                    background: rgba(10, 10, 25, 0.95);
+                    padding: 12px 28px;
+                    border-radius: 60px;
+                    font-weight: 500;
+                    font-size: 0.85rem;
+                    border-left: 4px solid #F2994A;
+                    color: white;
+                    z-index: 9999;
+                    white-space: nowrap;
+                    box-shadow: 0 8px 32px rgba(0,0,0,0.4);
+                    animation: slideUp 0.3s ease;
+                }
 
-        @keyframes slideUp {
-          from { opacity: 0; transform: translateX(-50%) translateY(10px); }
-          to { opacity: 1; transform: translateX(-50%) translateY(0); }
-        }
+                .toast-message.error {
+                    border-left-color: #ff5e5e;
+                }
 
-        @media (max-width: 480px) {
-          .crewholic-card {
-            padding: 1.8rem 1.5rem;
-          }
+                @keyframes slideUp {
+                    from { opacity: 0; transform: translateX(-50%) translateY(10px); }
+                    to   { opacity: 1; transform: translateX(-50%) translateY(0);    }
+                }
 
-          .brand-title {
-            font-size: 1.75rem;
-          }
+                @media (max-width: 480px) {
+                    .crewholic-card {
+                        padding: 1.8rem 1.5rem;
+                    }
 
-          .toast-message {
-            white-space: normal;
-            text-align: center;
-            width: 90%;
-            bottom: 1rem;
-          }
-        }
-      `}</style>
+                    .brand-title {
+                        font-size: 1.75rem;
+                    }
+
+                    .toast-message {
+                        white-space: normal;
+                        text-align: center;
+                        width: 90%;
+                        bottom: 1rem;
+                    }
+                }
+            `}</style>
 
             <div className="login-container">
                 <div className="crewholic-card">
+
+                    {/* Brand */}
                     <div className="brand-wrapper">
                         <div className="logo-circle">
                             <img src={logo} alt="CREWHOLIC Logo" />
@@ -590,8 +612,10 @@ function LoginPage() {
                     <p className="form-subheading">Sign in to continue your journey</p>
 
                     <form onSubmit={handleLogin}>
+
+                        {/* Email */}
                         <div className="input-group-modern">
-                            <i className="fas fa-envelope input-icon"></i>
+                            <i className="fas fa-envelope input-icon" />
                             <input
                                 type="email"
                                 className="form-control-modern"
@@ -600,11 +624,13 @@ function LoginPage() {
                                 onChange={(e) => setEmail(e.target.value)}
                                 required
                                 disabled={loading}
+                                autoComplete="email"
                             />
                         </div>
 
+                        {/* Password with show/hide toggle */}
                         <div className="input-group-modern">
-                            <i className="fas fa-lock input-icon"></i>
+                            <i className="fas fa-lock input-icon" />
                             <input
                                 type={showPassword ? "text" : "password"}
                                 className="form-control-modern"
@@ -613,11 +639,32 @@ function LoginPage() {
                                 onChange={(e) => setPassword(e.target.value)}
                                 required
                                 disabled={loading}
+                                autoComplete="current-password"
                             />
-                            <i
-                                className={`fas ${showPassword ? "fa-eye-slash" : "fa-eye"} password-toggle`}
-                                onClick={() => setShowPassword(!showPassword)}
-                            ></i>
+
+                            {/* ── Clean SVG toggle button — no FontAwesome dependency ── */}
+                            <button
+                                type="button"
+                                className="password-toggle-btn"
+                                onClick={() => setShowPassword((prev) => !prev)}
+                                tabIndex={-1}
+                                aria-label={showPassword ? "Hide password" : "Show password"}
+                            >
+                                {showPassword ? (
+                                    /* Eye-slash: password is visible, click to hide */
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                        <path d="M17.94 17.94A10.07 10.07 0 0 1 12 20c-7 0-11-8-11-8a18.45 18.45 0 0 1 5.06-5.94" />
+                                        <path d="M9.9 4.24A9.12 9.12 0 0 1 12 4c7 0 11 8 11 8a18.5 18.5 0 0 1-2.16 3.19" />
+                                        <line x1="1" y1="1" x2="23" y2="23" />
+                                    </svg>
+                                ) : (
+                                    /* Eye: password is hidden, click to show */
+                                    <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round">
+                                        <path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z" />
+                                        <circle cx="12" cy="12" r="3" />
+                                    </svg>
+                                )}
+                            </button>
                         </div>
 
                         <div className="forgot-link-wrapper">
@@ -627,22 +674,38 @@ function LoginPage() {
                         </div>
 
                         <button type="submit" className="login-btn" disabled={loading}>
-                            {loading ? "Signing in..." : "Sign In →"}
+                            {loading ? (
+                                <>
+                                    <svg style={{ width: 16, height: 16, animation: "spin 1s linear infinite" }} viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2">
+                                        <path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83" />
+                                    </svg>
+                                    Signing in...
+                                </>
+                            ) : (
+                                "Sign In →"
+                            )}
                         </button>
+
+                        <style>{`
+                            @keyframes spin {
+                                from { transform: rotate(0deg); }
+                                to   { transform: rotate(360deg); }
+                            }
+                        `}</style>
                     </form>
 
                     <div className="divider-modern">
-                        <span className="divider-line"></span>
+                        <span className="divider-line" />
                         <span>OR</span>
-                        <span className="divider-line"></span>
+                        <span className="divider-line" />
                     </div>
 
                     <div className="google-btn-wrapper">
-                        <div id="googleLoginBtn"></div>
+                        <div id="googleLoginBtn" />
                     </div>
 
                     <div className="signup-wrapper">
-                        Don't have an account?
+                        Don&apos;t have an account?
                         <Link to="/signup" className="signup-link">
                             Sign Up
                         </Link>

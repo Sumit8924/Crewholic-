@@ -104,6 +104,26 @@ const ALL_ITEMS = RENTAL_CATALOG.flatMap(cat =>
     cat.items.map(item => ({ ...item, categoryName: cat.category }))
 );
 
+const AVAILABILITY_STORAGE_KEY = "crewholic_product_availability";
+
+const readAvailabilityFromStorage = (): Record<number, { isAvailable: boolean; reason: string; updatedAt: string }> => {
+    try {
+        const raw = localStorage.getItem(AVAILABILITY_STORAGE_KEY);
+        return raw ? JSON.parse(raw) : {};
+    } catch {
+        return {};
+    }
+};
+
+const saveAvailabilityToStorage = (map: Record<number, { isAvailable: boolean; reason: string; updatedAt: string }>) => {
+    try {
+        localStorage.setItem(AVAILABILITY_STORAGE_KEY, JSON.stringify(map));
+        window.dispatchEvent(new Event("crewholicAvailabilityUpdated"));
+    } catch {
+        // ignore localStorage errors
+    }
+};
+
 // ─── SIDEBAR ─────────────────────────────────────────────────────────────────
 const SIDEBAR_ITEMS = [
     { id: "dashboard", label: "Dashboard", icon: "▦" },
@@ -672,20 +692,27 @@ function AvailabilityTab() {
                     updatedAt: a.updatedAt || "",
                 };
             });
+
+            const savedMap = readAvailabilityFromStorage();
+
             // Fill in defaults for any product not in DB
             ALL_ITEMS.forEach(item => {
                 if (!map[item.id]) {
-                    map[item.id] = { isAvailable: true, reason: "", updatedAt: "" };
+                    map[item.id] = savedMap[item.id] || { isAvailable: true, reason: "", updatedAt: "" };
                 }
             });
+
             setAvailMap(map);
+            saveAvailabilityToStorage(map);
         } catch {
-            // If endpoint doesn't exist, initialize all as available
+            // If endpoint doesn't exist, keep sync using localStorage
+            const savedMap = readAvailabilityFromStorage();
             const map: typeof availMap = {};
             ALL_ITEMS.forEach(item => {
-                map[item.id] = { isAvailable: true, reason: "", updatedAt: "" };
+                map[item.id] = savedMap[item.id] || { isAvailable: true, reason: "", updatedAt: "" };
             });
             setAvailMap(map);
+            saveAvailabilityToStorage(map);
         } finally {
             setLoading(false);
         }
@@ -698,13 +725,23 @@ function AvailabilityTab() {
         const currentReason = availMap[productId]?.reason || "";
         const updatedAt = new Date().toISOString();
 
-        // Optimistic update
-        setAvailMap(prev => ({
-            ...prev,
-            [productId]: { ...prev[productId], isAvailable, updatedAt },
-        }));
+        // Optimistic update + local sync for service page
+        setAvailMap(prev => {
+            const next = {
+                ...prev,
+                [productId]: {
+                    ...prev[productId],
+                    isAvailable,
+                    reason: isAvailable ? "" : currentReason,
+                    updatedAt,
+                },
+            };
+            saveAvailabilityToStorage(next);
+            return next;
+        });
 
         try {
+            saveAvailabilityToStorage(availMap);
             const endpoints = [
                 `/api/product-availability/${productId}`,
                 `/api/rental-availability/${productId}`,
@@ -733,13 +770,18 @@ function AvailabilityTab() {
     };
 
     const updateReason = (productId: number, reason: string) => {
-        setAvailMap(prev => ({ ...prev, [productId]: { ...prev[productId], reason } }));
+        setAvailMap(prev => {
+            const next = { ...prev, [productId]: { ...prev[productId], reason } };
+            saveAvailabilityToStorage(next);
+            return next;
+        });
     };
 
     const saveReason = async (productId: number) => {
         setSaving(productId);
         const { isAvailable, reason } = availMap[productId] || {};
         try {
+            saveAvailabilityToStorage(availMap);
             const endpoints = [
                 `/api/product-availability/${productId}`,
                 `/api/rental-availability/${productId}`,
