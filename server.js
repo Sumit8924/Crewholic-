@@ -16,6 +16,8 @@ const orderRoutes = require("./backend/routes/orderRoutes");
 const generateExcelFile = require("./backend/utils/generateExcel");
 const rentalInquiryRoutes = require("./backend/routes/rentalInquiry");
 const cloudinary = require("./backend/config/cloudinary");
+const productAvailabilityRoutes = require("./backend/routes/productAvailability");
+const authRoutes = require("./backend/routes/auth");
 
 const app = express();
 
@@ -41,6 +43,8 @@ app.use(
     express.static(path.join(__dirname, "backend", "uploads"))
 );
 
+app.use("/api/product-availability", productAvailabilityRoutes);
+app.use("/api/rental-availability", productAvailabilityRoutes);
 app.use("/api/rental-inquiry", rentalInquiryRoutes);
 app.use("/api/export", exportRoutes);
 app.use("/api/orders", orderRoutes);
@@ -112,6 +116,14 @@ function getPermissions(role) {
 
 async function sendEmail(to, subject, html) {
     try {
+        if (!BREVO_API_KEY) {
+            throw new Error("BREVO_API_KEY is missing in .env");
+        }
+
+        if (!BREVO_SENDER_EMAIL) {
+            throw new Error("BREVO_SENDER_EMAIL is missing in .env");
+        }
+
         const sendSmtpEmail = {
             sender: {
                 name: "CREWHOLIC",
@@ -185,6 +197,7 @@ function createToken(user) {
 function cleanUser(user) {
     return {
         _id: user._id,
+        id: user._id,
         name: user.name,
         email: user.email,
         role: user.role,
@@ -282,6 +295,43 @@ async function createMainAdmin() {
 
 app.get("/", (req, res) => {
     res.send("🚀 Backend Running Successfully");
+});
+
+app.get("/api/check-env", (req, res) => {
+    res.json({
+        mongo: !!process.env.MONGO_URI,
+        jwt: !!process.env.JWT_SECRET,
+        brevoApiKey: !!process.env.BREVO_API_KEY,
+        brevoSenderEmail: process.env.BREVO_SENDER_EMAIL || null,
+        googleClientId: !!process.env.GOOGLE_CLIENT_ID,
+    });
+});
+
+app.get("/api/test-email", async (req, res) => {
+    try {
+        const result = await sendEmail(
+            BREVO_SENDER_EMAIL,
+            "✅ CREWHOLIC Test Email",
+            `
+            <div style="font-family: Arial; padding: 20px;">
+                <h1>Email Working Successfully 🚀</h1>
+                <p>Brevo API configured correctly.</p>
+            </div>
+            `
+        );
+
+        res.json({
+            success: true,
+            msg: "Email Sent",
+            result,
+        });
+    } catch (err) {
+        res.status(500).json({
+            success: false,
+            msg: "Email Failed",
+            error: err.response?.body || err.message,
+        });
+    }
 });
 
 app.get("/api/me", verifyToken, async (req, res) => {
@@ -556,6 +606,7 @@ app.patch(
         }
     }
 );
+
 app.get("/api/test-cloudinary", async (req, res) => {
     try {
         const result = await cloudinary.api.ping();
@@ -598,7 +649,7 @@ app.post("/api/service-inquiry", async (req, res) => {
         });
 
         await sendEmail(
-            "officialcrewholic@gmail.com",
+            BREVO_SENDER_EMAIL,
             `📩 New Service Inquiry - ${service}`,
             `
             <div style="font-family: Arial, sans-serif; padding: 20px;">
@@ -656,30 +707,6 @@ app.get("/api/generate-excel", async (req, res) => {
     });
 });
 
-app.get("/api/test-email", async (req, res) => {
-    try {
-        const result = await sendEmail(
-            "srout2023@gift.edu.in",
-            "✅ CREWHOLIC Test Email",
-            `
-            <div style="font-family: Arial; padding: 20px;">
-                <h1>Email Working Successfully 🚀</h1>
-                <p>Brevo API configured correctly.</p>
-            </div>
-            `
-        );
-
-        res.json({
-            msg: "Email Sent",
-            result,
-        });
-    } catch (err) {
-        res.status(500).json({
-            msg: "Email Failed",
-            error: err.response?.body || err.message,
-        });
-    }
-});
 app.get("/api/service-inquiry", async (req, res) => {
     try {
         const inquiries = await Order.find({
@@ -902,6 +929,198 @@ app.post("/api/register", async (req, res) => {
     }
 });
 
+app.post("/api/forgot-password", async (req, res) => {
+    try {
+        const { email } = req.body;
+
+        if (!email) {
+            return res.status(400).json({
+                success: false,
+                message: "Email is required",
+            });
+        }
+
+        const user = await User.findOne({ email });
+
+        if (!user) {
+            return res.status(404).json({
+                success: false,
+                message: "No account found with this email address",
+            });
+        }
+
+        const otp = Math.floor(100000 + Math.random() * 900000);
+
+        otpStore[email] = {
+            otp,
+            expires: Date.now() + 10 * 60 * 1000,
+        };
+
+        console.log("=================================");
+        console.log("CREWHOLIC PASSWORD RESET OTP");
+        console.log("EMAIL:", email);
+        console.log("OTP:", otp);
+        console.log("=================================");
+
+        await sendEmail(
+            email,
+            "🔐 CREWHOLIC Password Reset OTP",
+            `
+            <div style="font-family: Arial; padding: 20px;">
+                <h2>Password Reset OTP</h2>
+                <p>Your OTP is:</p>
+                <h1 style="letter-spacing: 5px; color: #F2994A;">${otp}</h1>
+                <p>This OTP is valid for 10 minutes.</p>
+            </div>
+            `
+        );
+
+        res.json({
+            success: true,
+            message: "OTP sent to your email",
+        });
+    } catch (err) {
+        console.log("Forgot password email error:", err.response?.body || err.message);
+
+        res.status(500).json({
+            success: false,
+            message: "Failed to send OTP",
+            error: err.response?.body || err.message,
+        });
+    }
+});
+
+app.post("/api/resend-otp", async (req, res) => {
+    try {
+        const { email } = req.body;
+
+        if (!email) {
+            return res.status(400).json({
+                success: false,
+                message: "Email is required",
+            });
+        }
+
+        const user = await User.findOne({ email });
+
+        if (!user) {
+            return res.status(404).json({
+                success: false,
+                message: "No account found with this email address",
+            });
+        }
+
+        const otp = Math.floor(100000 + Math.random() * 900000);
+
+        otpStore[email] = {
+            otp,
+            expires: Date.now() + 10 * 60 * 1000,
+        };
+
+        console.log("=================================");
+        console.log("CREWHOLIC RESEND PASSWORD RESET OTP");
+        console.log("EMAIL:", email);
+        console.log("OTP:", otp);
+        console.log("=================================");
+
+        await sendEmail(
+            email,
+            "🔐 CREWHOLIC Password Reset OTP",
+            `
+            <div style="font-family: Arial; padding: 20px;">
+                <h2>Password Reset OTP</h2>
+                <p>Your OTP is:</p>
+                <h1 style="letter-spacing: 5px; color: #F2994A;">${otp}</h1>
+                <p>This OTP is valid for 10 minutes.</p>
+            </div>
+            `
+        );
+
+        res.json({
+            success: true,
+            message: "New OTP sent to your email",
+        });
+    } catch (err) {
+        console.log("Resend OTP email error:", err.response?.body || err.message);
+
+        res.status(500).json({
+            success: false,
+            message: "Failed to resend OTP",
+            error: err.response?.body || err.message,
+        });
+    }
+});
+
+app.post("/api/reset-password", async (req, res) => {
+    try {
+        const { email, otp, newPassword } = req.body;
+
+        if (!email || !otp || !newPassword) {
+            return res.status(400).json({
+                success: false,
+                message: "Email, OTP and new password are required",
+            });
+        }
+
+        if (newPassword.length < 6) {
+            return res.status(400).json({
+                success: false,
+                message: "Password must be at least 6 characters",
+            });
+        }
+
+        const record = otpStore[email];
+
+        if (!record) {
+            return res.status(400).json({
+                success: false,
+                message: "OTP expired or not found. Please request a new OTP.",
+            });
+        }
+
+        if (Date.now() > record.expires) {
+            delete otpStore[email];
+
+            return res.status(400).json({
+                success: false,
+                message: "OTP expired. Please request a new OTP.",
+            });
+        }
+
+        if (String(record.otp) !== String(otp)) {
+            return res.status(400).json({
+                success: false,
+                message: "Invalid OTP",
+            });
+        }
+
+        const hashedPassword = await bcrypt.hash(newPassword, 10);
+
+        await User.findOneAndUpdate(
+            { email },
+            {
+                password: hashedPassword,
+                authProvider: "local",
+                isActive: true,
+            }
+        );
+
+        delete otpStore[email];
+
+        res.json({
+            success: true,
+            message: "Password reset successful",
+        });
+    } catch (err) {
+        res.status(500).json({
+            success: false,
+            message: "Failed to reset password",
+            error: err.message,
+        });
+    }
+});
+
+
 app.post("/api/auth/signup", async (req, res) => {
     try {
         const { fullName, name, email, password, emailVerified } = req.body;
@@ -1038,7 +1257,7 @@ app.post("/api/login", async (req, res) => {
             return res.status(404).json({ msg: "User not found" });
         }
 
-        if (!user.isActive) {
+        if (user.isActive === false) {
             return res.status(403).json({ msg: "Your account is disabled" });
         }
 
