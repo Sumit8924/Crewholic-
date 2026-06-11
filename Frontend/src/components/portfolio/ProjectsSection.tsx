@@ -1,3 +1,4 @@
+/* eslint-disable prettier/prettier */
 import { useRef } from "react";
 import { motion, useScroll, useTransform } from "framer-motion";
 import { LiveProjectButton } from "./LiveProjectButton";
@@ -14,36 +15,27 @@ type Project = {
 const PROJECTS: Project[] = [
   {
     n: "01",
-    name: "Nextlevel Studio",
-    category: "Client",
-    col1a:
-      "https://images.higgs.ai/?default=1&output=webp&url=https%3A%2F%2Fd8j0ntlcm91z4.cloudfront.net%2Fuser_38xzZboKViGWJOttwIXH07lWA1P%2Fhf_20260412_055344_5eff02e0-87a5-41ce-b64f-eb08da8f33db.png&w=1280&q=85",
-    col1b:
-      "https://images.higgs.ai/?default=1&output=webp&url=https%3A%2F%2Fd8j0ntlcm91z4.cloudfront.net%2Fuser_38xzZboKViGWJOttwIXH07lWA1P%2Fhf_20260412_055431_11d841fd-8b41-46a5-82e4-b04f2407a7d8.png&w=1280&q=85",
-    col2:
-      "https://images.higgs.ai/?default=1&output=webp&url=https%3A%2F%2Fd8j0ntlcm91z4.cloudfront.net%2Fuser_38xzZboKViGWJOttwIXH07lWA1P%2Fhf_20260412_055451_e317bf2d-28d4-48cc-86b0-6f72f25b6327.png&w=1280&q=85",
+    name: "CREWHOLIC STUDIOS",
+    category: "CLIENT",
+    col1a: "https://images.pexels.com/photos/3183197/pexels-photo-3183197.jpeg?auto=compress&cs=tinysrgb&w=800",
+    col1b: "https://images.pexels.com/photos/3183150/pexels-photo-3183150.jpeg?auto=compress&cs=tinysrgb&w=800",
+    col2: "https://images.pexels.com/photos/3183176/pexels-photo-3183176.jpeg?auto=compress&cs=tinysrgb&w=1200",
   },
   {
     n: "02",
-    name: "Aura Brand Identity",
-    category: "Personal",
-    col1a:
-      "https://images.higgs.ai/?default=1&output=webp&url=https%3A%2F%2Fd8j0ntlcm91z4.cloudfront.net%2Fuser_38xzZboKViGWJOttwIXH07lWA1P%2Fhf_20260412_055654_911201c5-36d9-4bc6-bac7-331adfce159f.png&w=1280&q=85",
-    col1b:
-      "https://images.higgs.ai/?default=1&output=webp&url=https%3A%2F%2Fd8j0ntlcm91z4.cloudfront.net%2Fuser_38xzZboKViGWJOttwIXH07lWA1P%2Fhf_20260412_055723_5ceda0b8-d9c2-4665-b2e3-83ba19ba76d1.png&w=1280&q=85",
-    col2:
-      "https://images.higgs.ai/?default=1&output=webp&url=https%3A%2F%2Fd8j0ntlcm91z4.cloudfront.net%2Fuser_38xzZboKViGWJOttwIXH07lWA1P%2Fhf_20260412_055753_adc5dcbd-a8e6-49c0-b43a-9b030d835cea.png&w=1280&q=85",
+    name: "DIGITAL EXPERIENCES",
+    category: "PERSONAL",
+    col1a: "https://images.pexels.com/photos/3184418/pexels-photo-3184418.jpeg?auto=compress&cs=tinysrgb&w=800",
+    col1b: "https://images.pexels.com/photos/3184423/pexels-photo-3184423.jpeg?auto=compress&cs=tinysrgb&w=800",
+    col2: "https://images.pexels.com/photos/3184398/pexels-photo-3184398.jpeg?auto=compress&cs=tinysrgb&w=1200",
   },
   {
     n: "03",
-    name: "Solaris Digital",
-    category: "Client",
-    col1a:
-      "https://images.higgs.ai/?default=1&output=webp&url=https%3A%2F%2Fd8j0ntlcm91z4.cloudfront.net%2Fuser_38xzZboKViGWJOttwIXH07lWA1P%2Fhf_20260412_055759_963cfb0b-4bd1-4b0f-9d0a-09bd6cf95b2f.png&w=1280&q=85",
-    col1b:
-      "https://images.higgs.ai/?default=1&output=webp&url=https%3A%2F%2Fd8j0ntlcm91z4.cloudfront.net%2Fuser_38xzZboKViGWJOttwIXH07lWA1P%2Fhf_20260412_060108_438f781a-9846-4dcc-89ab-c4e6cb830f5b.png&w=1280&q=85",
-    col2:
-      "https://images.higgs.ai/?default=1&output=webp&url=https%3A%2F%2Fd8j0ntlcm91z4.cloudfront.net%2Fuser_38xzZboKViGWJOttwIXH07lWA1P%2Fhf_20260412_055818_9d062121-ad7e-46b9-999a-1a6a692ef1ee.png&w=1280&q=85",
+    name: "MARKET DOMINANCE",
+    category: "CLIENT",
+    col1a: "https://images.pexels.com/photos/3183154/pexels-photo-3183154.jpeg?auto=compress&cs=tinysrgb&w=800",
+    col1b: "https://images.pexels.com/photos/3183162/pexels-photo-3183162.jpeg?auto=compress&cs=tinysrgb&w=800",
+    col2: "https://images.pexels.com/photos/3183174/pexels-photo-3183174.jpeg?auto=compress&cs=tinysrgb&w=1200",
   },
 ];
 
@@ -65,58 +57,64 @@ function Card({
   const scale = useTransform(progress, range, [1, targetScale]);
   return (
     <div
-      className="sticky top-24 md:top-32 h-[85vh] flex items-start justify-center"
-      style={{ top: `${index * 28 + 96}px` }}
+      className="sticky top-20 sm:top-24 md:top-32 h-[90vh] sm:h-[85vh] flex items-start justify-center"
+      style={{ top: `${Math.min(index * 20 + 80, 120)}px` }}
     >
       <motion.div
         style={{ scale, backgroundColor: "#0C0C0C" }}
-        className="w-full rounded-[40px] sm:rounded-[50px] md:rounded-[60px] border-2 border-[#D7E2EA] p-4 sm:p-6 md:p-8 flex flex-col gap-4 sm:gap-6 md:gap-8"
+        className="w-full rounded-[30px] sm:rounded-[40px] md:rounded-[50px] lg:rounded-[60px] border-2 border-[#D7E2EA] p-3 sm:p-4 md:p-6 lg:p-8 flex flex-col gap-3 sm:gap-4 md:gap-6 lg:gap-8"
       >
-        <div className="flex items-center gap-4 sm:gap-6 md:gap-8 flex-wrap">
+        {/* Header Section - Improved for mobile */}
+        <div className="flex flex-col sm:flex-row items-start sm:items-center gap-3 sm:gap-4 md:gap-6 lg:gap-8">
           <span
             className="font-black leading-none text-[#D7E2EA]"
-            style={{ fontSize: "clamp(3rem, 10vw, 140px)" }}
+            style={{ fontSize: "clamp(2.5rem, 8vw, 140px)" }}
           >
             {project.n}
           </span>
-          <div className="flex flex-col flex-1 min-w-0">
+          <div className="flex flex-col sm:flex-row sm:items-center flex-wrap gap-2 sm:gap-4 flex-1 min-w-0 w-full">
             <span
-              className="font-light uppercase tracking-widest text-[#D7E2EA]/70"
-              style={{ fontSize: "clamp(0.75rem, 1.2vw, 1rem)" }}
+              className="font-light uppercase tracking-wider sm:tracking-widest text-[#D7E2EA]/70 whitespace-nowrap"
+              style={{ fontSize: "clamp(0.7rem, 2vw, 1rem)" }}
             >
               {project.category}
             </span>
             <h3
-              className="font-medium uppercase text-[#D7E2EA] leading-tight"
-              style={{ fontSize: "clamp(1.25rem, 3vw, 2.5rem)" }}
+              className="font-medium uppercase text-[#D7E2EA] leading-tight break-words"
+              style={{ fontSize: "clamp(1rem, 3vw, 2.5rem)" }}
             >
               {project.name}
             </h3>
           </div>
-          <LiveProjectButton />
+          <div className="sm:ml-auto">
+            <LiveProjectButton />
+          </div>
         </div>
-        <div className="grid grid-cols-5 gap-3 sm:gap-4 md:gap-6">
-          <div className="col-span-2 flex flex-col gap-3 sm:gap-4 md:gap-6">
+
+        {/* Images Grid - Responsive gap and rounded corners */}
+        <div className="grid grid-cols-1 sm:grid-cols-5 gap-2 sm:gap-3 md:gap-4 lg:gap-6">
+          <div className="sm:col-span-2 flex flex-col gap-2 sm:gap-3 md:gap-4 lg:gap-6">
             <img
               src={project.col1a}
-              alt=""
-              className="w-full object-cover rounded-[40px] sm:rounded-[50px] md:rounded-[60px]"
-              style={{ height: "clamp(130px, 16vw, 230px)" }}
+              alt={`${project.name} image 1`}
+              className="w-full object-cover rounded-[20px] sm:rounded-[30px] md:rounded-[40px] lg:rounded-[50px]"
+              style={{ height: "clamp(120px, 16vw, 230px)" }}
               loading="lazy"
             />
             <img
               src={project.col1b}
-              alt=""
-              className="w-full object-cover rounded-[40px] sm:rounded-[50px] md:rounded-[60px]"
-              style={{ height: "clamp(160px, 22vw, 340px)" }}
+              alt={`${project.name} image 2`}
+              className="w-full object-cover rounded-[20px] sm:rounded-[30px] md:rounded-[40px] lg:rounded-[50px]"
+              style={{ height: "clamp(140px, 22vw, 340px)" }}
               loading="lazy"
             />
           </div>
-          <div className="col-span-3">
+          <div className="sm:col-span-3">
             <img
               src={project.col2}
-              alt=""
-              className="w-full h-full object-cover rounded-[40px] sm:rounded-[50px] md:rounded-[60px]"
+              alt={`${project.name} main image`}
+              className="w-full h-full object-cover rounded-[20px] sm:rounded-[30px] md:rounded-[40px] lg:rounded-[50px]"
+              style={{ minHeight: "clamp(180px, 30vw, 400px)" }}
               loading="lazy"
             />
           </div>
@@ -133,20 +131,21 @@ export function ProjectsSection() {
     offset: ["start start", "end end"],
   });
   const total = PROJECTS.length;
+  
   return (
     <section
       id="projects"
       ref={ref}
-      className="relative z-10 -mt-10 sm:-mt-12 md:-mt-14 rounded-t-[40px] sm:rounded-t-[50px] md:rounded-t-[60px] px-5 sm:px-8 md:px-10 pt-20 sm:pt-24 md:pt-32 pb-32"
+      className="relative z-10 -mt-8 sm:-mt-10 md:-mt-12 lg:-mt-14 rounded-t-[30px] sm:rounded-t-[40px] md:rounded-t-[50px] lg:rounded-t-[60px] px-3 sm:px-5 md:px-8 lg:px-10 pt-16 sm:pt-20 md:pt-24 lg:pt-32 pb-20 sm:pb-24 md:pb-28 lg:pb-32"
       style={{ backgroundColor: "#0C0C0C" }}
     >
       <h2
-        className="hero-heading font-black uppercase text-center leading-none tracking-tight mb-16 sm:mb-20 md:mb-24"
-        style={{ fontSize: "clamp(3rem, 12vw, 160px)" }}
+        className="hero-heading font-black uppercase text-center leading-none tracking-tight mb-12 sm:mb-16 md:mb-20 lg:mb-24 px-4 break-words"
+        style={{ fontSize: "clamp(2.5rem, 10vw, 160px)" }}
       >
         Portfolio
       </h2>
-      <div className="max-w-6xl mx-auto">
+      <div className="max-w-6xl mx-auto px-2 sm:px-0">
         {PROJECTS.map((p, i) => {
           const targetScale = 1 - (total - 1 - i) * 0.03;
           const start = i / total;

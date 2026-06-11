@@ -81,7 +81,7 @@ function FadeIn({ children, delay = 0, y = 20, className = "", as: Component = "
 }
 
 // ─── CONTACT BUTTON ─────────────────────────────────────────────────────────
-function ContactButton({ label = "CONTACT ME", href = "/contact", small = false }: { label?: string; href?: string; small?: boolean }) {
+function ContactButton({ label = "CONTACT US", href = "/contact", small = false }: { label?: string; href?: string; small?: boolean }) {
     return (
         <motion.a
             href={href}

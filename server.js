@@ -18,6 +18,7 @@ const rentalInquiryRoutes = require("./backend/routes/rentalInquiry");
 const cloudinary = require("./backend/config/cloudinary");
 const productAvailabilityRoutes = require("./backend/routes/productAvailability");
 const authRoutes = require("./backend/routes/auth");
+// contactRoute = require("./backend/routes/contact");
 
 const app = express();
 
@@ -42,7 +43,7 @@ app.use(
     "/uploads",
     express.static(path.join(__dirname, "backend", "uploads"))
 );
-
+//app.use("/api/contact", contactRoute);
 app.use("/api/product-availability", productAvailabilityRoutes);
 app.use("/api/rental-availability", productAvailabilityRoutes);
 app.use("/api/rental-inquiry", rentalInquiryRoutes);
@@ -636,6 +637,8 @@ app.post("/api/service-inquiry", async (req, res) => {
         }
 
         const order = await Order.create({
+            userId: req.user?.id || null,
+            orderId: `ORD-${Date.now()}`,
             service,
             serviceType: service,
             amount: 0,
@@ -1346,8 +1349,8 @@ app.post("/api/contact", async (req, res) => {
         );
 
         await sendEmail(
-            email,
-            "✅ We've Received Your Message!",
+            ADMIN_EMAIL,
+            `📬 New Contact Message from ${name}`,
             `
             <div style="font-family: Arial, sans-serif; background: #0a0a2a; padding: 30px; color: #fff;">
                 <div style="max-width: 600px; margin: auto; background: #111328; border-radius: 20px; padding: 30px; text-align: center;">
@@ -1391,6 +1394,49 @@ app.get("/api/admin/analytics", verifyAdmin, async (req, res) => {
     } catch (err) {
         res.status(500).json({
             msg: "Error fetching analytics",
+            error: err.message,
+        });
+    }
+});
+app.get("/api/orders/my-orders", verifyToken, async (req, res) => {
+    try {
+        const orders = await Order.find({
+            $or: [
+                { userId: req.user.id },
+                { customerEmail: req.user.email }
+            ]
+        }).sort({ createdAt: -1 });
+
+        const formattedOrders = orders.map((order) => ({
+            id: order._id,
+            orderNumber: order.orderId || `ORD-${String(order._id).slice(-6).toUpperCase()}`,
+            date: order.createdAt,
+            status: order.status || "pending",
+            items: [
+                {
+                    id: 1,
+                    name: order.service || order.serviceType || "Service Order",
+                    quantity: 1,
+                    price: order.amount || 0,
+                    image: "🛠️",
+                },
+            ],
+            totalAmount: order.amount || 0,
+            paymentMethod: "Pending",
+            shippingAddress: {
+                name: order.customerName || "Customer",
+                address: order.address || "Not provided",
+                city: "Bhubaneswar",
+                state: "Odisha",
+                pincode: "000000",
+                phone: order.customerPhone || "Not provided",
+            },
+        }));
+
+        res.json({ orders: formattedOrders });
+    } catch (err) {
+        res.status(500).json({
+            msg: "Failed to fetch user orders",
             error: err.message,
         });
     }

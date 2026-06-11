@@ -9,26 +9,19 @@ export const Route = createFileRoute("/contact")({
 
 // ─── DATA ───────────────────────────────────────────────────────────────────
 const contactInfo = [
-    { id: 1, title: "Email Us", value: "hello@crewholic.com", icon: "📧", accent: "#9B51E0", description: "Get a response within 24 hours" },
-    { id: 2, title: "Call Us", value: "+1 (555) 123-4567", icon: "📞", accent: "#F2994A", description: "Mon-Fri, 9AM - 6PM PST" },
-    { id: 3, title: "Visit Us", value: "San Francisco, CA", icon: "📍", accent: "#4ecdc4", description: "By appointment only" },
+    { id: 1, title: "Email Us", value: "officialcrewholic@gmail.com", icon: "📧", accent: "#9B51E0", description: "Get a response within 24 hours" },
+    { id: 2, title: "Call Us", value: "+91 7381116465", icon: "📞", accent: "#F2994A", description: "Mon-Fri, 9AM - 6PM PST" },
+    { id: 3, title: "Visit Us", value: "Jatani Gate, Bhubaneswar", icon: "📍", accent: "#4ecdc4", description: "By appointment only" },
     { id: 4, title: "Follow Us", value: "@crewholic", icon: "🌐", accent: "#ff8c42", description: "Connect on social media" },
 ];
 
 const socialLinks = [
-    { name: "LinkedIn", icon: "fab fa-linkedin-in", url: "#", color: "#0077B5" },
-    { name: "Instagram", icon: "fab fa-instagram", url: "#", color: "#E4405F" },
-    { name: "Twitter", icon: "fab fa-twitter", url: "#", color: "#1DA1F2" },
-    { name: "Behance", icon: "fab fa-behance", url: "#", color: "#1769FF" },
-    { name: "GitHub", icon: "fab fa-github", url: "#", color: "#fff" },
-    { name: "Dribbble", icon: "fab fa-dribbble", url: "#", color: "#EA4C89" },
+    { name: "Instagram", icon: "fab fa-instagram", url: "https://www.instagram.com/crewholic?igsh=MWs5am9heW1rdWhpNw==", color: "#E4405F" },
+    { name: "Youtube", icon: "fab fa-youtube", url: "https://www.youtube.com/@crewholicstudios", color: "#FF0000" },
 ];
 
 const locations = [
-    { city: "San Francisco", address: "123 Market Street, Suite 400", country: "USA", flag: "🇺🇸" },
-    { city: "New York", address: "456 Broadway, Floor 12", country: "USA", flag: "🇺🇸" },
-    { city: "London", address: "789 Oxford Street", country: "UK", flag: "🇬🇧" },
-    { city: "Singapore", address: "Marina Bay Financial Centre", country: "Singapore", flag: "🇸🇬" },
+    { city: "Jatani Gate , Bhubaneswar", address: "Near Petrol Pump", country: "India", flag: "🇺🇸" },
 ];
 
 const navItems = [

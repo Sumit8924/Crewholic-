@@ -79,6 +79,10 @@ export function HeroSection() {
     window.location.href = href;
   };
 
+  const handleContactClick = () => {
+    window.location.href = "/contact";
+  };
+
   return (
     <section className="relative h-screen flex flex-col" style={{ overflowX: "clip" }}>
       <button
@@ -207,12 +211,12 @@ export function HeroSection() {
       </FadeIn>
 
       <div className="flex-1 flex flex-col justify-between relative">
-        <div className="overflow-hidden mt-6 sm:mt-4 md:-mt-5">
+        <div className="overflow-hidden mt-16 sm:mt-20 md:mt-8">
           <FadeIn delay={0.15} y={40}>
             <h1
               className="hero-heading font-black uppercase tracking-tight leading-none w-full text-center px-4"
               style={{
-                fontSize: "clamp(3.5rem, 12vw, 17.5vw)",
+                fontSize: "clamp(4rem, 15vw, 12rem)", // Larger on mobile, capped on desktop
                 wordBreak: "break-word",
                 whiteSpace: "normal",
               }}
@@ -225,10 +229,10 @@ export function HeroSection() {
         <FadeIn
           delay={0.6}
           y={30}
-          className="absolute left-1/2 -translate-x-1/2 z-10 w-[180px] sm:w-[280px] md:w-[360px] lg:w-[440px] xl:w-[520px] top-1/2 -translate-y-1/2 sm:top-auto sm:translate-y-0 sm:bottom-0"
+          className="absolute left-1/2 -translate-x-1/2 z-10 w-[260px] sm:w-[300px] md:w-[360px] lg:w-[440px] xl:w-[520px] top-1/2 -translate-y-1/2 sm:top-auto sm:translate-y-0 sm:bottom-0"
         >
           <Magnet padding={150} strength={3} activeTransition="transform 0.3s ease-out" inactiveTransition="transform 0.6s ease-in-out">
-            <img src={skr} alt="Creholic logo" className="w-full h-auto" />
+            <img src={skr} alt="Crewholic logo" className="w-full h-auto" />
           </Magnet>
         </FadeIn>
 
@@ -243,7 +247,9 @@ export function HeroSection() {
           </FadeIn>
 
           <FadeIn delay={0.5} y={20}>
-            <ContactButton />
+            <div onClick={handleContactClick}>
+              <ContactButton />
+            </div>
           </FadeIn>
         </div>
       </div>

@@ -1,3 +1,4 @@
+/* eslint-disable prettier/prettier */
 export function ContactButton() {
   return (
     <button
@@ -12,7 +13,7 @@ export function ContactButton() {
         outlineOffset: "-3px",
       }}
     >
-      Contact Me
+      Contact Us
     </button>
   );
 }
