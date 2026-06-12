@@ -64,7 +64,7 @@ function SignupPage() {
         try {
             setEmailOTPLoading(true);
 
-            const res = await fetch(`${API_BASE_URL}/otp/send-email`, {
+            const res = await fetch(`${API_BASE_URL}/api/otp/send-email`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -96,7 +96,7 @@ function SignupPage() {
         }
 
         try {
-            const res = await fetch(`${API_BASE_URL}/otp/verify-email`, {
+            const res = await fetch(`${API_BASE_URL}/api/otp/verify-email`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
@@ -153,7 +153,7 @@ function SignupPage() {
         try {
             setLoading(true);
 
-            const res = await fetch(`${API_BASE_URL}/auth/signup`, {
+            const res = await fetch(`${API_BASE_URL}/api/auth/signup`, {
                 method: "POST",
                 headers: {
                     "Content-Type": "application/json",
