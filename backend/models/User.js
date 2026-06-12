@@ -37,6 +37,10 @@ const userSchema = new mongoose.Schema(
                 "rental_admin",
                 "web_admin",
                 "user",
+
+                // old roles kept only so old database users do not break
+                "admin",
+                "client",
             ],
             default: "user",
         },
@@ -44,6 +48,11 @@ const userSchema = new mongoose.Schema(
         isActive: {
             type: Boolean,
             default: true,
+        },
+
+        permissions: {
+            type: [String],
+            default: [],
         },
     },
     { timestamps: true }
