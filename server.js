@@ -17,6 +17,7 @@ const generateExcelFile = require("./backend/utils/generateExcel");
 const rentalInquiryRoutes = require("./backend/routes/rentalInquiry");
 const cloudinary = require("./backend/config/cloudinary");
 const productAvailabilityRoutes = require("./backend/routes/productAvailability");
+const serviceInquiryRoutes = require("./backend/routes/serviceInquiry");
 
 // contactRoute = require("./backend/routes/contact");
 
@@ -49,6 +50,9 @@ app.use("/api/rental-availability", productAvailabilityRoutes);
 app.use("/api/rental-inquiry", rentalInquiryRoutes);
 app.use("/api/export", exportRoutes);
 app.use("/api/orders", orderRoutes);
+app.use("/api/service-inquiry", serviceInquiryRoutes);
+app.use("/api/service-inquiries", serviceInquiryRoutes);
+
 
 const PORT = process.env.PORT || 5000;
 const JWT_SECRET = process.env.JWT_SECRET || "crewholic_secret";

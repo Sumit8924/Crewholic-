@@ -9,7 +9,7 @@ export const Route = createFileRoute("/signup")({
 });
 
 const API_BASE_URL =
-    import.meta.env.VITE_API_URL || "https://crewholic-0jht.onrender.com";
+    import.meta.env.VITE_API_URL || "https://crewholic-1-if9w.onrender.com";
 
 function SignupPage() {
     const navigate = useNavigate();
