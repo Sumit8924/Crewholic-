@@ -120,21 +120,32 @@ function RootShell({ children }: { children: React.ReactNode }) {
 
 function RootComponent() {
   const { queryClient } = Route.useRouteContext();
-  // Check if splash screen has already been shown in this session
-  const [hasSeenSplash, setHasSeenSplash] = useState(() => {
-    // Check sessionStorage on initial load
-    if (typeof window !== "undefined") {
-      return sessionStorage.getItem("splashShown") === "true";
+
+  const [mounted, setMounted] = useState(false);
+  const [showSplash, setShowSplash] = useState(false);
+
+  useEffect(() => {
+    setMounted(true);
+
+    const alreadyShown = sessionStorage.getItem("splashShown") === "true";
+
+    if (!alreadyShown) {
+      setShowSplash(true);
     }
-    return false;
-  });
-  const [showSplash, setShowSplash] = useState(!hasSeenSplash);
+  }, []);
 
   const handleSplashComplete = () => {
     setShowSplash(false);
-    // Mark that splash has been shown for this session
     sessionStorage.setItem("splashShown", "true");
   };
+
+  if (!mounted) {
+    return (
+      <QueryClientProvider client={queryClient}>
+        <Outlet />
+      </QueryClientProvider>
+    );
+  }
 
   return (
     <QueryClientProvider client={queryClient}>

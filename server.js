@@ -17,7 +17,7 @@ const generateExcelFile = require("./backend/utils/generateExcel");
 const rentalInquiryRoutes = require("./backend/routes/rentalInquiry");
 const cloudinary = require("./backend/config/cloudinary");
 const productAvailabilityRoutes = require("./backend/routes/productAvailability");
-const authRoutes = require("./backend/routes/auth");
+
 // contactRoute = require("./backend/routes/contact");
 
 const app = express();

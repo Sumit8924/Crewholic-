@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 /* eslint-disable prettier/prettier */
 import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
 import { useState, useEffect } from "react";
@@ -8,7 +9,7 @@ export const Route = createFileRoute("/signup")({
 });
 
 const API_BASE_URL =
-    import.meta.env.VITE_API_URL || "https://crewholic-0jht.onrender.com/api";
+    import.meta.env.VITE_API_URL || "http://localhost:5000/api";
 
 function SignupPage() {
     const navigate = useNavigate();
@@ -29,6 +30,18 @@ function SignupPage() {
 
     const [passwordError, setPasswordError] = useState("");
     const [agreeTerms, setAgreeTerms] = useState(false);
+    const [particles, setParticles] = useState<any[]>([]);
+
+    useEffect(() => {
+        const generated = Array.from({ length: 50 }).map(() => ({
+            size: Math.random() * 5 + 2,
+            left: Math.random() * 100,
+            duration: Math.random() * 10 + 5,
+            delay: Math.random() * 5,
+        }));
+
+        setParticles(generated);
+    }, []);
 
     const togglePassword = () => setShowPassword(!showPassword);
     const toggleConfirmPassword = () => setShowConfirmPassword(!showConfirmPassword);
@@ -154,25 +167,24 @@ function SignupPage() {
             });
 
             const data = await res.json();
-
             if (!res.ok) {
-                alert(data.message || "Signup failed");
+                console.error("Signup failed:", data);
+                alert(data.error || data.message || "Signup failed");
                 return;
             }
-
             // Store user info for welcome message
-            localStorage.setItem("token", data.token || "dummy-token");
-            localStorage.setItem("user", JSON.stringify({ name: fullName, email }));
+            localStorage.setItem("token", data.token);
+            localStorage.setItem("user", JSON.stringify(data.user));
 
             // Navigate to home page with welcome message
             navigate({
-            to: "/",
-            search: {
-                welcome: "true",
-                name: fullName,
-            },
+                to: "/",
+                search: {
+                    welcome: "true",
+                    name: fullName,
+                },
             });
-                    } catch (error) {
+        } catch (error) {
             console.error(error);
             alert("Something went wrong while creating account");
         } finally {
@@ -651,28 +663,20 @@ function SignupPage() {
                     animation: spin 1s linear infinite;
                 }
             `}</style>
-
             <div className="particles-signup" id="particles">
-                {Array.from({ length: 50 }).map((_, i) => {
-                    const size = Math.random() * 5 + 2;
-                    const left = Math.random() * 100;
-                    const duration = Math.random() * 10 + 5;
-                    const delay = Math.random() * 5;
-
-                    return (
-                        <div
-                            key={i}
-                            className="particle-signup"
-                            style={{
-                                width: `${size}px`,
-                                height: `${size}px`,
-                                left: `${left}%`,
-                                animationDuration: `${duration}s`,
-                                animationDelay: `${delay}s`,
-                            }}
-                        />
-                    );
-                })}
+                {particles.map((particle, i) => (
+                    <div
+                        key={i}
+                        className="particle-signup"
+                        style={{
+                            width: `${particle.size}px`,
+                            height: `${particle.size}px`,
+                            left: `${particle.left}%`,
+                            animationDuration: `${particle.duration}s`,
+                            animationDelay: `${particle.delay}s`,
+                        }}
+                    />
+                ))}
             </div>
 
             <div className="signup-container">
@@ -807,12 +811,12 @@ function SignupPage() {
                         {passwordError && <div className="error-message">{passwordError}</div>}
 
                         <div className="terms-wrapper">
-                            <input 
-                                type="checkbox" 
-                                id="terms" 
+                            <input
+                                type="checkbox"
+                                id="terms"
                                 checked={agreeTerms}
                                 onChange={(e) => setAgreeTerms(e.target.checked)}
-                                required 
+                                required
                             />
                             <label htmlFor="terms">
                                 I agree to the <a href="/terms">Terms of Service</a> and{" "}
