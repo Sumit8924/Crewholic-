@@ -9,15 +9,51 @@ export const Route = createFileRoute("/contact")({
 
 // ─── DATA ───────────────────────────────────────────────────────────────────
 const contactInfo = [
-    { id: 1, title: "Email Us", value: "officialcrewholic@gmail.com", icon: "📧", accent: "#9B51E0", description: "Get a response within 24 hours" },
-    { id: 2, title: "Call Us", value: "+91 7381116465", icon: "📞", accent: "#F2994A", description: "Mon-Fri, 9AM - 6PM PST" },
-    { id: 3, title: "Visit Us", value: "Jatani Gate, Bhubaneswar", icon: "📍", accent: "#4ecdc4", description: "By appointment only" },
-    { id: 4, title: "Follow Us", value: "@crewholic", icon: "🌐", accent: "#ff8c42", description: "Connect on social media" },
+    {
+        id: 1,
+        title: "Email Us",
+        value: "officialcrewholic@gmail.com",
+        icon: "📧",
+        accent: "#9B51E0",
+        description: "Get a response within 24 hours",
+        href: "mailto:officialcrewholic@gmail.com",
+        target: "_self",
+    },
+    {
+        id: 2,
+        title: "Call Us",
+        value: "+91 7381116465",
+        icon: "📞",
+        accent: "#F2994A",
+        description: "Mon-Fri, 9AM - 6PM",
+        href: "tel:+917381116465",
+        target: "_self",
+    },
+    {
+        id: 3,
+        title: "Visit Us",
+        value: "Jatani Gate, Bhubaneswar",
+        icon: "📍",
+        accent: "#4ecdc4",
+        description: "By appointment only",
+        href: "https://www.google.com/maps/search/?api=1&query=Jatani%20Gate%20Bhubaneswar",
+        target: "_blank",
+    },
+    {
+        id: 4,
+        title: "Follow Us",
+        value: "@crewholic",
+        icon: "🌐",
+        accent: "#ff8c42",
+        description: "Connect on social media",
+        href: "https://www.instagram.com/crewholic?igsh=MWs5am9heW1rdWhpNw==",
+        target: "_blank",
+    },
 ];
 
 const socialLinks = [
     { name: "Instagram", icon: "fab fa-instagram", url: "https://www.instagram.com/crewholic?igsh=MWs5am9heW1rdWhpNw==", color: "#E4405F" },
-    { name: "Youtube", icon: "fab fa-youtube", url: "https://www.youtube.com/@crewholicstudios", color: "#FF0000" },
+    { name: "Youtube", icon: "fab fa-youtube", url: "https://youtube.com/@unfilteredcrewbycrewholic?si=OXc2wYxT9fIranIp", color: "#FF0000" },
 ];
 
 const locations = [
@@ -162,17 +198,19 @@ function Scroll3DCard({ children, index = 0, direction = "left" }: {
 // ─── CONTACT CARD ───────────────────────────────────────────────────────────
 function ContactCard({ info, index }: { info: typeof contactInfo[0]; index: number }) {
     const [hovered, setHovered] = useState(false);
-    const cardRef = useRef<HTMLDivElement>(null);
+    const cardRef = useRef<HTMLAnchorElement>(null);
     const rotateX = useMotionValue(0);
     const rotateY = useMotionValue(0);
     const springRX = useSpring(rotateX, { stiffness: 200, damping: 20 });
     const springRY = useSpring(rotateY, { stiffness: 200, damping: 20 });
 
-    const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    const handleMouseMove = (e: React.MouseEvent<HTMLAnchorElement>) => {
         if (!cardRef.current) return;
+
         const rect = cardRef.current.getBoundingClientRect();
         const px = (e.clientX - rect.left) / rect.width - 0.5;
         const py = (e.clientY - rect.top) / rect.height - 0.5;
+
         rotateX.set(-py * 12);
         rotateY.set(px * 12);
     };
@@ -187,26 +225,39 @@ function ContactCard({ info, index }: { info: typeof contactInfo[0]; index: numb
 
     return (
         <Scroll3DCard index={index} direction={directions[index % directions.length]}>
-            <motion.div
+            <motion.a
                 ref={cardRef}
-                style={{ rotateX: springRX, rotateY: springRY, transformPerspective: 800 }}
+                href={info.href}
+                target={info.target}
+                rel={info.target === "_blank" ? "noopener noreferrer" : undefined}
+                style={{
+                    rotateX: springRX,
+                    rotateY: springRY,
+                    transformPerspective: 800,
+                    textDecoration: "none",
+                    display: "block",
+                }}
                 onMouseMove={handleMouseMove}
                 onMouseEnter={() => setHovered(true)}
                 onMouseLeave={handleMouseLeave}
+                whileTap={{ scale: 0.95 }}
                 className="relative group cursor-pointer active:scale-95 transition-transform"
             >
                 <motion.div
                     animate={{ opacity: hovered ? 1 : 0 }}
                     transition={{ duration: 0.3 }}
                     className="absolute inset-0 rounded-2xl blur-xl -z-10"
-                    style={{ background: `radial-gradient(ellipse at center, ${info.accent}33 0%, transparent 70%)` }}
+                    style={{
+                        background: `radial-gradient(ellipse at center, ${info.accent}33 0%, transparent 70%)`,
+                    }}
                 />
+
                 <div
                     className="relative rounded-2xl p-4 sm:p-5 md:p-6 text-center overflow-hidden border transition-all duration-300 h-full"
                     style={{
-                        background: "rgba(255,255,255,0.03)",
+                        background: hovered ? "rgba(255,255,255,0.06)" : "rgba(255,255,255,0.03)",
                         backdropFilter: "blur(20px)",
-                        borderColor: hovered ? info.accent + "55" : "rgba(255,255,255,0.07)",
+                        borderColor: hovered ? info.accent + "66" : "rgba(255,255,255,0.07)",
                         boxShadow: hovered
                             ? `0 0 40px ${info.accent}22, inset 0 1px 0 rgba(255,255,255,0.08)`
                             : "inset 0 1px 0 rgba(255,255,255,0.04)",
@@ -216,29 +267,53 @@ function ContactCard({ info, index }: { info: typeof contactInfo[0]; index: numb
                         animate={{ scaleX: hovered ? 1 : 0 }}
                         transition={{ duration: 0.3 }}
                         className="absolute top-0 left-0 h-0.5 w-full origin-left"
-                        style={{ background: `linear-gradient(90deg, ${info.accent}, transparent)` }}
+                        style={{
+                            background: `linear-gradient(90deg, ${info.accent}, transparent)`,
+                        }}
                     />
+
                     <motion.div
-                        animate={{ scale: hovered ? 1.15 : 1, rotate: hovered ? 15 : 0 }}
+                        animate={{
+                            scale: hovered ? 1.15 : 1,
+                            rotate: hovered ? 15 : 0,
+                        }}
                         transition={{ duration: 0.4, ease: "backOut" }}
                         className="text-3xl sm:text-4xl mb-3 sm:mb-4"
                     >
                         {info.icon}
                     </motion.div>
+
                     <h3
                         className="text-base sm:text-lg font-semibold mb-1 sm:mb-2 tracking-tight transition-colors duration-300"
-                        style={{ color: hovered ? info.accent : "#e5e5e5", fontFamily: "'Syne', sans-serif" }}
+                        style={{
+                            color: hovered ? info.accent : "#e5e5e5",
+                            fontFamily: "'Syne', sans-serif",
+                        }}
                     >
                         {info.title}
                     </h3>
-                    <p className="text-xs sm:text-sm mb-1 sm:mb-2 break-words" style={{ color: "#fff" }}>
+
+                    <p
+                        className="text-xs sm:text-sm mb-1 sm:mb-2 break-words"
+                        style={{ color: "#fff" }}
+                    >
                         {info.value}
                     </p>
+
                     <p className="text-[11px] sm:text-xs" style={{ color: "#888" }}>
                         {info.description}
                     </p>
+
+                    <motion.div
+                        animate={{ opacity: hovered ? 1 : 0, y: hovered ? 0 : 8 }}
+                        transition={{ duration: 0.25 }}
+                        className="mt-3 text-[10px] uppercase tracking-widest"
+                        style={{ color: info.accent }}
+                    >
+                        Click to open →
+                    </motion.div>
                 </div>
-            </motion.div>
+            </motion.a>
         </Scroll3DCard>
     );
 }
