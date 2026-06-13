@@ -62,15 +62,15 @@ function FadeIn({ children, delay = 0, y = 20, className = "", as: Component = "
 }
 
 // ─── CONTACT BUTTON ─────────────────────────────────────────────────────────
-function ContactButton({ label = "CONTACT ME", href = "/contact", onClick, type = "button" }: { 
-    label?: string; 
-    href?: string; 
+function ContactButton({ label = "CONTACT ME", href = "/contact", onClick, type = "button" }: {
+    label?: string;
+    href?: string;
     onClick?: (e: any) => void;
     type?: "button" | "submit";
 }) {
     const Component: any = href ? motion.a : motion.button;
     const props = href ? { href } : { type, onClick };
-    
+
     return (
         <Component
             {...props}
@@ -134,10 +134,10 @@ function Scroll3DCard({ children, index = 0, direction = "left" }: {
     const { scrollYProgress } = useScroll({ target: ref, offset: ["start 95%", "center 55%"] });
 
     const dirMap: Record<string, [number, number, number, number, number, number]> = {
-        left:  [-8, -15, 3,  -40, 30, -60],
-        right: [-8,  15, -3,  40, 30, -60],
-        up:    [-15,  0, 0,   0, 60, -80],
-        down:  [ 15,  0, 0,   0,-60, -80],
+        left: [-8, -15, 3, -40, 30, -60],
+        right: [-8, 15, -3, 40, 30, -60],
+        up: [-15, 0, 0, 0, 60, -80],
+        down: [15, 0, 0, 0, -60, -80],
     };
     const [frX, frY, frZ, frTX, frTY, frTZ] = dirMap[direction];
 
@@ -249,7 +249,13 @@ function ContactPage() {
     const [toastMessage, setToastMessage] = useState<{ text: string; isError: boolean } | null>(null);
     const [isSubmitting, setIsSubmitting] = useState(false);
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
-    
+    const [loggedInUser, setLoggedInUser] = useState<any>(null);
+
+    const getFirstName = (name?: string) => {
+        if (!name) return "User";
+        return name.trim().split(" ")[0];
+    };
+
     const [formData, setFormData] = useState({
         name: "",
         email: "",
@@ -277,6 +283,21 @@ function ContactPage() {
         setToastMessage({ text, isError });
         setTimeout(() => setToastMessage(null), 3000);
     };
+    useEffect(() => {
+        const token = localStorage.getItem("token");
+        const userData = localStorage.getItem("user");
+
+        if (token && userData) {
+            try {
+                const parsedUser = JSON.parse(userData);
+                setLoggedInUser(parsedUser);
+            } catch {
+                setLoggedInUser(null);
+            }
+        } else {
+            setLoggedInUser(null);
+        }
+    }, []);
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement | HTMLTextAreaElement | HTMLSelectElement>) => {
         setFormData({ ...formData, [e.target.name]: e.target.value });
@@ -394,7 +415,7 @@ function ContactPage() {
                                         animate={{ opacity: 1, y: 0 }}
                                         transition={{ delay: idx * 0.1 }}
                                         className="text-2xl font-medium uppercase tracking-wider hover:text-[#F2994A] transition-colors duration-200"
-                                        style={{ 
+                                        style={{
                                             color: item.label === "Contact" ? "#F2994A" : "#D7E2EA",
                                         }}
                                     >
@@ -402,14 +423,14 @@ function ContactPage() {
                                     </motion.a>
                                 ))}
                                 <motion.a
-                                    href="/login"
+                                    href={loggedInUser ? "/dashboard" : "/login"}
                                     initial={{ opacity: 0, y: 20 }}
                                     animate={{ opacity: 1, y: 0 }}
                                     transition={{ delay: 0.4 }}
                                     className="text-2xl font-medium uppercase tracking-wider hover:text-[#F2994A] transition-colors duration-200"
                                     style={{ color: "#D7E2EA" }}
                                 >
-                                    Signup/Login
+                                    {loggedInUser ? `👋 ${getFirstName(loggedInUser.name)}` : "Signup/Login"}
                                 </motion.a>
                             </div>
                         </motion.div>
@@ -428,7 +449,7 @@ function ContactPage() {
                             key={item.label}
                             href={item.href}
                             className="text-sm md:text-lg lg:text-[1.4rem] font-medium uppercase tracking-wider hover:opacity-70 transition-opacity duration-200"
-                            style={{ 
+                            style={{
                                 color: item.label === "Contact" ? "#F2994A" : "#D7E2EA",
                             }}
                         >
@@ -437,14 +458,17 @@ function ContactPage() {
                     ))}
 
                     <a
-                        href="/login"
+                        href={loggedInUser ? "/dashboard" : "/login"}
                         className="text-sm md:text-lg lg:text-[1.4rem] font-medium uppercase tracking-wider hover:opacity-70 transition-opacity duration-200 flex items-center gap-2"
                         style={{ color: "#D7E2EA" }}
                     >
-                        👋 SUMIT
-                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                        </svg>
+                        {loggedInUser ? `👋 ${getFirstName(loggedInUser.name)}` : "Signup/Login"}
+
+                        {loggedInUser && (
+                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                            </svg>
+                        )}
                     </a>
                 </FadeIn>
 
@@ -549,7 +573,7 @@ function ContactPage() {
                             <h3 className="text-xl sm:text-2xl font-bold mb-4 sm:mb-6" style={{ color: "#9B51E0" }}>
                                 Drop Us A Line
                             </h3>
-                            
+
                             <form onSubmit={handleSubmit} className="space-y-4 sm:space-y-5">
                                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 sm:gap-5">
                                     <div>
@@ -648,7 +672,7 @@ function ContactPage() {
                                         />
                                     )}
                                 </motion.button>
-                                
+
                                 <p className="text-[11px] sm:text-xs text-gray-500 text-center">
                                     We'll get back to you within 24 hours
                                 </p>
@@ -672,8 +696,8 @@ function ContactPage() {
                                 </h3>
                                 <div className="space-y-3 sm:space-y-4">
                                     {locations.map((location, index) => (
-                                        <motion.div 
-                                            key={index} 
+                                        <motion.div
+                                            key={index}
                                             initial={{ opacity: 0, x: 20 }}
                                             whileInView={{ opacity: 1, x: 0 }}
                                             viewport={{ once: true }}
@@ -788,7 +812,7 @@ function ContactPage() {
                         { step: "03", title: "Proposal", description: "Receive a tailored proposal within 48 hours." },
                         { step: "04", title: "Let's Build", description: "We kick off and bring your vision to life." },
                     ].map((item, index) => {
-                        const rotations: Array<[number,number,number]> = [[-15,20,5], [-15,-20,-5], [15,20,-5], [15,-20,5]];
+                        const rotations: Array<[number, number, number]> = [[-15, 20, 5], [-15, -20, -5], [15, 20, -5], [15, -20, 5]];
                         return (
                             <Scroll3DReveal
                                 key={index}
@@ -802,9 +826,9 @@ function ContactPage() {
                                     className="p-4 sm:p-5 md:p-6 rounded-2xl text-center h-full relative overflow-hidden"
                                     style={{ background: "rgba(255,255,255,0.03)", border: "1px solid rgba(255,255,255,0.07)" }}
                                 >
-                                    <div 
+                                    <div
                                         className="text-4xl sm:text-5xl md:text-6xl font-black mb-2 sm:mb-3"
-                                        style={{ 
+                                        style={{
                                             background: "linear-gradient(135deg, #9B51E0, #F2994A)",
                                             WebkitBackgroundClip: "text",
                                             WebkitTextFillColor: "transparent",

@@ -559,45 +559,217 @@ function Scroll3DCard({ children, index = 0, direction = "up" }: { children: Rea
 function UserNavButton({ user }: { user: LoggedInUser | null }) {
     const [open, setOpen] = useState(false);
     const ref = useRef<HTMLDivElement>(null);
+
     useEffect(() => {
-        const handler = (e: MouseEvent) => { if (ref.current && !ref.current.contains(e.target as Node)) setOpen(false); };
+        const handler = (e: MouseEvent) => {
+            if (ref.current && !ref.current.contains(e.target as Node)) {
+                setOpen(false);
+            }
+        };
+
         document.addEventListener("mousedown", handler);
         return () => document.removeEventListener("mousedown", handler);
     }, []);
-    const handleLogout = () => { localStorage.removeItem("token"); localStorage.removeItem("user"); window.location.reload(); };
-    if (!user) return <a href="/login" className="text-sm md:text-lg lg:text-[1.4rem] font-medium uppercase tracking-wider hover:opacity-70 transition-opacity duration-200" style={{ color: "#D7E2EA" }}>Signup / Login</a>;
+
+    const handleLogout = () => {
+        localStorage.removeItem("token");
+        localStorage.removeItem("user");
+        localStorage.removeItem("role");
+        localStorage.removeItem("permissions");
+        window.location.href = "/login";
+    };
+
+    if (!user) {
+        return (
+            <a
+                href="/login"
+                className="text-sm md:text-lg lg:text-[1.4rem] font-medium uppercase tracking-wider hover:opacity-70 transition-opacity duration-200"
+                style={{ color: "#D7E2EA" }}
+            >
+                Signup / Login
+            </a>
+        );
+    }
+
     const firstName = user.name.split(" ")[0];
-    const initial = firstName.charAt(0).toUpperCase();
+
     return (
         <div ref={ref} style={{ position: "relative" }}>
-            <button onClick={() => setOpen(prev => !prev)} className="flex items-center gap-2 hover:opacity-80 transition-opacity" style={{ background: "none", border: "none", cursor: "pointer", padding: 0 }}>
-                <div className="flex items-center justify-center font-bold text-black rounded-full flex-shrink-0" style={{ width: 36, height: 36, background: "linear-gradient(135deg, #9B51E0, #F2994A)", fontSize: 14 }}>{initial}</div>
-                <span className="text-sm md:text-base lg:text-[1.1rem] font-medium uppercase tracking-wider hidden md:block" style={{ color: "#F2994A" }}>👋 {firstName.toUpperCase()}</span>
-                <svg className="w-3 h-3 hidden md:block transition-transform duration-200" style={{ color: "#F2994A", transform: open ? "rotate(180deg)" : "rotate(0deg)" }} fill="none" stroke="currentColor" viewBox="0 0 24 24"><path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" /></svg>
+            <button
+                onClick={() => setOpen(prev => !prev)}
+                className="flex items-center gap-2 hover:opacity-80 transition-opacity"
+                style={{
+                    background: "none",
+                    border: "none",
+                    cursor: "pointer",
+                    padding: 0,
+                }}
+            >
+                <span
+                    className="text-sm md:text-base lg:text-[1.1rem] font-medium uppercase tracking-wider hidden md:block"
+                    style={{ color: "#F2994A" }}
+                >
+                    👋 {firstName.toUpperCase()}
+                </span>
+
+                <svg
+                    className="w-3 h-3 hidden md:block transition-transform duration-200"
+                    style={{
+                        color: "#F2994A",
+                        transform: open ? "rotate(180deg)" : "rotate(0deg)",
+                    }}
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                >
+                    <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M19 9l-7 7-7-7"
+                    />
+                </svg>
             </button>
+
             <AnimatePresence>
                 {open && (
-                    <motion.div initial={{ opacity: 0, y: -8, scale: 0.95 }} animate={{ opacity: 1, y: 0, scale: 1 }} exit={{ opacity: 0, y: -8, scale: 0.95 }} transition={{ duration: 0.18, ease: [0.22, 1, 0.36, 1] }} style={{ position: "absolute", top: "calc(100% + 12px)", right: 0, minWidth: 220, background: "rgba(18,18,26,0.98)", backdropFilter: "blur(20px)", border: "1px solid rgba(155,81,224,0.3)", borderRadius: 14, boxShadow: "0 20px 60px rgba(0,0,0,0.5)", overflow: "hidden", zIndex: 9999 }}>
-                        <div style={{ padding: "14px 16px", borderBottom: "1px solid rgba(255,255,255,0.06)", background: "linear-gradient(135deg, rgba(155,81,224,0.08), rgba(242,153,74,0.05))" }}>
-                            <div className="flex items-center gap-3">
-                                <div className="flex items-center justify-center font-bold text-black rounded-full flex-shrink-0" style={{ width: 40, height: 40, background: "linear-gradient(135deg, #9B51E0, #F2994A)", fontSize: 16 }}>{initial}</div>
-                                <div style={{ minWidth: 0 }}>
-                                    <p style={{ fontSize: 13, fontWeight: 600, color: "#E8E8EF", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap" }}>{user.name}</p>
-                                    <p style={{ fontSize: 10, color: "#666688", overflow: "hidden", textOverflow: "ellipsis", whiteSpace: "nowrap", marginTop: 2 }}>{user.email}</p>
-                                </div>
+                    <motion.div
+                        initial={{ opacity: 0, y: -8, scale: 0.95 }}
+                        animate={{ opacity: 1, y: 0, scale: 1 }}
+                        exit={{ opacity: 0, y: -8, scale: 0.95 }}
+                        transition={{ duration: 0.18, ease: [0.22, 1, 0.36, 1] }}
+                        style={{
+                            position: "absolute",
+                            top: "calc(100% + 12px)",
+                            right: 0,
+                            minWidth: 220,
+                            background: "rgba(18,18,26,0.98)",
+                            backdropFilter: "blur(20px)",
+                            border: "1px solid rgba(155,81,224,0.3)",
+                            borderRadius: 14,
+                            boxShadow: "0 20px 60px rgba(0,0,0,0.5)",
+                            overflow: "hidden",
+                            zIndex: 9999,
+                        }}
+                    >
+                        <div
+                            style={{
+                                padding: "14px 16px",
+                                borderBottom: "1px solid rgba(255,255,255,0.06)",
+                                background: "linear-gradient(135deg, rgba(155,81,224,0.08), rgba(242,153,74,0.05))",
+                            }}
+                        >
+                            <div style={{ minWidth: 0 }}>
+                                <p
+                                    style={{
+                                        fontSize: 13,
+                                        fontWeight: 600,
+                                        color: "#E8E8EF",
+                                        overflow: "hidden",
+                                        textOverflow: "ellipsis",
+                                        whiteSpace: "nowrap",
+                                    }}
+                                >
+                                    {user.name}
+                                </p>
+
+                                <p
+                                    style={{
+                                        fontSize: 10,
+                                        color: "#666688",
+                                        overflow: "hidden",
+                                        textOverflow: "ellipsis",
+                                        whiteSpace: "nowrap",
+                                        marginTop: 2,
+                                    }}
+                                >
+                                    {user.email}
+                                </p>
                             </div>
-                            <div style={{ marginTop: 10, display: "inline-flex", alignItems: "center", gap: 5, padding: "3px 8px", background: "rgba(0,201,167,0.1)", borderRadius: 20, border: "1px solid rgba(0,201,167,0.2)" }}>
-                                <span style={{ width: 6, height: 6, borderRadius: "50%", background: "#00C9A7", display: "inline-block" }} />
-                                <span style={{ fontSize: 10, color: "#00C9A7", fontWeight: 600 }}>Online</span>
+
+                            <div
+                                style={{
+                                    marginTop: 10,
+                                    display: "inline-flex",
+                                    alignItems: "center",
+                                    gap: 5,
+                                    padding: "3px 8px",
+                                    background: "rgba(0,201,167,0.1)",
+                                    borderRadius: 20,
+                                    border: "1px solid rgba(0,201,167,0.2)",
+                                }}
+                            >
+                                <span
+                                    style={{
+                                        width: 6,
+                                        height: 6,
+                                        borderRadius: "50%",
+                                        background: "#00C9A7",
+                                        display: "inline-block",
+                                    }}
+                                />
+                                <span
+                                    style={{
+                                        fontSize: 10,
+                                        color: "#00C9A7",
+                                        fontWeight: 600,
+                                    }}
+                                >
+                                    Online
+                                </span>
                             </div>
                         </div>
+
                         <div style={{ padding: "6px 0" }}>
-                            <a href="/dashboard" style={{ display: "flex", alignItems: "center", gap: 10, padding: "10px 16px", fontSize: 13, color: "#CCCCE0", textDecoration: "none", transition: "background 0.15s" }} onMouseEnter={e => (e.currentTarget.style.background = "rgba(155,81,224,0.08)")} onMouseLeave={e => (e.currentTarget.style.background = "transparent")}>
-                                <span style={{ fontSize: 15, width: 18, textAlign: "center" }}>👤</span><span>My Profile</span>
+                            <a
+                                href="/dashboard"
+                                style={{
+                                    display: "flex",
+                                    alignItems: "center",
+                                    gap: 10,
+                                    padding: "10px 16px",
+                                    fontSize: 13,
+                                    color: "#CCCCE0",
+                                    textDecoration: "none",
+                                    transition: "background 0.15s",
+                                }}
+                                onMouseEnter={e => (e.currentTarget.style.background = "rgba(155,81,224,0.08)")}
+                                onMouseLeave={e => (e.currentTarget.style.background = "transparent")}
+                            >
+                                <span style={{ fontSize: 15, width: 18, textAlign: "center" }}>👤</span>
+                                <span>My Profile</span>
                             </a>
-                            <div style={{ height: 1, background: "rgba(255,255,255,0.05)", margin: "6px 0" }} />
-                            <button onClick={handleLogout} style={{ width: "100%", display: "flex", alignItems: "center", gap: 10, padding: "10px 16px", fontSize: 13, color: "#FF6B6B", background: "none", border: "none", cursor: "pointer", fontFamily: "inherit", textAlign: "left", transition: "background 0.15s" }} onMouseEnter={e => (e.currentTarget.style.background = "rgba(255,107,107,0.08)")} onMouseLeave={e => (e.currentTarget.style.background = "transparent")}>
-                                <span style={{ fontSize: 15, width: 18, textAlign: "center" }}>⎋</span><span>Logout</span>
+
+                            <div
+                                style={{
+                                    height: 1,
+                                    background: "rgba(255,255,255,0.05)",
+                                    margin: "6px 0",
+                                }}
+                            />
+
+                            <button
+                                onClick={handleLogout}
+                                style={{
+                                    width: "100%",
+                                    display: "flex",
+                                    alignItems: "center",
+                                    gap: 10,
+                                    padding: "10px 16px",
+                                    fontSize: 13,
+                                    color: "#FF6B6B",
+                                    background: "none",
+                                    border: "none",
+                                    cursor: "pointer",
+                                    fontFamily: "inherit",
+                                    textAlign: "left",
+                                    transition: "background 0.15s",
+                                }}
+                                onMouseEnter={e => (e.currentTarget.style.background = "rgba(255,107,107,0.08)")}
+                                onMouseLeave={e => (e.currentTarget.style.background = "transparent")}
+                            >
+                                <span style={{ fontSize: 15, width: 18, textAlign: "center" }}>⎋</span>
+                                <span>Logout</span>
                             </button>
                         </div>
                     </motion.div>

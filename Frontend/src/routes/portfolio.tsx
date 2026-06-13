@@ -259,10 +259,10 @@ function Scroll3DCard({ children, index = 0, direction = "left" }: {
     const { scrollYProgress } = useScroll({ target: ref, offset: ["start 95%", "center 55%"] });
 
     const dirMap: Record<string, [number, number, number, number, number, number]> = {
-        left:  [-8, -15, 3,  -40, 30, -60],
-        right: [-8,  15, -3,  40, 30, -60],
-        up:    [-15,  0, 0,   0, 60, -80],
-        down:  [ 15,  0, 0,   0,-60, -80],
+        left: [-8, -15, 3, -40, 30, -60],
+        right: [-8, 15, -3, 40, 30, -60],
+        up: [-15, 0, 0, 0, 60, -80],
+        down: [15, 0, 0, 0, -60, -80],
     };
     const [frX, frY, frZ, frTX, frTY, frTZ] = dirMap[direction];
 
@@ -352,7 +352,7 @@ function ProjectCard({ project, index, onClick }: {
                             transition={{ duration: 0.5 }}
                         />
                         <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
-                        
+
                         <div
                             className="absolute top-3 left-3 text-[9px] sm:text-[10px] px-2 py-1 rounded-full font-medium"
                             style={{ background: project.accent + "CC", color: "#fff" }}
@@ -458,7 +458,7 @@ function ProjectModal({ project, isOpen, onClose }: {
                             <div className="relative h-48 sm:h-64 md:h-96 overflow-hidden rounded-t-2xl sm:rounded-t-3xl">
                                 <img src={project.image} alt={project.title} className="w-full h-full object-cover" />
                                 <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
-                                
+
                                 <div
                                     className="absolute bottom-3 sm:bottom-5 left-4 sm:left-6 text-xs sm:text-sm px-3 sm:px-4 py-1 sm:py-1.5 rounded-full font-medium"
                                     style={{ background: project.accent + "CC", color: "#fff" }}
@@ -551,6 +551,13 @@ function PortfolioPage() {
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
+    const [loggedInUser, setLoggedInUser] = useState<{ name?: string; role?: string } | null>(null);
+
+    const getFirstName = (name?: string) => {
+        if (!name) return "User";
+        return name.trim().split(" ")[0];
+    };
+
     useEffect(() => {
         const link = document.createElement("link");
         link.rel = "stylesheet";
@@ -565,6 +572,21 @@ function PortfolioPage() {
         document.body.style.overflow = mobileMenuOpen ? 'hidden' : 'unset';
         return () => { document.body.style.overflow = 'unset'; };
     }, [mobileMenuOpen]);
+    useEffect(() => {
+        const token = localStorage.getItem("token");
+        const userData = localStorage.getItem("user");
+
+        if (token && userData) {
+            try {
+                const parsedUser = JSON.parse(userData);
+                setLoggedInUser(parsedUser);
+            } catch {
+                setLoggedInUser(null);
+            }
+        } else {
+            setLoggedInUser(null);
+        }
+    }, []);
 
     const filteredProjects = activeCategory === "All"
         ? projects
@@ -622,7 +644,7 @@ function PortfolioPage() {
                                         animate={{ opacity: 1, y: 0 }}
                                         transition={{ delay: idx * 0.1 }}
                                         className="text-2xl font-medium uppercase tracking-wider hover:text-[#F2994A] transition-colors duration-200"
-                                        style={{ 
+                                        style={{
                                             color: item.label === "Portfolio" ? "#F2994A" : "#D7E2EA",
                                         }}
                                     >
@@ -630,14 +652,14 @@ function PortfolioPage() {
                                     </motion.a>
                                 ))}
                                 <motion.a
-                                    href="/login"
+                                    href={loggedInUser ? "/dashboard" : "/login"}
                                     initial={{ opacity: 0, y: 20 }}
                                     animate={{ opacity: 1, y: 0 }}
                                     transition={{ delay: 0.4 }}
                                     className="text-2xl font-medium uppercase tracking-wider hover:text-[#F2994A] transition-colors duration-200"
                                     style={{ color: "#D7E2EA" }}
                                 >
-                                    Signup/Login
+                                    {loggedInUser ? `👋 ${getFirstName(loggedInUser.name)}` : "Signup/Login"}
                                 </motion.a>
                             </div>
                         </motion.div>
@@ -656,7 +678,7 @@ function PortfolioPage() {
                             key={item.label}
                             href={item.href}
                             className="text-sm md:text-lg lg:text-[1.4rem] font-medium uppercase tracking-wider hover:opacity-70 transition-opacity duration-200"
-                            style={{ 
+                            style={{
                                 color: item.label === "Portfolio" ? "#F2994A" : "#D7E2EA",
                             }}
                         >
@@ -665,14 +687,17 @@ function PortfolioPage() {
                     ))}
 
                     <a
-                        href="/login"
+                        href={loggedInUser ? "/dashboard" : "/login"}
                         className="text-sm md:text-lg lg:text-[1.4rem] font-medium uppercase tracking-wider hover:opacity-70 transition-opacity duration-200 flex items-center gap-2"
                         style={{ color: "#D7E2EA" }}
                     >
-                        👋 SUMIT
-                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                        </svg>
+                        {loggedInUser ? `👋 ${getFirstName(loggedInUser.name)}` : "Signup/Login"}
+
+                        {loggedInUser && (
+                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                            </svg>
+                        )}
                     </a>
                 </FadeIn>
 
@@ -746,7 +771,7 @@ function PortfolioPage() {
                             >
                                 <div className="text-2xl sm:text-3xl mb-2">{stat.icon}</div>
                                 <div className="text-2xl sm:text-3xl md:text-4xl font-bold mb-1"
-                                    style={{ 
+                                    style={{
                                         background: "linear-gradient(135deg, #9B51E0, #F2994A)",
                                         WebkitBackgroundClip: "text",
                                         WebkitTextFillColor: "transparent",
@@ -852,7 +877,7 @@ function PortfolioPage() {
                         { icon: "🚀", title: "Scalable", description: "Built to grow with your business, from MVP to enterprise-grade solutions." },
                         { icon: "💎", title: "Premium Quality", description: "Pixel-perfect execution with attention to every detail and interaction." },
                     ].map((item, index) => {
-                        const rotations: Array<[number,number,number]> = [[-15,20,5], [-15,-20,-5], [15,20,-5], [15,-20,5]];
+                        const rotations: Array<[number, number, number]> = [[-15, 20, 5], [-15, -20, -5], [15, 20, -5], [15, -20, 5]];
                         return (
                             <Scroll3DReveal
                                 key={index}

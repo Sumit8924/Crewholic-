@@ -87,11 +87,10 @@ function ContactButton({ label = "CONTACT US", href = "/contact", small = false 
             href={href}
             whileHover={{ scale: 1.05 }}
             whileTap={{ scale: 0.95 }}
-            className={`relative inline-block rounded-full font-bold uppercase tracking-wider text-white overflow-hidden ${
-                small 
-                    ? "px-4 py-2.5 text-[10px] sm:text-xs" 
-                    : "px-5 sm:px-6 md:px-8 py-3 sm:py-3.5 md:py-4 text-xs sm:text-sm md:text-base"
-            }`}
+            className={`relative inline-block rounded-full font-bold uppercase tracking-wider text-white overflow-hidden ${small
+                ? "px-4 py-2.5 text-[10px] sm:text-xs"
+                : "px-5 sm:px-6 md:px-8 py-3 sm:py-3.5 md:py-4 text-xs sm:text-sm md:text-base"
+                }`}
             style={{
                 background: "linear-gradient(135deg, #9B51E0 0%, #F2994A 100%)",
                 boxShadow: "0 0 20px rgba(155, 81, 224, 0.4), 0 0 40px rgba(242, 153, 74, 0.2)",
@@ -149,10 +148,10 @@ function Scroll3DCard({ children, index = 0, direction = "left" }: {
     const { scrollYProgress } = useScroll({ target: ref, offset: ["start 95%", "center 55%"] });
 
     const dirMap: Record<string, [number, number, number, number, number, number]> = {
-        left:  [-8, -15, 3,  -40, 30, -60],
-        right: [-8,  15, -3,  40, 30, -60],
-        up:    [-15,  0, 0,   0, 60, -80],
-        down:  [ 15,  0, 0,   0,-60, -80],
+        left: [-8, -15, 3, -40, 30, -60],
+        right: [-8, 15, -3, 40, 30, -60],
+        up: [-15, 0, 0, 0, 60, -80],
+        down: [15, 0, 0, 0, -60, -80],
     };
     const [frX, frY, frZ, frTX, frTY, frTZ] = dirMap[direction];
 
@@ -193,8 +192,8 @@ function MilestoneNode({ milestone, index }: { milestone: typeof milestones[0]; 
             style={{ perspective: "1000px" }}
         >
             {/* Mobile: Year first (left), Desktop: Title */}
-            <motion.div 
-                style={{ rotateY, x, scale, opacity }} 
+            <motion.div
+                style={{ rotateY, x, scale, opacity }}
                 className="flex-1 text-left md:text-right p-2 md:p-6 order-2 md:order-1"
             >
                 <h3 className="text-base md:text-xl font-bold" style={{ color: "#F2994A" }}>{milestone.title}</h3>
@@ -202,13 +201,13 @@ function MilestoneNode({ milestone, index }: { milestone: typeof milestones[0]; 
             </motion.div>
 
             {/* Center circle */}
-            <motion.div 
-                style={{ scale, opacity }} 
+            <motion.div
+                style={{ scale, opacity }}
                 className="relative z-10 flex-shrink-0 order-1 md:order-2"
             >
-                <div 
-                    className="w-12 h-12 md:w-16 md:h-16 rounded-full flex items-center justify-center" 
-                    style={{ 
+                <div
+                    className="w-12 h-12 md:w-16 md:h-16 rounded-full flex items-center justify-center"
+                    style={{
                         background: "linear-gradient(135deg, #9B51E0, #F2994A)",
                         boxShadow: "0 0 20px rgba(155, 81, 224, 0.5)",
                     }}
@@ -218,16 +217,16 @@ function MilestoneNode({ milestone, index }: { milestone: typeof milestones[0]; 
             </motion.div>
 
             {/* Year (right on desktop, hidden on mobile - shown in main text) */}
-            <motion.div 
-                style={{ rotateY: oppositeRotateY, x: oppositeX, scale, opacity }} 
+            <motion.div
+                style={{ rotateY: oppositeRotateY, x: oppositeX, scale, opacity }}
                 className="hidden md:block flex-1 text-center md:text-left p-2 md:p-6 order-3"
             >
                 <span className="text-2xl font-bold" style={{ color: "#9B51E0" }}>{milestone.year}</span>
             </motion.div>
 
             {/* Mobile year - inline */}
-            <motion.div 
-                style={{ scale, opacity }} 
+            <motion.div
+                style={{ scale, opacity }}
                 className="md:hidden absolute -top-2 left-16 text-[10px] font-bold tracking-widest"
                 style={{ color: "#9B51E0" }}
             >
@@ -348,6 +347,13 @@ function AboutPage() {
     const [showTeamModal, setShowTeamModal] = useState(false);
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
 
+    const [loggedInUser, setLoggedInUser] = useState<{ name?: string; role?: string } | null>(null);
+
+    const getFirstName = (name?: string) => {
+        if (!name) return "User";
+        return name.trim().split(" ")[0];
+    };
+
     useEffect(() => {
         const link = document.createElement("link");
         link.rel = "stylesheet";
@@ -362,6 +368,21 @@ function AboutPage() {
         document.body.style.overflow = mobileMenuOpen ? 'hidden' : 'unset';
         return () => { document.body.style.overflow = 'unset'; };
     }, [mobileMenuOpen]);
+    useEffect(() => {
+        const token = localStorage.getItem("token");
+        const userData = localStorage.getItem("user");
+
+        if (token && userData) {
+            try {
+                const parsedUser = JSON.parse(userData);
+                setLoggedInUser(parsedUser);
+            } catch {
+                setLoggedInUser(null);
+            }
+        } else {
+            setLoggedInUser(null);
+        }
+    }, []);
 
     const handleTeamClick = (member: typeof teamMembers[0]) => {
         setSelectedMember(member);
@@ -415,7 +436,7 @@ function AboutPage() {
                                         animate={{ opacity: 1, y: 0 }}
                                         transition={{ delay: idx * 0.1 }}
                                         className="text-2xl font-medium uppercase tracking-wider hover:text-[#F2994A] transition-colors duration-200"
-                                        style={{ 
+                                        style={{
                                             color: item.label === "About" ? "#F2994A" : "#D7E2EA",
                                         }}
                                     >
@@ -423,14 +444,14 @@ function AboutPage() {
                                     </motion.a>
                                 ))}
                                 <motion.a
-                                    href="/login"
+                                    href={loggedInUser ? "/dashboard" : "/login"}
                                     initial={{ opacity: 0, y: 20 }}
                                     animate={{ opacity: 1, y: 0 }}
                                     transition={{ delay: 0.4 }}
                                     className="text-2xl font-medium uppercase tracking-wider hover:text-[#F2994A] transition-colors duration-200"
                                     style={{ color: "#D7E2EA" }}
                                 >
-                                    Signup/Login
+                                    {loggedInUser ? `👋 ${getFirstName(loggedInUser.name)}` : "Signup/Login"}
                                 </motion.a>
                             </div>
                         </motion.div>
@@ -449,7 +470,7 @@ function AboutPage() {
                             key={item.label}
                             href={item.href}
                             className="text-sm md:text-lg lg:text-[1.4rem] font-medium uppercase tracking-wider hover:opacity-70 transition-opacity duration-200"
-                            style={{ 
+                            style={{
                                 color: item.label === "About" ? "#F2994A" : "#D7E2EA",
                             }}
                         >
@@ -458,14 +479,17 @@ function AboutPage() {
                     ))}
 
                     <a
-                        href="/login"
+                        href={loggedInUser ? "/dashboard" : "/login"}
                         className="text-sm md:text-lg lg:text-[1.4rem] font-medium uppercase tracking-wider hover:opacity-70 transition-opacity duration-200 flex items-center gap-2"
                         style={{ color: "#D7E2EA" }}
                     >
-                        👋 SUMIT
-                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                        </svg>
+                        {loggedInUser ? `👋 ${getFirstName(loggedInUser.name)}` : "Signup/Login"}
+
+                        {loggedInUser && (
+                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
+                            </svg>
+                        )}
                     </a>
                 </FadeIn>
 
@@ -576,7 +600,7 @@ function AboutPage() {
 
                 <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 max-w-7xl mx-auto">
                     {stats.map((stat, index) => {
-                        const dirs: Array<"left"|"right"|"up"|"down"> = ["up","down","left","right","up","down","left","right"];
+                        const dirs: Array<"left" | "right" | "up" | "down"> = ["up", "down", "left", "right", "up", "down", "left", "right"];
                         return (
                             <Scroll3DCard key={index} index={index} direction={dirs[index % dirs.length]}>
                                 <motion.div
@@ -587,7 +611,7 @@ function AboutPage() {
                                 >
                                     <div className="text-xl sm:text-2xl md:text-3xl mb-1 sm:mb-2 md:mb-3">{stat.icon}</div>
                                     <div className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-bold mb-1 md:mb-2"
-                                        style={{ 
+                                        style={{
                                             background: "linear-gradient(135deg, #9B51E0, #F2994A)",
                                             WebkitBackgroundClip: "text",
                                             WebkitTextFillColor: "transparent",
@@ -620,7 +644,7 @@ function AboutPage() {
 
                 <div className="grid grid-cols-2 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 max-w-7xl mx-auto">
                     {values.map((value, index) => {
-                        const rotations: Array<[number,number,number]> = [[-15,20,5], [-15,-20,-5], [15,20,-5], [15,-20,5]];
+                        const rotations: Array<[number, number, number]> = [[-15, 20, 5], [-15, -20, -5], [15, 20, -5], [15, -20, 5]];
                         return (
                             <Scroll3DReveal
                                 key={index}
@@ -661,9 +685,9 @@ function AboutPage() {
 
                 <div className="max-w-4xl mx-auto relative">
                     {/* Vertical line - left on mobile, center on desktop */}
-                    <div 
-                        className="absolute left-6 md:left-1/2 md:transform md:-translate-x-1/2 w-px h-full" 
-                        style={{ background: "linear-gradient(180deg, transparent, #9B51E0, #F2994A, transparent)" }} 
+                    <div
+                        className="absolute left-6 md:left-1/2 md:transform md:-translate-x-1/2 w-px h-full"
+                        style={{ background: "linear-gradient(180deg, transparent, #9B51E0, #F2994A, transparent)" }}
                     />
                     {milestones.map((milestone, index) => (
                         <MilestoneNode key={index} milestone={milestone} index={index} />
@@ -716,8 +740,8 @@ function AboutPage() {
                                     boxShadow: `0 25px 50px -12px ${selectedMember.accent}40`,
                                 }}
                             >
-                                <button 
-                                    onClick={() => setShowTeamModal(false)} 
+                                <button
+                                    onClick={() => setShowTeamModal(false)}
                                     className="absolute top-3 right-3 sm:top-5 sm:right-5 w-9 h-9 flex items-center justify-center text-gray-400 hover:text-white text-2xl transition-colors rounded-full bg-white/5 active:scale-90"
                                 >
                                     ×
