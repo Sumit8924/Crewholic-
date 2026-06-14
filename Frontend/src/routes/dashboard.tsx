@@ -118,7 +118,17 @@ const normalizeOrder = (o: any): Order => ({
 });
 
 const isApprovedWithPrice = (order: Order): boolean => {
-    const approvedStatuses = ["approved", "processing", "shipped", "delivered", "completed", "work_completed"];
+    const approvedStatuses = [
+        "approved",
+        "processing",
+        "Advance Paid",
+        "Fully Paid",
+        "shipped",
+        "delivered",
+        "completed",
+        "work_completed",
+    ];
+
     return approvedStatuses.includes(order.status) && !!order.quotedAmount && order.quotedAmount > 0;
 };
 
@@ -209,39 +219,53 @@ function UserDashboard() {
         const cacheKey = getUserOrderKey(currentUser);
 
         try {
-            const res = await fetch(`${API_URL}/api/orders/my-orders`, {
+            const res = await fetch(`${API_URL}/api/orders/my-orders?t=${Date.now()}`, {
                 method: "GET",
                 headers: {
                     "Content-Type": "application/json",
                     Authorization: `Bearer ${token}`,
                 },
+                cache: "no-store",
             });
 
-            if (res.ok) {
-                const contentType = res.headers.get("content-type");
-                if (contentType && contentType.includes("application/json")) {
-                    const data = await res.json();
-                    const rawOrders: any[] = Array.isArray(data) ? data : data.orders || [];
-
-                    // Normalize field names from backend (SERVER IS SOURCE OF TRUTH)
-                    const fetchedOrders: Order[] = rawOrders.map(normalizeOrder);
-
-                    setOrders(fetchedOrders);
-                    localStorage.setItem(cacheKey, JSON.stringify(fetchedOrders));
-                    return;
-                }
+            if (res.status === 401) {
+                localStorage.removeItem("token");
+                localStorage.removeItem("user");
+                localStorage.removeItem("role");
+                localStorage.removeItem("permissions");
+                navigate({ to: "/login" });
+                return;
             }
 
-            // If fetch fails, use cache
-            loadOrdersFromCache(cacheKey);
-        } catch {
-            loadOrdersFromCache(cacheKey);
+            if (!res.ok) {
+                throw new Error("Failed to fetch orders");
+            }
+
+            const data = await res.json();
+            const rawOrders: any[] = Array.isArray(data) ? data : data.orders || [];
+
+            const fetchedOrders: Order[] = rawOrders.map(normalizeOrder);
+
+            setOrders(fetchedOrders);
+            localStorage.setItem(cacheKey, JSON.stringify(fetchedOrders));
+        } catch (error) {
+            console.error("Fetch orders error:", error);
+
+            // Important: don't show old stale cache as fresh data
+            const cached = localStorage.getItem(cacheKey);
+
+            if (cached && orders.length === 0) {
+                try {
+                    setOrders(JSON.parse(cached));
+                } catch {
+                    setOrders([]);
+                }
+            }
         } finally {
             setOrdersLoading(false);
             setRefreshing(false);
         }
     };
-
     const loadOrdersFromCache = (cacheKey: string) => {
         const cached = localStorage.getItem(cacheKey);
         if (cached) {
@@ -255,11 +279,15 @@ function UserDashboard() {
         }
     };
 
-    const handleManualRefresh = () => {
+    const handleManualRefresh = async () => {
         if (!user) return;
+
         const token = localStorage.getItem("token");
         if (!token) return;
-        fetchUserOrders(user, token, true);
+
+        localStorage.removeItem(getUserOrderKey(user));
+        await fetchUserOrders(user, token, true);
+
         showToast("Orders refreshed!", "success");
     };
 

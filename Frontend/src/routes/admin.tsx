@@ -69,7 +69,7 @@ interface ServiceInquiry {
     advanceAmount?: number;
     advanceTxnId?: string;
     advancePaidAt?: string;
-    advancePaymentStatus?: "pending_verification" | "approved" | "rejected" | "not_submitted";
+    advancePaymentStatus?: "pending_verification" | "approved" | "verified" | "rejected" | "not_submitted";
     advancePaymentMethod?: string;
     advanceScreenshotUrl?: string;
     advanceRejectionReason?: string;
@@ -81,7 +81,7 @@ interface ServiceInquiry {
     finalAmount?: number;
     finalTxnId?: string;
     finalPaidAt?: string;
-    finalPaymentStatus?: "pending_verification" | "approved" | "rejected" | "not_submitted";
+    finalPaymentStatus?: "pending_verification" | "approved" | "verified" | "rejected" | "not_submitted";
     finalPaymentMethod?: string;
     finalScreenshotUrl?: string;
     finalRejectionReason?: string;
@@ -768,20 +768,32 @@ function PaymentVerificationPanel() {
 
         const updateData = type === "advance"
             ? {
-                advancePaymentStatus: "approved",
+                advancePaymentStatus: "verified",
                 advancePaid: true,
+                advanceVerified: true,
                 advancePaidAt: now,
-                status: "Advance Paid",
+                advanceVerifiedAt: now,
+                advanceRejected: false,
+                advanceRejectionReason: "",
+                status: "processing",
             }
             : {
-                finalPaymentStatus: "approved",
+                finalPaymentStatus: "verified",
                 finalPaid: true,
+                finalVerified: true,
                 finalPaidAt: now,
-                status: "Fully Paid",
+                finalVerifiedAt: now,
+                finalRejected: false,
+                finalRejectionReason: "",
+                status: "completed",
             };
 
         const result = await Api.smartUpdate(
-            [`/api/service-inquiry/${item._id}`, `/api/service-inquiries/${item._id}`],
+            [
+                `/api/orders/${item._id}`,
+                `/api/service-inquiry/${item._id}`,
+                `/api/service-inquiries/${item._id}`,
+            ],
             updateData
         );
         if (result.success) { show(`✓ ${type === "advance" ? "Advance" : "Final"} payment approved!`); inquiries.refetch(); }
@@ -1388,11 +1400,24 @@ function WebsitePanel({ sub }: { sub: string }) {
 
     const markWorkComplete = async (id: string) => {
         const result = await Api.smartUpdate(
-            [`/api/service-inquiry/${id}`, `/api/service-inquiries/${id}`],
-            { workCompleted: true, status: "work_completed" }
+            [
+                `/api/orders/${id}/work-complete`,
+                `/api/orders/${id}`,
+                `/api/service-inquiry/${id}`,
+                `/api/service-inquiries/${id}`,
+            ],
+            {
+                workCompleted: true,
+                status: "work_completed",
+            }
         );
-        if (result.success) { show("✓ Work marked complete"); requests.refetch(); }
-        else show("Failed", "error");
+
+        if (result.success) {
+            show("✓ Work marked complete. Client can now pay final amount.");
+            requests.refetch();
+        } else {
+            show("Failed to mark work complete", "error");
+        }
     };
 
     const updateProjStatus = async (id: string, status: string) => {
@@ -1435,7 +1460,6 @@ function WebsitePanel({ sub }: { sub: string }) {
         const totalQuoted = quoted.reduce((s, r) => s + (r.quotedAmount || 0), 0);
         const advanceCollected = quoted.filter(r => r.advancePaid).reduce((s, r) => s + (r.advanceAmount || 0), 0);
         const finalCollected = quoted.filter(r => r.finalPaid).reduce((s, r) => s + (r.finalAmount || 0), 0);
-
         return (
             <div>
                 <T />
@@ -1506,12 +1530,28 @@ function WebsitePanel({ sub }: { sub: string }) {
                                         style={{ fontSize: 11, color: "#fff", background: "linear-gradient(105deg, #00C9A7, #4ECDC4)", border: "none", borderRadius: 6, padding: "6px 12px", cursor: "pointer", fontFamily: "inherit", fontWeight: 600 }}>
                                         💼 Quote
                                     </button>
-                                    {q.advancePaid && !q.workCompleted && (
-                                        <button onClick={() => setCompleteModal(q)}
-                                            style={{ fontSize: 10, color: "#00C9A7", background: "rgba(0,201,167,0.1)", border: "1px solid rgba(0,201,167,0.3)", borderRadius: 4, padding: "4px 8px", cursor: "pointer", fontFamily: "inherit" }}>
-                                            ✓ Done
-                                        </button>
-                                    )}
+                                    {(
+                                        q.advancePaid ||
+                                        q.advanceVerified ||
+                                        q.advancePaymentStatus === "approved" ||
+                                        q.advancePaymentStatus === "verified"
+                                    ) && !q.workCompleted && (
+                                            <button
+                                                onClick={() => setCompleteModal(q)}
+                                                style={{
+                                                    fontSize: 10,
+                                                    color: "#00C9A7",
+                                                    background: "rgba(0,201,167,0.1)",
+                                                    border: "1px solid rgba(0,201,167,0.3)",
+                                                    borderRadius: 4,
+                                                    padding: "4px 8px",
+                                                    cursor: "pointer",
+                                                    fontFamily: "inherit",
+                                                }}
+                                            >
+                                                ✓ Done
+                                            </button>
+                                        )}
                                 </div>,
                             ];
                         })}
@@ -1527,56 +1567,295 @@ function WebsitePanel({ sub }: { sub: string }) {
             <div>
                 <T />
                 <PendingBanner />
+
                 {quoteModal && (
-                    <QuotationModal inquiry={quoteModal} onClose={() => setQuoteModal(null)}
-                        onSubmit={async (amount, notes) => { await sendQuotation(quoteModal._id, amount, notes); }} />
+                    <QuotationModal
+                        inquiry={quoteModal}
+                        onClose={() => setQuoteModal(null)}
+                        onSubmit={async (amount, notes) => {
+                            await sendQuotation(quoteModal._id, amount, notes);
+                        }}
+                    />
                 )}
-                <div style={{ display: "grid", gridTemplateColumns: "repeat(auto-fit,minmax(160px,1fr))", gap: 12, marginBottom: 16 }}>
-                    <StatCard label="Total Requests" value={requests.data.length} color="#6C63FF" icon="📩" />
-                    <StatCard label="Pending Quote" value={requests.data.filter(r => !r.quotedAmount).length} color="#FF6B6B" icon="⏳" />
-                    <StatCard label="Quoted" value={requests.data.filter(r => r.quotedAmount).length} color="#00C9A7" icon="💼" />
-                    <StatCard label="Verify Payments" value={pendingVerifications} color="#FFD60A" icon="🔍" />
+
+                <div
+                    style={{
+                        display: "grid",
+                        gridTemplateColumns: "repeat(auto-fit,minmax(160px,1fr))",
+                        gap: 12,
+                        marginBottom: 16,
+                    }}
+                >
+                    <StatCard
+                        label="Total Requests"
+                        value={requests.data.length}
+                        color="#6C63FF"
+                        icon="📩"
+                    />
+                    <StatCard
+                        label="Pending Quote"
+                        value={requests.data.filter((r) => !r.quotedAmount).length}
+                        color="#FF6B6B"
+                        icon="⏳"
+                    />
+                    <StatCard
+                        label="Quoted"
+                        value={requests.data.filter((r) => r.quotedAmount).length}
+                        color="#00C9A7"
+                        icon="💼"
+                    />
+                    <StatCard
+                        label="Verify Payments"
+                        value={pendingVerifications}
+                        color="#FFD60A"
+                        icon="🔍"
+                    />
                 </div>
-                <div style={{ background: "#13141C", border: "1px solid #1E1F2A", borderRadius: 10, overflow: "hidden" }}>
-                    <div style={{ padding: "12px 16px", borderBottom: "1px solid #1E1F2A", display: "flex", justifyContent: "space-between" }}>
-                        <span style={{ fontSize: 13, fontWeight: 600, color: "#CCCCE0" }}>Service Requests ({requests.data.length})</span>
-                        <button onClick={requests.refetch} style={{ fontSize: 11, color: "#6C63FF", background: "rgba(108,99,255,0.08)", border: "1px solid rgba(108,99,255,0.3)", borderRadius: 6, padding: "5px 12px", cursor: "pointer", fontFamily: "inherit" }}>↻ Refresh</button>
+
+                <div
+                    style={{
+                        background: "#13141C",
+                        border: "1px solid #1E1F2A",
+                        borderRadius: 10,
+                        overflow: "hidden",
+                    }}
+                >
+                    <div
+                        style={{
+                            padding: "12px 16px",
+                            borderBottom: "1px solid #1E1F2A",
+                            display: "flex",
+                            justifyContent: "space-between",
+                        }}
+                    >
+                        <span
+                            style={{
+                                fontSize: 13,
+                                fontWeight: 600,
+                                color: "#CCCCE0",
+                            }}
+                        >
+                            Service Requests ({requests.data.length})
+                        </span>
+
+                        <button
+                            onClick={requests.refetch}
+                            style={{
+                                fontSize: 11,
+                                color: "#6C63FF",
+                                background: "rgba(108,99,255,0.08)",
+                                border: "1px solid rgba(108,99,255,0.3)",
+                                borderRadius: 6,
+                                padding: "5px 12px",
+                                cursor: "pointer",
+                                fontFamily: "inherit",
+                            }}
+                        >
+                            ↻ Refresh
+                        </button>
                     </div>
+
                     <Table
                         cols={["Date", "Client", "Service", "Timeline", "Quote", "Payment", "Action"]}
-                        rows={requests.data.map(q => [
+                        rows={requests.data.map((q) => [
                             fmtDT(q.createdAt),
+
                             <div>
-                                <p style={{ fontWeight: 500, color: "#D0D0E8", fontSize: 12 }}>{q.name}</p>
-                                <p style={{ fontSize: 10, color: "#6C63FF" }}>{q.email}</p>
+                                <p
+                                    style={{
+                                        fontWeight: 500,
+                                        color: "#D0D0E8",
+                                        fontSize: 12,
+                                    }}
+                                >
+                                    {q.name}
+                                </p>
+                                <p
+                                    style={{
+                                        fontSize: 10,
+                                        color: "#6C63FF",
+                                    }}
+                                >
+                                    {q.email}
+                                </p>
                             </div>,
-                            <span style={{ fontSize: 11, color: "#FFA94D", fontWeight: 600 }}>{q.service}</span>,
+
+                            <span
+                                style={{
+                                    fontSize: 11,
+                                    color: "#FFA94D",
+                                    fontWeight: 600,
+                                }}
+                            >
+                                {q.service}
+                            </span>,
+
                             q.timeline,
-                            q.quotedAmount ? <span style={{ color: "#00C9A7", fontWeight: 700 }}>{fmtINR(q.quotedAmount)}</span> : <span style={{ fontSize: 10, color: "#FF6B6B" }}>Not quoted</span>,
-                            // Payment verification status
+
+                            q.quotedAmount ? (
+                                <span
+                                    style={{
+                                        color: "#00C9A7",
+                                        fontWeight: 700,
+                                    }}
+                                >
+                                    {fmtINR(q.quotedAmount)}
+                                </span>
+                            ) : (
+                                <span
+                                    style={{
+                                        fontSize: 10,
+                                        color: "#FF6B6B",
+                                    }}
+                                >
+                                    Not quoted
+                                </span>
+                            ),
+
                             <div>
                                 {q.advancePaymentStatus === "pending_verification" && (
-                                    <span style={{ fontSize: 10, color: "#FFD60A", background: "rgba(255,214,10,0.1)", padding: "2px 6px", borderRadius: 4, fontWeight: 700, display: "block", marginBottom: 2 }}>
+                                    <span
+                                        style={{
+                                            fontSize: 10,
+                                            color: "#FFD60A",
+                                            background: "rgba(255,214,10,0.1)",
+                                            padding: "2px 6px",
+                                            borderRadius: 4,
+                                            fontWeight: 700,
+                                            display: "block",
+                                            marginBottom: 2,
+                                        }}
+                                    >
                                         ⏳ Adv. Verifying
                                     </span>
                                 )}
+
                                 {q.finalPaymentStatus === "pending_verification" && (
-                                    <span style={{ fontSize: 10, color: "#FFD60A", background: "rgba(255,214,10,0.1)", padding: "2px 6px", borderRadius: 4, fontWeight: 700, display: "block" }}>
+                                    <span
+                                        style={{
+                                            fontSize: 10,
+                                            color: "#FFD60A",
+                                            background: "rgba(255,214,10,0.1)",
+                                            padding: "2px 6px",
+                                            borderRadius: 4,
+                                            fontWeight: 700,
+                                            display: "block",
+                                        }}
+                                    >
                                         ⏳ Final Verifying
                                     </span>
                                 )}
-                                {q.advancePaid && q.advancePaymentStatus === "approved" && (
-                                    <span style={{ fontSize: 10, color: "#00C9A7", display: "block" }}>✓ Adv. Paid</span>
+
+                                {(q.advancePaid ||
+                                    q.advanceVerified ||
+                                    q.advancePaymentStatus === "approved" ||
+                                    q.advancePaymentStatus === "verified") && (
+                                        <span
+                                            style={{
+                                                fontSize: 10,
+                                                color: "#00C9A7",
+                                                display: "block",
+                                            }}
+                                        >
+                                            ✓ Adv. Paid
+                                        </span>
+                                    )}
+
+                                {(q.finalPaid ||
+                                    q.finalVerified ||
+                                    q.finalPaymentStatus === "approved" ||
+                                    q.finalPaymentStatus === "verified") && (
+                                        <span
+                                            style={{
+                                                fontSize: 10,
+                                                color: "#00C9A7",
+                                                display: "block",
+                                            }}
+                                        >
+                                            ✓ Final Paid
+                                        </span>
+                                    )}
+
+                                {q.workCompleted && (
+                                    <span
+                                        style={{
+                                            fontSize: 10,
+                                            color: "#4ECDC4",
+                                            display: "block",
+                                        }}
+                                    >
+                                        ✓ Work Done
+                                    </span>
                                 )}
-                                {q.finalPaid && <span style={{ fontSize: 10, color: "#00C9A7", display: "block" }}>✓ Final Paid</span>}
-                                {!q.advanceTxnId && !q.finalTxnId && <span style={{ fontSize: 10, color: "#444" }}>—</span>}
+
+                                {!q.advanceTxnId && !q.finalTxnId && !q.workCompleted && (
+                                    <span
+                                        style={{
+                                            fontSize: 10,
+                                            color: "#444",
+                                        }}
+                                    >
+                                        —
+                                    </span>
+                                )}
                             </div>,
-                            <button onClick={() => setQuoteModal(q)}
-                                style={{ fontSize: 11, color: "#fff", background: q.quotedAmount ? "linear-gradient(105deg, #6C63FF, #9D97FF)" : "linear-gradient(105deg, #00C9A7, #4ECDC4)", border: "none", borderRadius: 6, padding: "6px 14px", cursor: "pointer", fontFamily: "inherit", fontWeight: 600, whiteSpace: "nowrap" }}>
-                                {q.quotedAmount ? "✎ Edit Quote" : "💼 Send Quote"}
-                            </button>,
+
+                            <div
+                                style={{
+                                    display: "flex",
+                                    alignItems: "center",
+                                    gap: 8,
+                                    flexWrap: "wrap",
+                                }}
+                            >
+                                <button
+                                    onClick={() => setQuoteModal(q)}
+                                    style={{
+                                        fontSize: 11,
+                                        color: "#fff",
+                                        background: q.quotedAmount
+                                            ? "linear-gradient(105deg, #6C63FF, #9D97FF)"
+                                            : "linear-gradient(105deg, #00C9A7, #4ECDC4)",
+                                        border: "none",
+                                        borderRadius: 6,
+                                        padding: "6px 14px",
+                                        cursor: "pointer",
+                                        fontFamily: "inherit",
+                                        fontWeight: 600,
+                                        whiteSpace: "nowrap",
+                                    }}
+                                >
+                                    {q.quotedAmount ? "✎ Edit Quote" : "💼 Send Quote"}
+                                </button>
+
+                                {q.quotedAmount && q.quotedAmount > 0 && (
+                                    <button
+                                        onClick={() => markWorkComplete(q._id)}
+                                        disabled={q.workCompleted}
+                                        style={{
+                                            fontSize: 11,
+                                            color: q.workCompleted ? "#888" : "#000",
+                                            background: q.workCompleted
+                                                ? "rgba(100,100,120,0.12)"
+                                                : "linear-gradient(105deg, #00C9A7, #4ECDC4)",
+                                            border: q.workCompleted
+                                                ? "1px solid #2A2B38"
+                                                : "none",
+                                            borderRadius: 6,
+                                            padding: "6px 12px",
+                                            cursor: q.workCompleted ? "not-allowed" : "pointer",
+                                            fontFamily: "inherit",
+                                            fontWeight: 700,
+                                            whiteSpace: "nowrap",
+                                        }}
+                                    >
+                                        {q.workCompleted ? "✓ Done" : "✓ Mark Done"}
+                                    </button>
+                                )}
+                            </div>,
                         ])}
                     />
+
                     {requests.data.length === 0 && <Empty msg="No service requests yet" />}
                 </div>
             </div>

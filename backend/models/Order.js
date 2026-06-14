@@ -10,6 +10,8 @@ const orderSchema = new mongoose.Schema(
 
         orderId: {
             type: String,
+            unique: true,
+            sparse: true,
         },
 
         service: {
@@ -17,9 +19,7 @@ const orderSchema = new mongoose.Schema(
             required: true,
         },
 
-        serviceType: {
-            type: String,
-        },
+        serviceType: String,
 
         amount: {
             type: Number,
@@ -31,6 +31,7 @@ const orderSchema = new mongoose.Schema(
             enum: [
                 "pending",
                 "approved",
+                "processing",
                 "Advance Paid",
                 "work_completed",
                 "Fully Paid",
@@ -86,7 +87,7 @@ const orderSchema = new mongoose.Schema(
             default: null,
         },
 
-        // ADVANCE PAYMENT VERIFICATION
+        // ADVANCE PAYMENT
         advancePaid: {
             type: Boolean,
             default: false,
@@ -163,7 +164,7 @@ const orderSchema = new mongoose.Schema(
             default: "",
         },
 
-        // FINAL PAYMENT VERIFICATION
+        // FINAL PAYMENT
         finalPaid: {
             type: Boolean,
             default: false,

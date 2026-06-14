@@ -17,9 +17,13 @@ const generateExcelFile = require("./backend/utils/generateExcel");
 const rentalInquiryRoutes = require("./backend/routes/rentalInquiry");
 const cloudinary = require("./backend/config/cloudinary");
 const productAvailabilityRoutes = require("./backend/routes/productAvailability");
-const serviceInquiryRoutes = require("./backend/routes/serviceInquiry");
+const transactionRoutes = require("./backend/routes/finance/transactions");
+const invoiceRoutes = require("./backend/routes/finance/invoices");
+const budgetRoutes = require("./backend/routes/finance/budgets");
+const taxRoutes = require("./backend/routes/finance/tax");
 
 // contactRoute = require("./backend/routes/contact");
+// const serviceInquiryRoutes = require("./backend/routes/serviceInquiry");
 
 const app = express();
 
@@ -44,14 +48,26 @@ app.use(
     "/uploads",
     express.static(path.join(__dirname, "backend", "uploads"))
 );
-//app.use("/api/contact", contactRoute);
+
+// app.use("/api/contact", contactRoute);
+
 app.use("/api/product-availability", productAvailabilityRoutes);
 app.use("/api/rental-availability", productAvailabilityRoutes);
 app.use("/api/rental-inquiry", rentalInquiryRoutes);
 app.use("/api/export", exportRoutes);
+
+// Main order workflow
 app.use("/api/orders", orderRoutes);
-app.use("/api/service-inquiry", serviceInquiryRoutes);
-app.use("/api/service-inquiries", serviceInquiryRoutes);
+
+// Admin dashboard compatibility
+app.use("/api/service-inquiry", orderRoutes);
+app.use("/api/service-inquiries", orderRoutes);
+
+// ── Finance API ──
+app.use("/api/finance/transactions", transactionRoutes);
+app.use("/api/finance/invoices",     invoiceRoutes);
+app.use("/api/finance/budgets",      budgetRoutes);
+app.use("/api/finance/tax",          taxRoutes);
 
 
 const PORT = process.env.PORT || 5000;

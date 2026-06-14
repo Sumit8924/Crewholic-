@@ -83,6 +83,27 @@ function LoginPage() {
         // FIX 1: Removed setTimeout 500ms delay — load immediately
         loadGoogleScript();
     }, []);
+    useEffect(() => {
+        const checkLoginExpiry = () => {
+            const expiry = localStorage.getItem("loginExpiry");
+
+            if (!expiry) return;
+
+            const expiryTime = Number(expiry);
+
+            if (Date.now() > expiryTime) {
+                localStorage.removeItem("user");
+                localStorage.removeItem("token");
+                localStorage.removeItem("role");
+                localStorage.removeItem("permissions");
+                localStorage.removeItem("loginExpiry");
+
+                showMessage("Session expired. Please login again.", true);
+            }
+        };
+
+        checkLoginExpiry();
+    }, []);
 
     const showMessage = (text: string, isError = false) => {
         setToastMessage({ text, isError });
@@ -202,13 +223,19 @@ function LoginPage() {
 
     const saveLoginData = (data: any) => {
         const user = data.user || {};
-        // FIX 5: Batch all localStorage writes together
+
+        // 1 day expiry time
+        const oneDay = 24 * 60 * 60 * 1000;
+        const expiryTime = Date.now() + oneDay;
+
         const items: [string, string][] = [
             ["user", JSON.stringify(user)],
             ["token", data.token || ""],
             ["role", user?.role || "user"],
             ["permissions", JSON.stringify(user?.permissions || [])],
+            ["loginExpiry", expiryTime.toString()],
         ];
+
         items.forEach(([key, val]) => localStorage.setItem(key, val));
     };
 

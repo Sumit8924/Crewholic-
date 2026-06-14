@@ -11,111 +11,163 @@ export const Route = createFileRoute("/portfolio")({
 const projects = [
     {
         id: "01",
-        title: "Augustine",
-        category: "Hospitality",
-        description: "Luxury restaurant brand identity and digital experience design.",
-        longDesc: "A complete brand transformation for a high-end restaurant in San Jose. We created a sophisticated visual identity, custom website, and immersive dining experience that elevated their market presence.",
-        image: "https://images.unsplash.com/photo-1517248135467-4c7edcad34c4?w=800&q=80",
+        title: "Digital Edge Agency",
+        category: "Digital Marketing",
+        description: "Comprehensive digital marketing campaign that increased ROI by 300%.",
+        longDesc: "A full-scale digital marketing transformation for a leading agency. We implemented SEO, PPC, social media marketing, and email campaigns that resulted in 300% ROI increase within 6 months.",
+        image: "https://images.unsplash.com/photo-1460925895917-afdab827c52f?w=800&q=80",
         accent: "#9B51E0",
-        tags: ["Brand Identity", "Web Design", "Packaging"],
-        deliverables: ["Logo Design", "Menu Design", "Website", "Social Media Kit"],
+        tags: ["SEO", "PPC", "Social Media", "Email Marketing"],
+        deliverables: ["SEO Strategy", "PPC Campaigns", "Social Media Management", "Analytics Dashboard"],
         year: "2024",
-        location: "San Jose, California",
+        location: "New York, NY",
     },
     {
         id: "02",
-        title: "Magic Donuts",
-        category: "Retail",
-        description: "Playful brand identity and digital presence for a trendy donut shop.",
-        longDesc: "Created a whimsical brand identity that captures the magic of artisanal donuts. The project included packaging design, social media strategy, and a fun, engaging website.",
-        image: "https://images.unsplash.com/photo-1554118811-1e0d58224f24?w=800&q=80",
+        title: "Viral Vision",
+        category: "Content Creation",
+        description: "Viral content strategy that generated 10M+ views across platforms.",
+        longDesc: "Created a comprehensive content strategy including short-form videos, blog posts, and infographics that went viral across TikTok, Instagram, and YouTube, generating over 10 million views.",
+        image: "https://images.unsplash.com/photo-1611162617213-7d7a39e9b1d7?w=800&q=80",
         accent: "#4ecdc4",
-        tags: ["Brand Identity", "Packaging", "Social Media"],
-        deliverables: ["Logo Design", "Packaging", "Website", "Social Strategy"],
+        tags: ["Video Production", "Copywriting", "Graphic Design", "Strategy"],
+        deliverables: ["Video Content", "Blog Posts", "Infographics", "Content Calendar"],
         year: "2024",
-        location: "San Francisco, California",
+        location: "Los Angeles, CA",
     },
     {
         id: "03",
-        title: "Louie's Original",
-        category: "Hospitality",
-        description: "Vintage-inspired branding for a classic American eatery.",
-        longDesc: "Developed a nostalgic brand identity that honors tradition while appealing to modern diners. The project featured custom typography, retro color palette, and comprehensive brand guidelines.",
-        image: "https://images.unsplash.com/photo-1559329007-40df8a9345d8?w=800&q=80",
+        title: "TechFlow Solutions",
+        category: "Web Development",
+        description: "Custom web application with real-time analytics and dashboard.",
+        longDesc: "Built a full-stack web application for enterprise clients featuring real-time data visualization, user authentication, and responsive design across all devices.",
+        image: "https://images.unsplash.com/photo-1555066931-4365d14bab8c?w=800&q=80",
         accent: "#F2994A",
-        tags: ["Brand Identity", "Typography", "Illustration"],
-        deliverables: ["Logo Design", "Brand Guidelines", "Merchandise", "Menu"],
-        year: "2023",
-        location: "San Francisco, California",
+        tags: ["React", "Node.js", "MongoDB", "Tailwind"],
+        deliverables: ["Full-Stack App", "Admin Dashboard", "API Integration", "Mobile Responsive"],
+        year: "2024",
+        location: "San Francisco, CA",
     },
     {
         id: "04",
-        title: "Old Navy Flagship",
-        category: "Retail",
-        description: "Immersive digital experience for a flagship retail store.",
-        longDesc: "Created an engaging digital ecosystem for the iconic Old Navy flagship location. The project included interactive kiosks, mobile integration, and a seamless omnichannel experience.",
-        image: "https://images.unsplash.com/photo-1441986300917-64674bd600d8?w=800&q=80",
+        title: "EventMaster Pro",
+        category: "Event Management",
+        description: "End-to-end event management platform for large-scale conferences.",
+        longDesc: "Developed a comprehensive event management system handling ticketing, scheduling, speaker management, and attendee engagement for 5000+ participant events.",
+        image: "https://images.unsplash.com/photo-1505373877841-8d25f7d46678?w=800&q=80",
         accent: "#a8e6cf",
-        tags: ["Web Development", "3D", "Interactive"],
-        deliverables: ["Interactive Kiosks", "Mobile App", "Website", "Analytics"],
-        year: "2023",
-        location: "New York, NY",
+        tags: ["Planning", "Ticketing", "Logistics", "On-site Management"],
+        deliverables: ["Event Platform", "Ticketing System", "Mobile App", "Analytics"],
+        year: "2024",
+        location: "Chicago, IL",
     },
     {
         id: "05",
-        title: "GAP Times Square",
-        category: "Retail",
-        description: "Digital transformation for a premier retail destination.",
-        longDesc: "Led the digital transformation for GAP's flagship Times Square location. The project featured immersive visual displays, real-time inventory integration, and personalized shopping experiences.",
-        image: "https://images.unsplash.com/photo-1556742049-0cfed4f6a45d?w=800&q=80",
+        title: "Luxury Rentals Hub",
+        category: "Rentals",
+        description: "Premium property rental platform with virtual tours and booking system.",
+        longDesc: "Created a luxury vacation rental marketplace featuring 3D virtual tours, instant booking, payment processing, and host dashboard for property management.",
+        image: "https://images.unsplash.com/photo-1568605114967-8130f3a36994?w=800&q=80",
         accent: "#ff8c42",
-        tags: ["Digital Strategy", "Web Development", "Analytics"],
-        deliverables: ["Digital Displays", "E-commerce", "CRM Integration", "Analytics Dashboard"],
+        tags: ["Booking System", "Payment Gateway", "Virtual Tours", "Host Dashboard"],
+        deliverables: ["Rental Platform", "Booking Engine", "Payment Integration", "Mobile App"],
         year: "2024",
-        location: "New York, NY",
+        location: "Miami, FL",
     },
     {
         id: "06",
-        title: "Nebula Studios",
-        category: "Digital",
-        description: "Cutting-edge 3D web experience for a creative studio.",
-        longDesc: "Built an immersive 3D portfolio website that showcases creative work in an interactive environment. The project featured WebGL animations, particle systems, and seamless navigation.",
-        image: "https://images.unsplash.com/photo-1550745165-9bc0b252726f?w=800&q=80",
+        title: "Influencer Studios",
+        category: "Content Creation",
+        description: "Professional content studio producing high-conversion branded content.",
+        longDesc: "Full-service content production studio delivering photography, videography, and motion graphics for top brands, resulting in 200% engagement increase.",
+        image: "https://images.unsplash.com/photo-1492691527719-9d1e07e534b4?w=800&q=80",
         accent: "#8b5cf6",
-        tags: ["Three.js", "3D", "WebGL"],
-        deliverables: ["3D Website", "Particle System", "Interactive UI", "Performance Optimization"],
+        tags: ["Photography", "Videography", "Motion Graphics", "Editing"],
+        deliverables: ["Brand Photos", "Product Videos", "Motion Graphics", "Social Assets"],
         year: "2024",
-        location: "Los Angeles, California",
+        location: "Austin, TX",
     },
     {
         id: "07",
-        title: "EcoChic",
-        category: "Sustainability",
-        description: "Sustainable brand identity and digital presence for eco-friendly fashion.",
-        longDesc: "Created a cohesive brand identity for a sustainable fashion brand. The project included eco-conscious packaging, minimalist website design, and a compelling brand story.",
-        image: "https://images.unsplash.com/photo-1539109136881-3be0616acf4b?w=800&q=80",
+        title: "CorpConnect",
+        category: "Web Development",
+        description: "Enterprise web portal with CRM integration and workflow automation.",
+        longDesc: "Built a custom enterprise portal that streamlined internal operations with CRM integration, automated workflows, and real-time collaboration tools.",
+        image: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=800&q=80",
         accent: "#4caf50",
-        tags: ["Brand Identity", "Web Design", "Sustainability"],
-        deliverables: ["Logo Design", "Website", "Packaging", "Brand Guidelines"],
-        year: "2024",
-        location: "Portland, Oregon",
+        tags: ["CRM", "Workflow", "Dashboard", "API"],
+        deliverables: ["Portal", "CRM Integration", "Automation", "Analytics"],
+        year: "2023",
+        location: "Seattle, WA",
     },
     {
         id: "08",
-        title: "Quantum Finance",
-        category: "Fintech",
-        description: "Modern fintech platform with seamless user experience.",
-        longDesc: "Developed a cutting-edge fintech platform that simplifies complex financial operations. The project featured real-time data visualization, secure authentication, and intuitive dashboard design.",
-        image: "https://images.unsplash.com/photo-1551288049-bebda4e38f71?w=800&q=80",
+        title: "SocialFlow",
+        category: "Digital Marketing",
+        description: "Social media growth strategy that doubled engagement in 3 months.",
+        longDesc: "Comprehensive social media strategy including content planning, community management, and paid campaigns that doubled engagement metrics across all platforms.",
+        image: "https://images.unsplash.com/photo-1611162616305-c69b3fa7fbe0?w=800&q=80",
         accent: "#06b6d4",
-        tags: ["Web App", "Dashboard", "Data Visualization"],
-        deliverables: ["Web Platform", "Dashboard", "Analytics", "API Integration"],
+        tags: ["Social Strategy", "Community", "Paid Ads", "Analytics"],
+        deliverables: ["Strategy", "Content Plan", "Ad Campaigns", "Monthly Reports"],
         year: "2024",
-        location: "Remote",
+        location: "Denver, CO",
+    },
+    {
+        id: "09",
+        title: "Gala Events Co.",
+        category: "Event Management",
+        description: "Luxury event planning for weddings, galas, and corporate functions.",
+        longDesc: "Full-service event planning and execution for high-profile clients including venue selection, vendor management, design, and day-of coordination.",
+        image: "https://images.unsplash.com/photo-1519167758481-83f550bb49b3?w=800&q=80",
+        accent: "#e84393",
+        tags: ["Planning", "Design", "Vendor Management", "Coordination"],
+        deliverables: ["Event Design", "Vendor Booking", "Timeline", "On-site Management"],
+        year: "2024",
+        location: "Las Vegas, NV",
+    },
+    {
+        id: "10",
+        title: "Property Plus",
+        category: "Rentals",
+        description: "Short-term rental management system with automated guest communication.",
+        longDesc: "Complete rental management solution featuring automated messaging, smart lock integration, pricing optimization, and multi-calendar sync.",
+        image: "https://images.unsplash.com/photo-1522708323590-d24dbb6b0267?w=800&q=80",
+        accent: "#f39c12",
+        tags: ["Automation", "Calendar Sync", "Pricing", "Guest Comms"],
+        deliverables: ["Management System", "Automation", "Dashboard", "Integration"],
+        year: "2024",
+        location: "Nashville, TN",
+    },
+    {
+        id: "11",
+        title: "Creative Minds",
+        category: "Content Creation",
+        description: "Brand storytelling and creative direction for emerging brands.",
+        longDesc: "Developed compelling brand narratives and creative assets that helped 15+ startups establish their market presence and connect with target audiences.",
+        image: "https://images.unsplash.com/photo-1452587925148-ce544e77e70d?w=800&q=80",
+        accent: "#3498db",
+        tags: ["Storytelling", "Creative Direction", "Branding", "Assets"],
+        deliverables: ["Brand Story", "Creative Assets", "Guidelines", "Strategy"],
+        year: "2023",
+        location: "Portland, OR",
+    },
+    {
+        id: "12",
+        title: "SearchMaster",
+        category: "Digital Marketing",
+        description: "SEO overhaul that brought organic traffic from 0 to 50k monthly.",
+        longDesc: "Complete SEO audit and implementation including technical SEO, content optimization, and link building that grew organic traffic to 50k monthly visitors.",
+        image: "https://images.unsplash.com/photo-1432888622747-4eb9a8f2d293?w=800&q=80",
+        accent: "#2ecc71",
+        tags: ["SEO", "Content", "Link Building", "Analytics"],
+        deliverables: ["SEO Audit", "Keyword Strategy", "Content Plan", "Monthly Reports"],
+        year: "2024",
+        location: "Boston, MA",
     },
 ];
 
-const categories = ["All", "Hospitality", "Retail", "Digital", "Sustainability", "Fintech"];
+const categories = ["All", "Digital Marketing", "Content Creation", "Web Development", "Rentals", "Event Management"];
 
 const navItems = [
     { label: "Home", href: "/" },
@@ -134,14 +186,8 @@ const gradientStyle = {
 };
 
 // ─── FADE IN ────────────────────────────────────────────────────────────────
-function FadeIn({ children, delay = 0, y = 20, className = "", as: Component = "div" }: {
-    children: React.ReactNode;
-    delay?: number;
-    y?: number;
-    className?: string;
-    as?: any;
-}) {
-    const MotionComponent = motion[Component as keyof typeof motion] as any || motion.div;
+function FadeIn({ children, delay = 0, y = 20, className = "", as: Component = "div" }) {
+    const MotionComponent = motion[Component] || motion.div;
     return (
         <MotionComponent
             initial={{ opacity: 0, y }}
@@ -155,7 +201,7 @@ function FadeIn({ children, delay = 0, y = 20, className = "", as: Component = "
 }
 
 // ─── CONTACT BUTTON ─────────────────────────────────────────────────────────
-function ContactButton({ label = "CONTACT ME", href = "/contact" }: { label?: string; href?: string }) {
+function ContactButton({ label = "CONTACT ME", href = "/contact" }) {
     return (
         <motion.a
             href={href}
@@ -180,18 +226,14 @@ function ContactButton({ label = "CONTACT ME", href = "/contact" }: { label?: st
 }
 
 // ─── MAGNETIC BUTTON ────────────────────────────────────────────────────────
-function MagneticButton({ children, className, onClick }: {
-    children: React.ReactNode;
-    className?: string;
-    onClick?: () => void;
-}) {
-    const ref = useRef<HTMLDivElement>(null);
+function MagneticButton({ children, className, onClick }) {
+    const ref = useRef(null);
     const x = useMotionValue(0);
     const y = useMotionValue(0);
     const springX = useSpring(x, { stiffness: 300, damping: 20 });
     const springY = useSpring(y, { stiffness: 300, damping: 20 });
 
-    const handleMouseMove = (e: React.MouseEvent) => {
+    const handleMouseMove = (e) => {
         if (!ref.current) return;
         const rect = ref.current.getBoundingClientRect();
         const cx = rect.left + rect.width / 2;
@@ -222,14 +264,8 @@ function MagneticButton({ children, className, onClick }: {
 // ─── SCROLL 3D REVEAL ───────────────────────────────────────────────────────
 function Scroll3DReveal({
     children, rotateFrom = [20, 0, 0], translateFrom = [0, 80, -120], scaleFrom = 0.8, className = "",
-}: {
-    children: React.ReactNode;
-    rotateFrom?: [number, number, number];
-    translateFrom?: [number, number, number];
-    scaleFrom?: number;
-    className?: string;
 }) {
-    const ref = useRef<HTMLDivElement>(null);
+    const ref = useRef(null);
     const { scrollYProgress } = useScroll({ target: ref, offset: ["start end", "center center"] });
     const rotateX = useTransform(scrollYProgress, [0, 1], [rotateFrom[0], 0]);
     const rotateY = useTransform(scrollYProgress, [0, 1], [rotateFrom[1], 0]);
@@ -250,15 +286,11 @@ function Scroll3DReveal({
 }
 
 // ─── SCROLL 3D CARD ─────────────────────────────────────────────────────────
-function Scroll3DCard({ children, index = 0, direction = "left" }: {
-    children: React.ReactNode;
-    index?: number;
-    direction?: "left" | "right" | "up" | "down";
-}) {
-    const ref = useRef<HTMLDivElement>(null);
+function Scroll3DCard({ children, index = 0, direction = "left" }) {
+    const ref = useRef(null);
     const { scrollYProgress } = useScroll({ target: ref, offset: ["start 95%", "center 55%"] });
 
-    const dirMap: Record<string, [number, number, number, number, number, number]> = {
+    const dirMap = {
         left: [-8, -15, 3, -40, 30, -60],
         right: [-8, 15, -3, 40, 30, -60],
         up: [-15, 0, 0, 0, 60, -80],
@@ -285,19 +317,15 @@ function Scroll3DCard({ children, index = 0, direction = "left" }: {
 }
 
 // ─── PROJECT CARD ───────────────────────────────────────────────────────────
-function ProjectCard({ project, index, onClick }: {
-    project: typeof projects[0];
-    index: number;
-    onClick: () => void;
-}) {
+function ProjectCard({ project, index, onClick }) {
     const [hovered, setHovered] = useState(false);
-    const cardRef = useRef<HTMLDivElement>(null);
+    const cardRef = useRef(null);
     const rotateX = useMotionValue(0);
     const rotateY = useMotionValue(0);
     const springRX = useSpring(rotateX, { stiffness: 200, damping: 20 });
     const springRY = useSpring(rotateY, { stiffness: 200, damping: 20 });
 
-    const handleMouseMove = (e: React.MouseEvent<HTMLDivElement>) => {
+    const handleMouseMove = (e) => {
         if (!cardRef.current) return;
         const rect = cardRef.current.getBoundingClientRect();
         const px = (e.clientX - rect.left) / rect.width - 0.5;
@@ -312,7 +340,7 @@ function ProjectCard({ project, index, onClick }: {
         setHovered(false);
     };
 
-    const directions: Array<"left" | "right" | "up" | "down"> = ["left", "up", "right", "down", "left", "up", "right", "down"];
+    const directions = ["left", "up", "right", "down", "left", "up", "right", "down"];
 
     return (
         <Scroll3DCard index={index} direction={directions[index % directions.length]}>
@@ -342,7 +370,6 @@ function ProjectCard({ project, index, onClick }: {
                             : "inset 0 1px 0 rgba(255,255,255,0.04)",
                     }}
                 >
-                    {/* Image */}
                     <div className="relative h-40 sm:h-44 md:h-48 overflow-hidden">
                         <motion.img
                             src={project.image}
@@ -352,7 +379,6 @@ function ProjectCard({ project, index, onClick }: {
                             transition={{ duration: 0.5 }}
                         />
                         <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent" />
-
                         <div
                             className="absolute top-3 left-3 text-[9px] sm:text-[10px] px-2 py-1 rounded-full font-medium"
                             style={{ background: project.accent + "CC", color: "#fff" }}
@@ -360,29 +386,23 @@ function ProjectCard({ project, index, onClick }: {
                             {project.category}
                         </div>
                     </div>
-
-                    {/* Content */}
                     <div className="p-4 sm:p-5 flex-1 flex flex-col">
                         <div className="text-[10px] sm:text-xs font-mono mb-1 sm:mb-2 tracking-widest" style={{ color: project.accent + "99" }}>
                             {project.id}
                         </div>
-
                         <h3
                             className="text-lg sm:text-xl font-semibold mb-1 sm:mb-2 tracking-tight transition-colors duration-300"
                             style={{ color: hovered ? "#fff" : "#e5e5e5", fontFamily: "'Syne', sans-serif" }}
                         >
                             {project.title}
                         </h3>
-
                         <p className="text-xs sm:text-sm leading-relaxed mb-2 sm:mb-3 flex-1" style={{ color: "#888" }}>
                             {project.description}
                         </p>
-
                         <div className="flex items-center justify-between text-[10px] sm:text-xs text-gray-500 mb-2 sm:mb-3">
                             <span className="truncate pr-2">{project.location}</span>
                             <span>{project.year}</span>
                         </div>
-
                         <div className="flex flex-wrap gap-1.5 sm:gap-2">
                             {project.tags.slice(0, 2).map((tag) => (
                                 <span
@@ -414,11 +434,7 @@ function ProjectCard({ project, index, onClick }: {
 }
 
 // ─── PROJECT MODAL ──────────────────────────────────────────────────────────
-function ProjectModal({ project, isOpen, onClose }: {
-    project: typeof projects[0] | null;
-    isOpen: boolean;
-    onClose: () => void;
-}) {
+function ProjectModal({ project, isOpen, onClose }) {
     if (!project) return null;
 
     return (
@@ -454,11 +470,9 @@ function ProjectModal({ project, isOpen, onClose }: {
                             >
                                 ×
                             </button>
-
                             <div className="relative h-48 sm:h-64 md:h-96 overflow-hidden rounded-t-2xl sm:rounded-t-3xl">
                                 <img src={project.image} alt={project.title} className="w-full h-full object-cover" />
                                 <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-transparent to-transparent" />
-
                                 <div
                                     className="absolute bottom-3 sm:bottom-5 left-4 sm:left-6 text-xs sm:text-sm px-3 sm:px-4 py-1 sm:py-1.5 rounded-full font-medium"
                                     style={{ background: project.accent + "CC", color: "#fff" }}
@@ -466,7 +480,6 @@ function ProjectModal({ project, isOpen, onClose }: {
                                     {project.category}
                                 </div>
                             </div>
-
                             <div className="p-5 sm:p-6 md:p-8">
                                 <div className="flex flex-wrap justify-between items-start mb-4 sm:mb-6 gap-2">
                                     <div>
@@ -482,13 +495,11 @@ function ProjectModal({ project, isOpen, onClose }: {
                                         <div className="text-xs sm:text-sm text-gray-400">{project.year}</div>
                                     </div>
                                 </div>
-
                                 <p className="text-gray-300 text-sm sm:text-base leading-relaxed mb-4 sm:mb-6">
                                     {project.longDesc}
                                 </p>
-
                                 <div className="mb-4 sm:mb-6">
-                                    <h4 className="text-xs sm:text-sm font-semibold text-gray-400 mb-2 sm:mb-3">Technologies & Skills</h4>
+                                    <h4 className="text-xs sm:text-sm font-semibold text-gray-400 mb-2 sm:mb-3">Services Provided</h4>
                                     <div className="flex flex-wrap gap-1.5 sm:gap-2">
                                         {project.tags.map((tag) => (
                                             <span
@@ -505,7 +516,6 @@ function ProjectModal({ project, isOpen, onClose }: {
                                         ))}
                                     </div>
                                 </div>
-
                                 <div>
                                     <h4 className="text-xs sm:text-sm font-semibold text-gray-400 mb-2 sm:mb-3">Deliverables</h4>
                                     <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-2 sm:gap-3">
@@ -517,7 +527,6 @@ function ProjectModal({ project, isOpen, onClose }: {
                                         ))}
                                     </div>
                                 </div>
-
                                 <div className="mt-6 sm:mt-8 pt-4 sm:pt-6 border-t border-white/10">
                                     <MagneticButton>
                                         <motion.a
@@ -547,13 +556,12 @@ function ProjectModal({ project, isOpen, onClose }: {
 function PortfolioPage() {
     const [mousePos, setMousePos] = useState({ x: 0, y: 0 });
     const [activeCategory, setActiveCategory] = useState("All");
-    const [selectedProject, setSelectedProject] = useState<typeof projects[0] | null>(null);
+    const [selectedProject, setSelectedProject] = useState(null);
     const [isModalOpen, setIsModalOpen] = useState(false);
     const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
+    const [loggedInUser, setLoggedInUser] = useState(null);
 
-    const [loggedInUser, setLoggedInUser] = useState<{ name?: string; role?: string } | null>(null);
-
-    const getFirstName = (name?: string) => {
+    const getFirstName = (name) => {
         if (!name) return "User";
         return name.trim().split(" ")[0];
     };
@@ -563,7 +571,7 @@ function PortfolioPage() {
         link.rel = "stylesheet";
         link.href = "https://fonts.googleapis.com/css2?family=Syne:wght@400;500;600;700;800;900&family=Space+Mono:wght@400;700&display=swap";
         document.head.appendChild(link);
-        const handleMouseMove = (e: MouseEvent) => setMousePos({ x: e.clientX, y: e.clientY });
+        const handleMouseMove = (e) => setMousePos({ x: e.clientX, y: e.clientY });
         window.addEventListener("mousemove", handleMouseMove);
         return () => window.removeEventListener("mousemove", handleMouseMove);
     }, []);
@@ -572,10 +580,10 @@ function PortfolioPage() {
         document.body.style.overflow = mobileMenuOpen ? 'hidden' : 'unset';
         return () => { document.body.style.overflow = 'unset'; };
     }, [mobileMenuOpen]);
+
     useEffect(() => {
         const token = localStorage.getItem("token");
         const userData = localStorage.getItem("user");
-
         if (token && userData) {
             try {
                 const parsedUser = JSON.parse(userData);
@@ -592,7 +600,7 @@ function PortfolioPage() {
         ? projects
         : projects.filter(p => p.category === activeCategory);
 
-    const handleProjectClick = (project: typeof projects[0]) => {
+    const handleProjectClick = (project) => {
         setSelectedProject(project);
         setIsModalOpen(true);
     };
@@ -685,19 +693,12 @@ function PortfolioPage() {
                             {item.label}
                         </a>
                     ))}
-
                     <a
                         href={loggedInUser ? "/dashboard" : "/login"}
                         className="text-sm md:text-lg lg:text-[1.4rem] font-medium uppercase tracking-wider hover:opacity-70 transition-opacity duration-200 flex items-center gap-2"
                         style={{ color: "#D7E2EA" }}
                     >
                         {loggedInUser ? `👋 ${getFirstName(loggedInUser.name)}` : "Signup/Login"}
-
-                        {loggedInUser && (
-                            <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M19 9l-7 7-7-7" />
-                            </svg>
-                        )}
                     </a>
                 </FadeIn>
 
@@ -744,7 +745,6 @@ function PortfolioPage() {
                             EXPLORING CREATIVE BOUNDARIES DELIVERING EXCEPTIONAL DIGITAL EXPERIENCES
                         </p>
                     </FadeIn>
-
                     <FadeIn delay={0.5} y={20} className="w-full sm:w-auto flex justify-end">
                         <ContactButton label="START PROJECT" href="/contact" />
                     </FadeIn>
@@ -799,8 +799,7 @@ function PortfolioPage() {
                             Browse Work
                         </h2>
                     </div>
-
-                    <div className="flex flex-wrap justify-center gap-2 sm:gap-3 max-w-4xl mx-auto">
+                    <div className="flex flex-wrap justify-center gap-2 sm:gap-3 max-w-5xl mx-auto">
                         {categories.map((category) => (
                             <motion.button
                                 key={category}
@@ -847,7 +846,6 @@ function PortfolioPage() {
                         ))}
                     </motion.div>
                 </AnimatePresence>
-
                 {filteredProjects.length === 0 && (
                     <div className="text-center py-12 sm:py-20">
                         <p className="text-gray-400 text-sm sm:text-base">No projects found in this category.</p>
@@ -869,7 +867,6 @@ function PortfolioPage() {
                         </h2>
                     </div>
                 </Scroll3DReveal>
-
                 <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 sm:gap-4 max-w-7xl mx-auto">
                     {[
                         { icon: "🎨", title: "Design First", description: "Every project begins with thoughtful design and user experience research." },
@@ -877,7 +874,7 @@ function PortfolioPage() {
                         { icon: "🚀", title: "Scalable", description: "Built to grow with your business, from MVP to enterprise-grade solutions." },
                         { icon: "💎", title: "Premium Quality", description: "Pixel-perfect execution with attention to every detail and interaction." },
                     ].map((item, index) => {
-                        const rotations: Array<[number, number, number]> = [[-15, 20, 5], [-15, -20, -5], [15, 20, -5], [15, -20, 5]];
+                        const rotations = [[-15, 20, 5], [-15, -20, -5], [15, 20, -5], [15, -20, 5]];
                         return (
                             <Scroll3DReveal
                                 key={index}
@@ -906,7 +903,6 @@ function PortfolioPage() {
             {/* ═══════════════════════════════════════════════════════════════ */}
             <section className="relative py-16 sm:py-20 md:py-32 px-4 sm:px-6 text-center overflow-hidden">
                 <div className="absolute inset-0 opacity-10" style={{ background: "radial-gradient(ellipse at center, #9B51E0 0%, transparent 65%)" }} />
-
                 <Scroll3DReveal rotateFrom={[30, 0, 0]} translateFrom={[0, 100, -200]} scaleFrom={0.65}>
                     <div className="relative z-10">
                         <p className="text-[9px] sm:text-[10px] tracking-[0.3em] sm:tracking-[0.4em] uppercase mb-4 sm:mb-6" style={{ color: "#F2994A", fontFamily: "'Space Mono', monospace" }}>
